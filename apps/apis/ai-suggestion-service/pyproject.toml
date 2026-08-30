@@ -1,0 +1,15 @@
+[project]
+name = "lc-arena-api-ai-suggestion-service"
+version = "0.1.0"
+description = "LCArena FastAPI API"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.0",
+    "uvicorn[standard]>=0.35.0"
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.17.0",
+    "ruff>=0.12.0"
+]
