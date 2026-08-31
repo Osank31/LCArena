@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter, Depends
+from controllers.suggestion_controller import SuggestionController
+from schemas.suggestion_schema import GetSuggestionRequest, GetSuggestionResponse
+from services.suggestion_service import SuggestionService
 
 app = FastAPI(
     title="LCArena API",
@@ -6,11 +9,23 @@ app = FastAPI(
 )
 
 
-@app.get("/")
-async def root() -> dict[str, str]:
-    return {"message": "LCArena API"}
+def get_suggestion_controller(
+
+) -> SuggestionController:
+    service = SuggestionService()
+
+    return SuggestionController(service)
 
 
-@app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+router = APIRouter(prefix="/suggestions")
+
+
+@router.get(
+    "",
+    response_model=GetSuggestionResponse
+)
+async def  get_suggestion(data: GetSuggestionRequest, controller: SuggestionController = Depends(get_suggestion_controller)):
+    response = await controller.get_suggestion(data)
+    return response
+
+app.include_router(router)
