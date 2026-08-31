@@ -26,5 +26,8 @@
     "apps/*",
     "apps/apis/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "axios": "^1.20.0"
+  }
 }
