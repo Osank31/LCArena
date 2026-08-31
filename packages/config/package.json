@@ -11,6 +11,8 @@
 		"build": "tsc"
 	},
 	"dependencies": {
-		"amqplib": "^2.0.1"
+		"amqplib": "^2.0.1",
+		"jsonwebtoken": "^9.0.3",
+		"otp-generator": "^4.0.1"
 	}
 }
