@@ -11,8 +11,11 @@
 		"build": "tsc"
 	},
 	"dependencies": {
+		"@LCArena/utils": "^1.0.0",
 		"amqplib": "^2.0.1",
 		"jsonwebtoken": "^9.0.3",
-		"otp-generator": "^4.0.1"
+		"mongoose": "^9.6.2",
+		"otp-generator": "^4.0.1",
+		"redis": "^6.2.1"
 	}
 }

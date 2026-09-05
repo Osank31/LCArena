@@ -147,6 +147,39 @@ npm exec turbo link
 npm exec turbo link
 ```
 
+## Docker
+
+Run the whole stack (all APIs + MongoDB, Redis, RabbitMQ) with Docker Compose:
+
+```sh
+cp .env.example .env   # then fill in the secrets (JWT keys, AWS, OpenAI, mail)
+docker compose up -d
+```
+
+Services and ports:
+
+| Service       | Port | Endpoint                |
+| ------------- | ---- | ----------------------- |
+| auth          | 3000 | http://localhost:3000   |
+| problem       | 3001 | http://localhost:3001   |
+| submission    | 3002 | http://localhost:3002   |
+| mail          | 3003 | http://localhost:3003   |
+| sockets       | 3007 | http://localhost:3007   |
+| ai-suggestion | 8000 | http://localhost:8000   |
+| mongo         | 27017|                         |
+| redis         | 6379 |                         |
+| rabbitmq      | 5672 | mgmt UI on 15672        |
+
+The TypeScript services are built from the single root `Dockerfile` (parameterized with a `SERVICE` build arg, pruned with `turbo prune`); the Python FastAPI service has its own Dockerfile at `apps/apis/ai-suggestion-service/Dockerfile`. Required environment variables are documented in `.env.example` — services crash at boot if any are missing.
+
+Useful commands:
+
+```sh
+docker compose build          # rebuild images
+docker compose logs -f auth   # follow one service's logs
+docker compose down -v        # stop and remove volumes
+```
+
 ## Useful Links
 
 Learn more about the power of Turborepo:

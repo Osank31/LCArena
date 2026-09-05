@@ -1,0 +1,143 @@
+services:
+  # ---------- Infrastructure ----------
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    restart: unless-stopped
+    ports:
+      - "5672:5672" # AMQP
+      - "15672:15672" # Management UI (guest/guest)
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ---------- App services (TypeScript) ----------
+  auth:
+    build:
+      context: .
+      args:
+        SERVICE: "@LCArena/auth"
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      MONGODB_URL: mongodb://mongo:27017/lcarena
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MAIL_SERVICE_URL: http://mail:3003
+      ACCESS_TOKEN_JWT_KEY: ${ACCESS_TOKEN_JWT_KEY}
+      REFRESH_TOKEN_JWT_KEY: ${REFRESH_TOKEN_JWT_KEY}
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  problem:
+    build:
+      context: .
+      args:
+        SERVICE: "@LCArena/problem"
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      MONGODB_URL: mongodb://mongo:27017/lcarena
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  submission:
+    build:
+      context: .
+      args:
+        SERVICE: "@LCArena/submission"
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      MONGODB_URL: mongodb://mongo:27017/lcarena
+      PROBLEM_URL: http://problem:3001
+    depends_on:
+      mongo:
+        condition: service_healthy
+      problem:
+        condition: service_started
+
+  mail:
+    build:
+      context: .
+      args:
+        SERVICE: "@LCArena/mail"
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+  sockets:
+    build:
+      context: .
+      args:
+        SERVICE: "@LCArena/socket"
+    restart: unless-stopped
+    ports:
+      - "3007:3007"
+    environment:
+      PORT: 3007
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # ---------- App services (Python) ----------
+  ai-suggestion:
+    build:
+      context: ./apps/apis/ai-suggestion-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+
+volumes:
+  mongo_data:
+  redis_data:
+  rabbitmq_data:

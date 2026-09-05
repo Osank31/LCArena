@@ -11,11 +11,14 @@
 		"build": "tsc"
 	},
 	"devDependencies": {
+		"@types/bcrypt": "^6.0.0",
 		"@types/jsonwebtoken": "^9.0.10",
 		"@types/otp-generator": "^4.0.2"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.1122.0",
-		"@aws-sdk/s3-request-presigner": "^3.1122.0"
+		"@aws-sdk/s3-request-presigner": "^3.1122.0",
+		"bcrypt": "^6.0.0",
+		"mongoose": "^9.6.2"
 	}
 }

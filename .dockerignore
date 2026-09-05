@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs (rebuilt inside the image)
+**/dist
+**/.turbo
+
+# VCS / env
+.git
+.env
+.env.*
+!/.env.example
+
+# Python service local artifacts
+apps/apis/ai-suggestion-service/venv
+**/__pycache__
+
+# Misc
+coverage
+*.md
+.idea
