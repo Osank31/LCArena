@@ -25,6 +25,8 @@
   "workspaces": [
     "apps/*",
     "apps/apis/*",
-    "packages/*"
+    "packages/*",
+    "packages/backend/*",
+    "packages/frontend/*"
   ]
 }
