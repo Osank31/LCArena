@@ -6,9 +6,12 @@ from fastapi import HTTPException, status
 from schemas.suggestion_schema import GetSuggestionRequest, GetSuggestionResponse, SuggestionChoices, SuggestionUsage
 from services.suggestion_service import SuggestionService
 
+from utils.logger import logger
+
 class SuggestionController:
     def __init__(self, service: SuggestionService):
         self.service=service
+    
     async def get_suggestion(self, data: GetSuggestionRequest)->GetSuggestionResponse:
         start_time=time.perf_counter()
 
@@ -18,6 +21,8 @@ class SuggestionController:
                 detail="Cannot generate suggestion: both prefix and suffix are empty."
             )
         try:
+            completion_response=self.service.get_suggestion(data)
+            logger.info(f"Completion response: {completion_response}")
             mock_completion_text="      return x*2\n"
             elapsed_time=time.perf_counter() - start_time
             latency_ms=round(elapsed_time * 1000, 2)

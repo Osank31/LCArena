@@ -8,6 +8,7 @@ COPY main.py pyproject.toml ./
 COPY controllers/ ./controllers/
 COPY schemas/ ./schemas/
 COPY services/ ./services/
+COPY utils/ ./utils/
 
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
