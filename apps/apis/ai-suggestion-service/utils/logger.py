@@ -1,9 +1,10 @@
-# logger.py
+
 import logging
 import time
 import uuid
 
 from fastapi import FastAPI, Request
+
 
 logger = logging.getLogger("fastapi")
 
@@ -35,6 +36,7 @@ def setup_logger(app: FastAPI) -> None:
             )
 
             response.headers["X-Request-ID"] = request_id
+
             return response
 
         except Exception:
@@ -47,4 +49,6 @@ def setup_logger(app: FastAPI) -> None:
                 duration,
                 request_id,
             )
+
             raise
+

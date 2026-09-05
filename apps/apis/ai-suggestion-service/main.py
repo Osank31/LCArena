@@ -19,7 +19,7 @@ def get_suggestion_controller(
 router = APIRouter(prefix="/suggestions")
 
 
-@router.get(
+@router.post(
     "",
     response_model=GetSuggestionResponse
 )

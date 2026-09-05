@@ -1,5 +1,4 @@
 import time
-import uuid
 
 from fastapi import HTTPException, status
 
@@ -23,26 +22,14 @@ class SuggestionController:
         try:
             completion_response=self.service.get_suggestion(data)
             logger.info(f"Completion response: {completion_response}")
-            mock_completion_text="      return x*2\n"
             elapsed_time=time.perf_counter() - start_time
             latency_ms=round(elapsed_time * 1000, 2)
 
             return GetSuggestionResponse(
-                id=f"sug_{uuid.uuid4()}",
-                model="starcoder2-7b-fim",
-                choices=[
-                    SuggestionChoices(
-                        index=0,
-                        insert_text=mock_completion_text,
-                        finish_reason="stop",
-                        score=0.92
-                    )
-                ],
-                usage=SuggestionUsage(
-                    prompt_tokens=45,
-                    completion_tokens=8,
-                    total_tokens=53
-                ),
+                id=completion_response.id,
+                model=completion_response.model,
+                choices=completion_response.choices,
+                usage=completion_response.usage,
                 latency_ms=latency_ms
             )
         except Exception as e:
