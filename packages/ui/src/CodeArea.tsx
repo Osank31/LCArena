@@ -48,8 +48,8 @@ export const CodeArea = ({
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setCode(e.target.value)        
-        
+        setCode(e.target.value)
+
         updateCursorPosition(e.target)
 
         onChange?.(e)
