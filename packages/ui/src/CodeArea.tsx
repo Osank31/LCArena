@@ -1,49 +1,45 @@
-import * as React from "react"
+import { ComponentProps, useEffect, useState } from "react"
 
-type CodeAreaProps = React.ComponentProps<"textarea"> & {
+type CodeAreaProps = ComponentProps<"textarea"> & {
     onCursorPositionChange?: (position: {
         row: number
         col: number
-    }) => void
+    }) => void,
 }
 
-function CodeArea({
-    className,
+export const CodeArea = ({
     value,
     defaultValue,
     onChange,
     onCursorPositionChange,
+    className,
     ...props
-}: CodeAreaProps) {
-    const [text, setText] = React.useState(
+}: CodeAreaProps) => {
+    const [code, setCode] = useState(
         String(value ?? defaultValue ?? "")
     )
 
-    const [cursorPosition, setCursorPosition] = React.useState({
+    const [cursorPosition, setCursorPosition] = useState({
         row: 1,
         col: 1,
     })
 
-    // Keep internal text synchronized when used as a controlled component.
-    React.useEffect(() => {
+    useEffect(() => {
         if (value !== undefined) {
-            setText(String(value))
+            setCode(String(value))
         }
     }, [value])
 
-    const lines = text.split("\n").length
+    const lines = code.split("\n").length
 
-    const updateCursorPosition = (
-        textarea: HTMLTextAreaElement
-    ) => {
+    const updateCursorPosition = (textarea: HTMLTextAreaElement) => {
         const cursor = textarea.selectionStart
         const textBeforeCursor = textarea.value.substring(0, cursor)
 
         const lineParts = textBeforeCursor.split("\n")
 
         const row = lineParts.length
-        const col =
-            lineParts[lineParts.length - 1].length + 1
+        const col = lineParts[lineParts.length - 1].length + 1
 
         const position = { row, col }
 
@@ -51,19 +47,15 @@ function CodeArea({
         onCursorPositionChange?.(position)
     }
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLTextAreaElement>
-    ) => {
-        setText(e.target.value)
-
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setCode(e.target.value)        
+        
         updateCursorPosition(e.target)
 
         onChange?.(e)
     }
 
-    const handleCursorChange = (
-        e: React.SyntheticEvent<HTMLTextAreaElement>
-    ) => {
+    const handleCursorChange = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
         updateCursorPosition(e.currentTarget)
     }
 
@@ -90,7 +82,7 @@ function CodeArea({
                 {/* Textarea */}
                 <textarea
                     data-slot="code-area"
-                    value={text}
+                    value={code}
                     onChange={handleChange}
                     onClick={handleCursorChange}
                     onKeyUp={handleCursorChange}
@@ -121,5 +113,3 @@ function CodeArea({
         </div>
     )
 }
-
-export { CodeArea }
