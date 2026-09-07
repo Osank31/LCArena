@@ -1,11 +1,16 @@
 import { ComponentProps, useEffect, useState } from "react"
+import { indentationStrategies } from "./indentation"
 
 type CodeAreaProps = ComponentProps<"textarea"> & {
     onCursorPositionChange?: (position: {
         row: number
         col: number
     }) => void,
+
+    language?: "cpp" | "python" | "javascript" | "java"
 }
+
+export const INDENTATION_SIZE = 4;
 
 export const CodeArea = ({
     value,
@@ -13,8 +18,11 @@ export const CodeArea = ({
     onChange,
     onCursorPositionChange,
     className,
+    language = "cpp",
     ...props
 }: CodeAreaProps) => {
+    const strategy = indentationStrategies[language]
+
     const [code, setCode] = useState(
         String(value ?? defaultValue ?? "")
     )
@@ -59,6 +67,64 @@ export const CodeArea = ({
         updateCursorPosition(e.currentTarget)
     }
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        const textarea = e.currentTarget
+
+        //TAB
+        if (e.key === "Tab") {
+            e.preventDefault()
+
+            const start = textarea.selectionStart
+            const end = textarea.selectionEnd
+
+            const indentation = " ".repeat(INDENTATION_SIZE) // 4 spaces for indentation
+
+            const newValue = code.substring(0, start) + indentation + code.substring(end)
+
+            setCode(newValue)
+            
+            requestAnimationFrame(() => {
+                textarea.selectionStart =  textarea.selectionEnd = start + indentation.length;
+
+                updateCursorPosition(textarea)
+            })
+
+            return
+        }
+
+        //ENTER
+        if (e.key === "Enter") {
+            e.preventDefault()
+
+            const cursor = textarea.selectionStart
+
+            const beforeCursor = code.substring(0, cursor)
+            const afterCursor = code.substring(cursor)
+
+            const currentLine = beforeCursor.split("\n").pop() ?? ""
+
+            const indentation = currentLine.match(/^\s*/)?.[0] ?? ""
+
+            const nextIndentation = strategy.getNextIndentation(currentLine, indentation)
+
+            const newText =  "\n" + nextIndentation
+
+            const newValue = beforeCursor + newText + afterCursor
+
+            setCode(newValue)
+
+            requestAnimationFrame(() => { 
+                const newCursorPosition = cursor + newText.length 
+                textarea.selectionStart = newCursorPosition 
+                textarea.selectionEnd = newCursorPosition 
+                updateCursorPosition(textarea) 
+            })
+            return
+        }
+
+
+    }
+
     return (
         <div className="w-full">
             <div className="flex w-full overflow-hidden rounded-md border bg-transparent shadow-xs">
@@ -84,6 +150,7 @@ export const CodeArea = ({
                     data-slot="code-area"
                     value={code}
                     onChange={handleChange}
+                    onKeyDown={handleKeyDown}
                     onClick={handleCursorChange}
                     onKeyUp={handleCursorChange}
                     onSelect={handleCursorChange}
