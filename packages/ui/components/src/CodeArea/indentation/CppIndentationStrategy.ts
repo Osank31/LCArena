@@ -1,7 +1,7 @@
 // indentation/CppIndentationStrategy.ts
 
-import { INDENTATION_SIZE } from "../CodeArea"
-import { IndentationStrategy } from "./IndentationStrategy"
+import { INDENTATION_SIZE } from "../useCodeEditor"
+import type { IndentationStrategy } from "./IndentationStrategy"
 
 export class CppIndentationStrategy
     implements IndentationStrategy {

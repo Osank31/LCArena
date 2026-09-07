@@ -1,3 +1,3 @@
-import { CodeArea } from "./CodeArea";
+import { CodeArea } from "./CodeArea/CodeArea";
 
 export {CodeArea};

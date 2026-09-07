@@ -2,7 +2,7 @@
 
 import { CppIndentationStrategy } from "./CppIndentationStrategy"
 import { PythonIndentationStrategy } from "./PythonIndentationStrategy"
-import { IndentationStrategy } from "./IndentationStrategy"
+import type { IndentationStrategy } from "./IndentationStrategy"
 
 export const indentationStrategies: Record<
     string,

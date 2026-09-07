@@ -31,6 +31,8 @@
   ],
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/prismjs": "^1.26.6",
+    "prismjs": "^1.30.0",
     "tailwindcss": "^4.3.3"
   }
 }
