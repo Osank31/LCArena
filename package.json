@@ -30,9 +30,12 @@
     "packages/ui/*"
   ],
   "dependencies": {
+    "@chakra-ui/react": "^3.37.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@monaco-editor/react": "^4.7.0",
     "@tailwindcss/vite": "^4.3.3",
-    "@types/prismjs": "^1.26.6",
-    "prismjs": "^1.30.0",
+    "next-themes": "^0.4.6",
     "tailwindcss": "^4.3.3"
   }
 }
