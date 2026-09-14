@@ -10,7 +10,7 @@ class GetSuggestionRequest(BaseModel):
     suffix: str = Field(..., description="Code immediately after the cursor")
 
     # 3. Use Literal instead of inline Enum for simple string choices
-    language_id: Literal['python', 'javascript', 'c++', 'java']
+    language_id: Literal['python', 'javascript', 'cpp', 'java']
 
     # 4. Use the nested model instead of a raw Tuple
     cursor_position: CursorPosition

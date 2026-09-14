@@ -79,11 +79,13 @@ class SuggestionService:
 
         self.chain = prompt | structured_llm
 
-    def get_suggestion(self, data: GetSuggestionRequest) -> GetSuggestionResponse:
-        # Placeholder for actual implementation
-        # This method would contain the logic to generate a suggestion based on the input data
-        temp=data.model_dump()
-        result=(self.chain.invoke(temp))
+    async def get_suggestion(self, data: GetSuggestionRequest) -> GetSuggestionResponse:
+        temp = data.model_dump()
+        result = await self.chain.ainvoke(temp)  # was: self.chain.invoke(temp)
+        
+        print(
+            result
+        )
 
         return GetSuggestionResponse(
             id=result["raw"].response_metadata['id'],
