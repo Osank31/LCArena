@@ -21,8 +21,9 @@ const LanguageSelector = ({
     language,
     onSelect,
 }: LanguageSelectorProps) => {
+    // Find label or fallback safely
     const selectedLanguage =
-        languages.find((item) => item.value === language)?.label ?? "C++"
+        languages.find((item) => item.value === language)?.label ?? "Select Language"
 
     return (
         <Box>
@@ -30,9 +31,10 @@ const LanguageSelector = ({
                 Select a language:
             </Text>
 
-            <Menu.Root>
+            {/* Handle selection cleanly at the root level */}
+            <Menu.Root onSelect={(details) => onSelect(details.value)}>
                 <Menu.Trigger asChild>
-                    <Button>
+                    <Button variant="outline">
                         {selectedLanguage}
                     </Button>
                 </Menu.Trigger>
@@ -43,7 +45,6 @@ const LanguageSelector = ({
                             <Menu.Item
                                 key={item.value}
                                 value={item.value}
-                                onClick={() => onSelect(item.value)}
                             >
                                 {item.label}
                             </Menu.Item>
