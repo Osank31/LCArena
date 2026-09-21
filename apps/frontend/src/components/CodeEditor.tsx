@@ -22,7 +22,8 @@ const CodeEditor = () => {
     const [value, setValue] = useState('');
     const [language, setLanguage] = useState('javascript');
 
-    const getSuggestions = async (params: getSuggestionsParams) => {
+    const getSuggestions = async (_params: getSuggestionsParams) => {
+        void _params;
         // Cancel any in-flight request — its result is stale now anyway
         abortControllerRef.current?.abort();
 
