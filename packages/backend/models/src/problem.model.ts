@@ -1,63 +1,43 @@
-import mongoose, { Document } from "mongoose";
-
-export interface ITestCase {
-    input: string;
-    output: string;
-}
+import mongoose, { Document, Model } from "mongoose";
 
 export interface IProblem extends Document {
-    title: string;
+    number: number;
     description: string;
-    difficulty: "Easy" | "Medium" | "Hard";
-    testCases: ITestCase[];
-    editorial: string;
-    embedding: number[];
-    createdAt: Date;
-    updatedAt: Date;
+    difficulty: "Easy" | "Medium" | "Hard",
+    sampleTestCaseUrl: string;
+    testCasesUrl: string;
 }
 
-const testCaseSchema = new mongoose.Schema<ITestCase>(
-    {
-        input: { type: String, required: true },
-        output: { type: String, required: true },
-    },
-    {
-        toJSON: {
-            transform: (_doc, ret) => {
-                const obj = ret as any;
-                delete obj._id;
-                delete obj.__v;
-                return obj;
-            },
-        },
-    }
-);
+export type ProblemModel = Model<IProblem, {}>
 
-const problemSchema = new mongoose.Schema<IProblem>(
-    {
-        title: { type: String, required: true },
+const problemSchema = new mongoose.Schema<IProblem, ProblemModel>({
+        number: { type: Number, required: true },
         description: { type: String, required: true },
-
         difficulty: {
             type: String,
             required: true,
             enum: ["Easy", "Medium", "Hard"],
         },
+        sampleTestCaseUrl: { type: String, required: true },
+        testCasesUrl: { type: String, required: true },
 
-        editorial: { type: String, default: "" },
-
-        embedding: {
-            type: [Number],
-            default: [],
-            index: false,
-        },
-
-        testCases: [testCaseSchema],
-    },
-    { timestamps: true }
+    }, { timestamps: true }
 );
 
 
-const Problem = mongoose.model<IProblem>("Problem", problemSchema);
+problemSchema.pre<IProblem & Document>("save", async function () {
+    if (this.isNew && !this.number) {
+        const Model = this.constructor as Model<IProblem>;
+
+        const lastProblem = await Model.findOne()
+            .sort({ number: -1 })
+            .select("number")
+            .exec();
+
+        this.number = (lastProblem?.number ?? 0) + 1;
+    }
+});
+
+const Problem = mongoose.model<IProblem>("Problem", problemSchema)
 
 export default Problem;

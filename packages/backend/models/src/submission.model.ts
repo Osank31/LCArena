@@ -1,64 +1,48 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
+import { type ExecutionResult } from "@LCArena/execution"
 
 export enum ELanguage {
     py = "py",
     cpp = "cpp",
+    java = "java",
+    js = "js"
 }
 
-export enum ESubmissionStatus {
-    Pending = "Pending",
-    Accepted = "Accepted",
-    Rejected = "Rejected",
-    Error = "Error"
-}
-
-export interface ISubmissionSchema extends Document {
-    problemId: string;
+export interface ISubmission extends Document {
+    problemId: mongoose.Schema.Types.ObjectId;
     code: string;
-    language: ELanguage;
+    language: ELanguage,
     userId: string;
-    status: ESubmissionStatus;
-    createdAt: Date;
-    updatedAt: Date;
+    status: ExecutionResult,
 }
 
-const submissionSchema = new mongoose.Schema<ISubmissionSchema>(
-    {
-        problemId: {
-            type: String,
-            required: [true, "Problem Id is required"],
-        },
+export type SubmissionModel=Model<ISubmission, {}>
 
-        code: {
-            type: String,
-            required: [true, "Code is required"],
-        },
-
-        language: {
-            type: String,
-            enum: Object.values(ELanguage),
-            default: ELanguage.cpp,
-            required: true,
-        },
-
-        userId: {
-            type: String,
-            required: [true, "userId required"]
-        },
-
-        status: {
-            type: String,
-            enum: Object.values(ESubmissionStatus),
-            default: ESubmissionStatus.Pending,
-            required: true,
-        },
+const submissionSchema = new mongoose.Schema<ISubmission, SubmissionModel>({
+    problemId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Problem"
     },
-    {
-        timestamps: true,
-    }
-);
+    code: {
+        type: String,
+        required: true
+    },
+    language: {
+        type: String,
+        enum: Object.values(ELanguage),
+        required: true
+    },
+    userId: {},
+    status: {
+        type: mongoose.Schema.Types.Mixed,
+        required: true
+    },
+},
+    { timestamps: true }
+)
 
-const Submission = mongoose.model<ISubmissionSchema>(
+
+const Submission = mongoose.model<ISubmission>(
     "Submission",
     submissionSchema
 );

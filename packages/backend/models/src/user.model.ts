@@ -16,7 +16,7 @@ export interface IUser extends Document {
     name: string;
     email: string;
     password: string;
-    profilePicUrl?: string;
+    profilePicUrl: string;
     userType: UserType;
     roleExpiry: Date | null;
     resetPasswordToken: string;
@@ -54,6 +54,8 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
         },
         profilePicUrl: {
             type: String,
+            default: "/default-url",
+            required: true,
         },
         userType: {
             type: String,
