@@ -1,19 +1,7 @@
-// controllers/problem.controller.ts
-
-import { NextFunction, Request, Response } from "express";
-import {
-    createProblemSchema,
-    updateProblemSchema,
-} from "../validations/problem.validation.js";
-import {logger, sendSuccess} from "@LCArena/utils";
-
-import {
-    createProblemService,
-    deleteProblemService,
-    getAllProblemsService,
-    getSingleProblemService,
-    updateProblemService,
-} from "../services/problem.service.js";
+import { type NextFunction, type Request, type Response } from "express";
+import { createProblemSchema, updateProblemSchema } from "./validation";
+import {createProblemService, getAllProblemsService, getSingleProblemService, deleteProblemService, updateProblemService} from "./service"
+import {logger, sendSuccess} from "@LCArena/utils"
 
 export const createProblem = async (
     req: Request,
@@ -38,7 +26,7 @@ export const createProblem = async (
 };
 
 export const getAllProblems = async (
-    req: Request,
+    _: Request,
     res: Response,
     next: NextFunction
 ) => {

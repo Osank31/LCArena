@@ -1,37 +1,16 @@
 {
-  "name": "@LCArena/problem",
+  "name": "problem",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/index.js",
+  "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
-  "dependencies": {
-    "@LCArena/config": "^1.0.0",
-    "@LCArena/middlewares": "^1.0.0",
-    "@LCArena/models": "^1.0.0",
-    "@LCArena/utils": "^1.0.0",
-    "bcrypt": "^6.0.0",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "mongoose": "^9.6.2",
-    "openai": "^6.38.0",
-    "winston": "^3.19.0",
-    "zod": "^4.4.3"
-  },
+  "type": "commonjs",
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.3.0",
-    "nodemon": "^3.1.14",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "typescript": "7.0.2"
+    "typescript": "^7.0.2"
   }
 }

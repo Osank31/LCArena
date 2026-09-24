@@ -1,4 +1,3 @@
-// src/validations/problem.validation.ts
 import { z } from "zod";
 
 export const testCaseSchema = z.object({
@@ -26,5 +25,4 @@ export const createProblemSchema = z.object({
 
 export const updateProblemSchema = createProblemSchema.partial();
 
-export type createProblemType = z.infer<typeof createProblemSchema>;
-export type updateProblemType = z.infer<typeof updateProblemSchema>;
+export type createProblemType = z.infer<typeof createProblemSchema>

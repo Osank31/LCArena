@@ -1,25 +1,29 @@
 import express from "express"
 import "dotenv/config"
-import { APP_PORT, MONGODB_URL } from "./constants/constants.js"
 import { appErrorHandler } from "@LCArena/middlewares"
-import {logger} from "@LCArena/utils"
-import { dbConnect } from "@LCArena/config"
-import problemRouter from "./routers/problem.router.js"
+import {dbConnect} from "@LCArena/config"
+import { logger } from "@LCArena/utils"
+import { APP_PORT, MONGODB_URL } from "./constants"
+import {createProblem, getAllProblems, getSingleProblem, updateProblem, deleteProblem} from "./controller"
+
 
 const app = express()
 
 app.use(express.json())
 
-app.get("/health", (req, res)=>{
+app.get("/health", (_, res)=>{
     res.status(200).json({message: "Problem Service Healthy"})
 })
 
-app.use("/", problemRouter)
+app.post("/", createProblem)
+app.get("/", getAllProblems)
+app.get("/:id", getSingleProblem)
+app.put("/:id", updateProblem)
+app.delete("/:id", deleteProblem)
 
 app.use(appErrorHandler);
 
 dbConnect(MONGODB_URL)
-
 
 app.listen(APP_PORT || 3000, ()=>{
     logger.info(`Server running on port ${APP_PORT || 3000}`)

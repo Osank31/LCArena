@@ -1,14 +1,11 @@
-// services/problem.service.ts
-
-import mongoose from "mongoose";
-import {Problem} from "@LCArena/models"
+import {Problem} from "@LCArena/models";
+import mongoose from "mongoose"
 import {
     BadRequestError,
     NotFoundError,
     NotImplementedError,
 } from "@LCArena/utils";
-import { createProblemType, updateProblemType } from "../validations/problem.validation.js";
-// import { createEmbedding } from "../utils/openai.embedding.js";
+import { type createProblemType } from "./validation.js";
 
 export const createProblemService = async (data: createProblemType) => {
     return await Problem.create(data);
@@ -34,7 +31,7 @@ export const getSingleProblemService = async (id: string) => {
 
 export const updateProblemService = async (
     id: string,
-    data: updateProblemType
+    data: any
 ) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new BadRequestError("Provided id isn't valid");
@@ -46,7 +43,7 @@ export const updateProblemService = async (
     });
 
     if (!updatedProblem) {
-        throw new NotFoundError("Problem not found or couldn't be updated");
+        throw new NotImplementedError("Problem couldnt be updated");
     }
 
     return updatedProblem;
@@ -60,37 +57,8 @@ export const deleteProblemService = async (id: string) => {
     const deletedProblem = await Problem.findByIdAndDelete(id);
 
     if (!deletedProblem) {
-        throw new NotFoundError("Problem not found or couldn't be deleted");
+        throw new NotImplementedError("Problem couldnt be deleted");
     }
 
     return deletedProblem;
 };
-
-// export const searchProblemsService = async (query: string) => {
-//     if (!query || query.trim() === "") {
-//         throw new BadRequestError("Invalid Query");
-//     }
-//     const queryEmbedding = await createEmbedding(query)
-
-//     const results = await Problem.aggregate([
-//         {
-//             $vectorSearch: {
-//                 index: "vector_index",
-//                 path: "embedding",
-//                 queryVector: queryEmbedding,
-//                 numCandidates: 100,
-//                 limit: 10
-//             }
-//         },
-//         {
-//             $project: {
-//                 title: 1,
-//                 description: 1,
-//                 difficulty: 1,
-//                 editorial: 1,
-//                 score: { $meta: "vectorSearchScore" }
-//             }
-//         }
-//     ]);
-//     return results
-// };
