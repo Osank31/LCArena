@@ -10,6 +10,12 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "dependencies": {
+    "@LCArena/utils": "*",
+    "@LCArena/models": "*",
+    "@LCArena/middlewares": "*",
+    "@LCArena/config": "*"
+  },
   "devDependencies": {
     "typescript": "^7.0.2"
   }

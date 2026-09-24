@@ -21,5 +21,9 @@ export interface ExecutionSuccessResult {
 	executionTimeMs: any;
 }
 
+export interface PendingResult {
+	status: "PENDING"
+}
+
 // The exported union type
-export type ExecutionResult = CompileErrorResult | ExecutionSuccessResult;
+export type ExecutionResult = CompileErrorResult | ExecutionSuccessResult | PendingResult;

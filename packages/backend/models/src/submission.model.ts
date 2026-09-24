@@ -9,10 +9,10 @@ export enum ELanguage {
 }
 
 export interface ISubmission extends Document {
-    problemId: mongoose.Schema.Types.ObjectId;
+    problemId: mongoose.Types.ObjectId;
     code: string;
     language: ELanguage,
-    userId: string;
+    userId: mongoose.Types.ObjectId;
     status: ExecutionResult,
 }
 
@@ -32,7 +32,10 @@ const submissionSchema = new mongoose.Schema<ISubmission, SubmissionModel>({
         enum: Object.values(ELanguage),
         required: true
     },
-    userId: {},
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
     status: {
         type: mongoose.Schema.Types.Mixed,
         required: true
