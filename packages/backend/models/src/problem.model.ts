@@ -6,6 +6,7 @@ export interface IProblem extends Document {
     difficulty: "Easy" | "Medium" | "Hard",
     sampleTestCaseUrl: string;
     testCasesUrl: string;
+    time_limit: number;
 }
 
 export type ProblemModel = Model<IProblem, {}>
@@ -20,7 +21,7 @@ const problemSchema = new mongoose.Schema<IProblem, ProblemModel>({
         },
         sampleTestCaseUrl: { type: String, required: true },
         testCasesUrl: { type: String, required: true },
-
+        time_limit: {type: Number, required: true, default: 5000}
     }, { timestamps: true }
 );
 

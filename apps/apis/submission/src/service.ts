@@ -47,3 +47,7 @@ export const updateSubmissionService = async (data: UpdateSubmissionInput & {sub
         status
     }, {new: true})
 }
+
+export const getSubmissionService = async (submissionId: string) => {
+    return await Submission.findById(submissionId)
+}

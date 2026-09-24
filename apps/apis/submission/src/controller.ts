@@ -2,7 +2,7 @@ import { type NextFunction, type Request, type Response } from "express"
 import { createSubmissionSchema, updateSubmissionSchema } from "./validations";
 import { BadRequestError, sendSuccess } from "@LCArena/utils";
 import mongoose from "mongoose"
-import { evaluationService, updateSubmissionService } from "./service";
+import { evaluationService, updateSubmissionService,getSubmissionService } from "./service";
 
 export const createEvaluation = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -38,6 +38,18 @@ export const updateSubmission = async (req: Request, res: Response, next: NextFu
             status,
             submissionId: (submissionId as string)
         });
+
+        sendSuccess(res, submission, "Submission updated successfully")
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getSubmission = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { submissionId } = req.params
+
+        const submission = await getSubmissionService(submissionId)
 
         sendSuccess(res, submission, "Submission updated successfully")
     } catch (error) {

@@ -1,0 +1,23 @@
+{
+  "name": "@LCArena/evaluation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@LCArena/utils": "*",
+    "@LCArena/models": "*",
+    "@LCArena/middlewares": "*",
+    "@LCArena/config": "*",
+    "@LCArena/execution": "*"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

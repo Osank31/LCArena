@@ -1,10 +1,10 @@
 import express from "express"
 import "dotenv/config"
 import {connectToQueue, dbConnect} from "@LCArena/config"
-import {appErrorHandler, userValidation, roleValidation} from "@LCArena/middlewares"
+import {appErrorHandler, userValidation} from "@LCArena/middlewares"
 import {logger} from "@LCArena/utils"
 import { APP_PORT, MONGODB_URL } from "./constants"
-import {UserType} from "@LCArena/models"
+import {createEvaluation, updateSubmission, getSubmission} from "./controller"
 
 
 const app = express()
@@ -13,6 +13,7 @@ app.use(express.json())
 
 app.post("/",userValidation, createEvaluation)
 app.put("/:submissionId", updateSubmission)
+app.get("/:submissionId", getSubmission)
 
 app.use(appErrorHandler);
 
