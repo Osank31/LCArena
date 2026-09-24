@@ -97,16 +97,19 @@ const CodeEditor = () => {
     }
 
     return (
-        <div className="">
+        <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
             <LanguageSelector language={language} onSelect={onSelect} />
-            <Editor
-                height="45vh"
-                language={language}
-                theme="vs-dark"
-                value={value}
-                onChange={(v) => setValue(v || '')}
-                onMount={onMount}
-            />
+            <div style={{ flex: 1, overflow: "hidden" }}>
+                <Editor
+                    height="100%"
+                    language={language}
+                    theme="vs-dark"
+                    value={value}
+                    options={{ automaticLayout: true }}
+                    onChange={(v) => setValue(v || '')}
+                    onMount={onMount}
+                />
+            </div>
         </div>
     )
 }

@@ -1,14 +1,9 @@
-import CodeEditor from "./components/CodeEditor";
-import Resizable from "./components/Resizable";
+import ProblemWindow from './components/ProblemWindow';
 
 const App = () => {
     return (
-        <div className="App">
-            <Resizable>
-                <CodeEditor />
-            </Resizable>
-        </div>
+        <ProblemWindow />
     );
 }
 
-export default App
+export default App;
