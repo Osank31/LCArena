@@ -3,7 +3,6 @@ import mongoose from "mongoose"
 import {
     BadRequestError,
     NotFoundError,
-    NotImplementedError,
 } from "@LCArena/utils";
 import { type createProblemType } from "./validation.js";
 
@@ -38,12 +37,12 @@ export const updateProblemService = async (
     }
 
     const updatedProblem = await Problem.findByIdAndUpdate(id, data, {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
     });
 
     if (!updatedProblem) {
-        throw new NotImplementedError("Problem couldnt be updated");
+        throw new NotFoundError("Problem not found");
     }
 
     return updatedProblem;
@@ -57,7 +56,7 @@ export const deleteProblemService = async (id: string) => {
     const deletedProblem = await Problem.findByIdAndDelete(id);
 
     if (!deletedProblem) {
-        throw new NotImplementedError("Problem couldnt be deleted");
+        throw new NotFoundError("Problem not found");
     }
 
     return deletedProblem;

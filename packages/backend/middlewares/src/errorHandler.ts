@@ -23,6 +23,28 @@ export const appErrorHandler = (err: any, req: Request, res: Response, next: Nex
         });
     }
 
+    // Malformed JSON bodies (thrown by express.json()) and invalid ObjectId
+    // casts are client mistakes, so report them as 4xx instead of 500.
+    const clientErrorStatus = err?.statusCode ?? err?.status;
+
+    if (
+        typeof clientErrorStatus === "number" &&
+        clientErrorStatus >= 400 &&
+        clientErrorStatus < 500
+    ) {
+        return res.status(clientErrorStatus).json({
+            success: false,
+            message: err.message || "Bad Request"
+        });
+    }
+
+    if (err?.name === "CastError") {
+        return res.status(400).json({
+            success: false,
+            message: `Invalid value for ${err.path || "field"}`
+        });
+    }
+
     return res.status(500).json({
         success: false,
         message: err.message || "Internal Server Error"

@@ -12,7 +12,7 @@ const app = express()
 app.use(express.json())
 
 app.post("/",
-    // userValidation, 
+    userValidation,
     createEvaluation)
 app.put("/:submissionId", updateSubmission)
 app.get("/:submissionId", getSubmission)

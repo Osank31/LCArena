@@ -37,17 +37,29 @@ export const evaluationService = async (data: CreateSubmissionInput & {userId: s
     return submission;
 }
 
-export const updateSubmissionService = async (data: UpdateSubmissionInput & {submissionId:String}) => {
+export const updateSubmissionService = async (data: UpdateSubmissionInput & {submissionId:string}) => {
     const {problemId, code, language, status, submissionId} = data
 
-    return await Submission.findByIdAndUpdate(submissionId, {
+    const submission = await Submission.findByIdAndUpdate(submissionId, {
         problemId,
         code,
         language,
         status
-    }, {new: true})
+    }, {returnDocument: "after"})
+
+    if (!submission) {
+        throw new NotFoundError("Submission not found")
+    }
+
+    return submission
 }
 
 export const getSubmissionService = async (submissionId: string) => {
-    return await Submission.findById(submissionId)
+    const submission = await Submission.findById(submissionId)
+
+    if (!submission) {
+        throw new NotFoundError("Submission not found")
+    }
+
+    return submission
 }

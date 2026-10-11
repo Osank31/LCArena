@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test \"test/api_test/*.test.js\"",
+    "test:load": "node test/load_test/submission.load.test.js",
     "dev": "tsx watch src/index.ts"
   },
   "keywords": [],
