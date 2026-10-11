@@ -14,6 +14,17 @@ import {
   setStoredToken,
 } from "./apiClient";
 
+export function normalizeUser(rawUser: any): UserProfile {
+  if (!rawUser) return rawUser;
+  return {
+    ...rawUser,
+    id: rawUser.id || rawUser.userId || "",
+    userId: rawUser.userId || rawUser.id || "",
+    userRole: rawUser.userRole || rawUser.userType || "Regular",
+    userType: rawUser.userType || rawUser.userRole || "Regular",
+  };
+}
+
 export const authService = {
   /** Send a 6-digit OTP to the user's email */
   async sendOtp(email: string): Promise<void> {
@@ -30,6 +41,9 @@ export const authService = {
     if (data?.accessToken) {
       setStoredToken(data.accessToken);
     }
+    if (data?.user) {
+      data.user = normalizeUser(data.user);
+    }
     return data;
   },
 
@@ -42,6 +56,9 @@ export const authService = {
     const data = response.data.data;
     if (data?.accessToken) {
       setStoredToken(data.accessToken);
+    }
+    if (data?.user) {
+      data.user = normalizeUser(data.user);
     }
     return data;
   },
@@ -56,13 +73,16 @@ export const authService = {
     if (data?.accessToken) {
       setStoredToken(data.accessToken);
     }
+    if (data?.user) {
+      data.user = normalizeUser(data.user);
+    }
     return data;
   },
 
   /** Fetch current user's profile */
   async getProfile(): Promise<UserProfile> {
     const response = await apiClient.get<ApiResponse<UserProfile>>("/auth/me");
-    return response.data.data;
+    return normalizeUser(response.data.data);
   },
 
   /** Refresh access token using cookie or stored refresh token */
@@ -75,6 +95,9 @@ export const authService = {
     const data = response.data.data;
     if (data?.accessToken) {
       setStoredToken(data.accessToken);
+    }
+    if (data?.user) {
+      data.user = normalizeUser(data.user);
     }
     return data;
   },

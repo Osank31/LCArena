@@ -202,4 +202,46 @@ describe("ProblemDetailPage component", () => {
       );
     });
   });
+
+  it("loads and displays previous submissions when opening problem page", async () => {
+    setStoredToken("valid_token_xyz");
+    vi.spyOn(authService, "getProfile").mockResolvedValue({
+      userId: "user_logged_in",
+      email: "coder@example.com",
+      name: "Competitive Coder",
+      userRole: "Regular",
+    });
+
+    vi.spyOn(problemService, "getProblemById").mockResolvedValue(mockProblem);
+
+    // Seed previous submission locally for this problem and user
+    submissionService.recordLocalSubmission({
+      _id: "prev_sub_101",
+      problemId: "prob_detail_1",
+      userId: "user_logged_in",
+      code: "class Solution { void solve() {} };",
+      language: "cpp",
+      status: {
+        status: "SUCCESS",
+        passed: 10,
+        total: 10,
+        failedCases: { tle: [], re: [], wa: [] },
+        executionTimeMs: { tc_0: 15 },
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    renderWithRouter("prob_detail_1");
+
+    expect(await screen.findAllByText("Longest Palindromic Substring")).toHaveLength(2);
+
+    // Switch to submissions tab
+    const submissionsTab = screen.getByRole("tab", { name: /submissions/i });
+    fireEvent.click(submissionsTab);
+
+    // The previous submission must be present and inspectable
+    expect(await screen.findByText("Accepted")).toBeInTheDocument();
+    expect(screen.getByText("Inspect")).toBeInTheDocument();
+  });
 });

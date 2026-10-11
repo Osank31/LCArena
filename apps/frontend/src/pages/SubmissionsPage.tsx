@@ -23,7 +23,8 @@ export const SubmissionsPage: React.FC = () => {
   const [langFilter, setLangFilter] = useState<string>("All");
 
   useEffect(() => {
-    const list = submissionService.getLocalSubmissions(user?.userId);
+    const effectiveUserId = user?.userId || (user as any)?.id;
+    const list = submissionService.getLocalSubmissions(effectiveUserId);
     setSubmissions(list);
 
     problemService

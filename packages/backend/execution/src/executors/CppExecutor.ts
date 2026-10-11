@@ -94,8 +94,7 @@ int main() {
 				`./${Runner_file}.sh`
 			);
 
-			const resultData = JSON.parse(output.trim());
-			return resultData;
+			return this.parseRunnerOutput(output);
 		} catch (error) {
 			logger.error(`Execution failed: ${error}`);
 			throw error;

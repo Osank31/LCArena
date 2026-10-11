@@ -51,7 +51,8 @@ export const ProblemsPage: React.FC = () => {
 
   // Compute set of solved problem IDs
   const solvedProblemIds = useMemo(() => {
-    const submissions = submissionService.getLocalSubmissions(user?.userId);
+    const effectiveUserId = user?.userId || (user as any)?.id;
+    const submissions = submissionService.getLocalSubmissions(effectiveUserId);
     const set = new Set<string>();
     for (const sub of submissions) {
       if (

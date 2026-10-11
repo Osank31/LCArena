@@ -485,8 +485,44 @@ export const acquireTestCases = async (
                 await fs.rm(downloaded, { force: true }).catch(() => undefined);
             }
         } else {
-            const sourcePath = path.resolve(options.testCasesUrl);
-            const stat = await fs.stat(sourcePath).catch(() => null);
+            let sourcePath = path.resolve(options.testCasesUrl);
+            let stat = await fs.stat(sourcePath).catch(() => null);
+
+            if (!stat) {
+                const isLegacyPlaceholder =
+                    options.testCasesUrl === "that" ||
+                    options.testCasesUrl === "this";
+                const isBundledReference =
+                    isLegacyPlaceholder ||
+                    options.testCasesUrl === "testcases" ||
+                    options.testCasesUrl.includes("packages/backend/execution/testcases");
+
+                const candidates: string[] = [];
+                if (!path.isAbsolute(options.testCasesUrl)) {
+                    candidates.push(
+                        path.resolve(process.cwd(), options.testCasesUrl),
+                        path.resolve(__dirname, "../../../..", options.testCasesUrl),
+                        path.resolve(__dirname, "../../..", options.testCasesUrl)
+                    );
+                }
+                if (isBundledReference) {
+                    candidates.push(
+                        path.resolve(process.cwd(), "packages/backend/execution/testcases"),
+                        path.resolve(process.cwd(), "testcases"),
+                        path.resolve(__dirname, "../../../../packages/backend/execution/testcases"),
+                        path.resolve(__dirname, "../../../packages/backend/execution/testcases")
+                    );
+                }
+
+                for (const candidate of candidates) {
+                    const candidateStat = await fs.stat(candidate).catch(() => null);
+                    if (candidateStat) {
+                        sourcePath = candidate;
+                        stat = candidateStat;
+                        break;
+                    }
+                }
+            }
 
             if (!stat) {
                 throw new TestCaseSourceError(

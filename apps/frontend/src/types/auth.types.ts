@@ -2,9 +2,11 @@ export type UserRole = "Regular" | "Admin" | "Premium";
 
 export interface UserProfile {
   userId: string;
+  id?: string;
   email: string;
   name: string;
   userRole: UserRole;
+  userType?: UserRole;
   profilePicUrl?: string;
   createdAt?: string;
 }

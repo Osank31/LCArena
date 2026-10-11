@@ -254,4 +254,14 @@ describe("acquireTestCases", () => {
             TestCaseSourceError
         );
     });
+
+    it("resolves bundled test cases for legacy 'that' reference", async () => {
+        const acquired = await acquireTestCases({ testCasesUrl: "that" });
+        try {
+            const files = await fs.readdir(acquired.testCasesDir);
+            assert.ok(files.some((f) => f.startsWith("test_case_")));
+        } finally {
+            await acquired.cleanup();
+        }
+    });
 });

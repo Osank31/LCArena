@@ -89,8 +89,7 @@ if __name__ == "__main__":
 			logger.debug("Running test cases inside container...");
 			const output = await this.runCommand(container, `./runner.sh`);
 
-			const resultData = JSON.parse(output.trim());
-			return resultData;
+			return this.parseRunnerOutput(output);
 		} catch (error) {
 			logger.error(`Execution failed: ${error}`);
 			throw error;

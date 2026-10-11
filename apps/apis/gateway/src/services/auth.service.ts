@@ -23,10 +23,12 @@ type UserDocument = HydratedDocument<IUser, IUserMethods>
 
 export interface PublicUser {
     id: string
+    userId: string
     name: string
     email: string
     profilePicUrl: string
     userType: UserType
+    userRole: UserType
     roleExpiry: Date | null
 }
 
@@ -36,10 +38,12 @@ export interface PublicUser {
  */
 export const toPublicUser = (user: UserDocument): PublicUser => ({
     id: String(user._id),
+    userId: String(user._id),
     name: user.name,
     email: user.email,
     profilePicUrl: user.profilePicUrl,
     userType: user.userType,
+    userRole: user.userType,
     roleExpiry: user.roleExpiry ?? null,
 })
 

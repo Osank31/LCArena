@@ -84,7 +84,8 @@ export const ProblemDetailPage: React.FC = () => {
         }
 
         // Load local submissions for this problem
-        const userSubs = submissionService.getProblemSubmissions(id, user?.userId);
+        const effectiveUserId = user?.userId || (user as any)?.id;
+        const userSubs = submissionService.getProblemSubmissions(id, effectiveUserId);
         setSubmissions(userSubs);
       })
       .catch((err: any) => {
@@ -101,7 +102,15 @@ export const ProblemDetailPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [id, user?.userId]);
+  }, [id, language]);
+
+  // Sync submissions whenever id or authenticated user resolves
+  useEffect(() => {
+    if (!id) return;
+    const effectiveUserId = user?.userId || (user as any)?.id;
+    const userSubs = submissionService.getProblemSubmissions(id, effectiveUserId);
+    setSubmissions(userSubs);
+  }, [id, user?.userId, (user as any)?.id]);
 
   const currentCode = codeMap[language];
 
@@ -297,7 +306,14 @@ export const ProblemDetailPage: React.FC = () => {
                     },
                   ]}
                   activeTab={leftTab}
-                  onChange={setLeftTab}
+                  onChange={(tab) => {
+                    setLeftTab(tab);
+                    if (tab === "submissions" && id) {
+                      const effectiveUserId = user?.userId || (user as any)?.id;
+                      const latest = submissionService.getProblemSubmissions(id, effectiveUserId);
+                      setSubmissions(latest);
+                    }
+                  }}
                   variant="underline"
                   className="border-none"
                 />

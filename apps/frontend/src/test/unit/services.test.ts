@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authService } from "../../services/authService";
 import { problemService } from "../../services/problemService";
 import { submissionService } from "../../services/submissionService";
-import { apiClient, getStoredToken } from "../../services/apiClient";
+import { apiClient, getStoredToken, setStoredToken } from "../../services/apiClient";
 import { IProblem } from "../../types/problem.types";
 import { ISubmission } from "../../types/submission.types";
 
@@ -290,5 +290,35 @@ describe("submissionService", () => {
     const forA = submissionService.getProblemSubmissions("prob_A", "user_1");
     expect(forA).toHaveLength(1);
     expect(forA[0]._id).toBe("sub_1");
+  });
+
+  it("resolves effective userId from stored token when userId is not provided", () => {
+    // Fake JWT with userId "u_token_123" in payload
+    const fakePayload = btoa(JSON.stringify({ userId: "u_token_123" }));
+    setStoredToken(`header.${fakePayload}.sig`);
+
+    submissionService.recordLocalSubmission({
+      ...sampleSubmission,
+      _id: "sub_token_test",
+      problemId: "prob_A",
+      userId: "",
+    });
+
+    const submissions = submissionService.getProblemSubmissions("prob_A");
+    expect(submissions).toHaveLength(1);
+    expect(submissions[0]._id).toBe("sub_token_test");
+    expect(submissions[0].userId).toBe("u_token_123");
+  });
+
+  it("merges anonymous submissions into user submissions once authenticated", () => {
+    submissionService.recordLocalSubmission({
+      ...sampleSubmission,
+      _id: "sub_anon_1",
+      problemId: "prob_A",
+      userId: "anonymous",
+    });
+
+    const userSubs = submissionService.getLocalSubmissions("user_authenticated");
+    expect(userSubs.some((s) => s._id === "sub_anon_1")).toBe(true);
   });
 });

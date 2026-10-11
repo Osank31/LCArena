@@ -84,22 +84,33 @@ export abstract class Executor {
 		const stream = await exec.start({ Detach: false });
 
 		return new Promise((resolve, reject) => {
-			let output = "";
+			let stdout = "";
+			let stderr = "";
 
-			const outStream = new Writable({
+			const stdoutStream = new Writable({
 				write(chunk, encoding, callback) {
-					output += chunk.toString("utf-8");
+					stdout += chunk.toString("utf-8");
 					callback();
 				},
 			});
 
-			container.modem.demuxStream(stream, outStream, outStream);
+			const stderrStream = new Writable({
+				write(chunk, encoding, callback) {
+					stderr += chunk.toString("utf-8");
+					callback();
+				},
+			});
+
+			container.modem.demuxStream(stream, stdoutStream, stderrStream);
 
 			stream.on("end", () => {
 				logger.debug(
-					`Command execution finished. Output length: ${output.length}`
+					`Command execution finished. Output length: ${stdout.length}`
 				);
-				resolve(output);
+				if (stderr) {
+					logger.debug(`Command stderr: ${stderr.trim()}`);
+				}
+				resolve(stdout);
 			});
 			stream.on("error", (err) => {
 				logger.error(`Error executing command '${cmdString}': ${err}`);
@@ -176,8 +187,8 @@ TIME_LIMIT="${time_limit}s"
 TESTCASES_DIR="./${testcases_dir}"
 
 # Compile/Syntax Check
-if ! ${compileCmd} 2> compile_error.log; then
-    ERR_MSG=$(cat compile_error.log | sed 's/"/\\\\"/g' | tr '\\n' ' ')
+if ! ${compileCmd} > compile_stdout.log 2> compile_error.log; then
+    ERR_MSG=$(cat compile_error.log compile_stdout.log | sed 's/"/\\\\"/g' | tr '\\n' ' ')
     echo "{\\"status\\":\\"COMPILE_ERROR\\", \\"compileError\\":\\"$ERR_MSG\\"}"
     exit 0
 fi
@@ -207,7 +218,7 @@ for tc_dir in "$TESTCASES_DIR"/*; do
     # Start timer (nanoseconds)
     START_TIME=$(date +%s%N)
     
-    timeout "$TIME_LIMIT" ${runCmd} < "$input_file" > "$user_out"
+    timeout "$TIME_LIMIT" ${runCmd} < "$input_file" > "$user_out" 2> "$tc_dir/user.err"
     EXIT_CODE=$?
     
     # End timer
@@ -264,6 +275,21 @@ cat <<EOF
 }
 EOF
 `;
+	}
+
+	protected parseRunnerOutput(output: string): ExecutionResult {
+		const trimmed = output.trim();
+		try {
+			return JSON.parse(trimmed);
+		} catch {
+			const jsonStart = trimmed.indexOf("{");
+			const jsonEnd = trimmed.lastIndexOf("}");
+			if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+				const jsonSubstring = trimmed.slice(jsonStart, jsonEnd + 1);
+				return JSON.parse(jsonSubstring);
+			}
+			throw new Error(`Failed to parse runner output as JSON: ${trimmed}`);
+		}
 	}
 
 	abstract execute(

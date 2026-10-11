@@ -48,7 +48,8 @@ export const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    const userSubs = submissionService.getLocalSubmissions(user.userId);
+    const effectiveUserId = user.userId || (user as any).id;
+    const userSubs = submissionService.getLocalSubmissions(effectiveUserId);
     setSubmissions(userSubs);
 
     problemService
