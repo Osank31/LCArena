@@ -10,7 +10,7 @@ ARG NODE_VERSION=24
 
 # ---- pruner: produce a pruned workspace containing only $SERVICE and its deps ----
 FROM node:${NODE_VERSION}-slim AS pruner
-RUN npm install -g turbo@^2
+RUN --mount=type=cache,target=/root/.npm,sharing=locked npm install -g turbo@^2
 WORKDIR /app
 COPY . .
 ARG SERVICE
@@ -20,21 +20,22 @@ RUN turbo prune ${SERVICE} --docker --out-dir=/out
 # ---- builder: install deps, then build the service and its workspace deps ----
 FROM node:${NODE_VERSION}-slim AS builder
 # git is needed by npm to resolve workspace link dependencies in the pruned lockfile
-RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=pruner /out/json/ ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm,sharing=locked npm ci --no-audit --no-fund
 COPY --from=pruner /out/full/ ./
 ARG SERVICE
 RUN npx turbo run build --filter=${SERVICE}
+RUN --mount=type=cache,target=/root/.npm,sharing=locked npm prune --omit=dev --no-audit --no-fund
 
 # ---- runner: production deps only, non-root user ----
 FROM node:${NODE_VERSION}-slim AS runner
 ENV NODE_ENV=production
 WORKDIR /app
-COPY --from=builder /app ./
-# Drop dev dependencies and hand the workspace to the unprivileged `node` user.
-RUN npm prune --omit=dev && chown -R node:node /app
+COPY --chown=node:node --from=builder /app ./
 ARG SERVICE
 ENV SERVICE_NAME=${SERVICE}
 USER node
