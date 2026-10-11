@@ -42,3 +42,4 @@ __pycache__/
 venv/
 .idea
 graphify-out
+.freebuff
