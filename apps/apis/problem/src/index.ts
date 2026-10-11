@@ -23,8 +23,16 @@ app.delete("/:id", deleteProblem)
 
 app.use(appErrorHandler);
 
-dbConnect(MONGODB_URL)
+async function startServer() {
+    try {
+        await dbConnect(MONGODB_URL)
 
-app.listen(APP_PORT || 3000, ()=>{
-    logger.info(`Server running on port ${APP_PORT || 3000}`)
-})
+        app.listen(APP_PORT || 3000, ()=>{
+            logger.info(`Server running on port ${APP_PORT || 3000}`)
+        })
+    } catch (error) {
+        logger.error(error)
+    }
+}
+
+startServer()
