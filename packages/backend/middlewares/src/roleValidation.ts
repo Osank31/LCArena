@@ -1,6 +1,8 @@
 import { ForbiddenError, UnauthorizedError } from "@LCArena/utils"
 import { type Request, type Response, type NextFunction } from "express"
 import { type UserType } from "@LCArena/models"
+// Importing the type also registers the Express.Request.user augmentation.
+import { type AuthenticatedUser } from "./express-request.js"
 
 /**
  * Route guard that only lets the listed user roles through.
@@ -16,7 +18,8 @@ import { type UserType } from "@LCArena/models"
 export const roleValidation = (...allowedRoles: UserType[]) => {
     return (req: Request, _res: Response, next: NextFunction): void => {
         try {
-            const userRole = req.user?.userRole
+            const authenticatedUser: AuthenticatedUser | undefined = req.user
+            const userRole = authenticatedUser?.userRole
 
             if (!userRole) {
                 throw new UnauthorizedError(

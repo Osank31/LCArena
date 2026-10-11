@@ -1,17 +1,8 @@
 import { type NextFunction, type Request, type Response } from "express"
-import {User, UserType} from "@LCArena/models"
+import {User} from "@LCArena/models"
 import {NotFoundError} from "@LCArena/utils"
-
-declare global {
-    namespace Express {
-        interface Request {
-            user?: {
-                userId: string,
-                userRole?: UserType
-            }
-        }
-    }
-}
+// Importing the type also registers the Express.Request.user augmentation.
+import { type AuthenticatedUser } from "./express-request.js"
 
 export const userValidation = async (
     req: Request,
@@ -33,10 +24,12 @@ export const userValidation = async (
             throw new NotFoundError("User not found")
         }
 
-        req.user = {
+        const authenticatedUser: AuthenticatedUser = {
             userId,
             userRole: user.userType
         }
+
+        req.user = authenticatedUser
 
         next()
     } catch (error) {

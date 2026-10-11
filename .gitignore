@@ -41,3 +41,4 @@ yarn-error.log*
 __pycache__/
 venv/
 .idea
+graphify-out

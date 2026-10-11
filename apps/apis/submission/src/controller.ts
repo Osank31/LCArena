@@ -1,6 +1,7 @@
 import { type NextFunction, type Request, type Response } from "express"
-import { createSubmissionSchema, updateSubmissionSchema } from "./validations";
-import { BadRequestError, UnauthorizedError, sendSuccess } from "@LCArena/utils";
+import { createSubmissionSchema, updateSubmissionSchema } from "./validations";import { BadRequestError, UnauthorizedError, sendSuccess } from "@LCArena/utils"
+import { type AuthenticatedUser } from "@LCArena/middlewares"
+;
 import mongoose from "mongoose"
 import { evaluationService, updateSubmissionService,getSubmissionService } from "./service";
 
@@ -12,7 +13,8 @@ export const createEvaluation = async (req: Request, res: Response, next: NextFu
             throw new BadRequestError("Invalid problem id")
         }
 
-        const userId = req.user?.userId
+        const authenticatedUser: AuthenticatedUser | undefined = req.user
+        const userId = authenticatedUser?.userId
 
         if (!userId) {
             throw new UnauthorizedError("Missing authenticated user")
