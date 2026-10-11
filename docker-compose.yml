@@ -129,6 +129,29 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  # Evaluation worker: consumes submission.created, runs untrusted code in
+  # ephemeral sibling containers and publishes submission.completed.
+  # It needs the host Docker socket to spawn those sandboxes.
+  execution:
+    build:
+      context: .
+      args:
+        SERVICE: "@LCArena/evaluator"
+    restart: unless-stopped
+    ports:
+      - "3004:3004" # health endpoint only
+    environment:
+      PORT: 3004
+      MONGODB_URL: mongodb://mongo:27017/lcarena
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
   # ---------- App services (Python) ----------
   ai-suggestion:
     build:

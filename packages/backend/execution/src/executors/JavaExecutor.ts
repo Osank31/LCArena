@@ -5,8 +5,8 @@ import Docker from "dockerode";
 export class JavaExecutor extends Executor {
 	private static IMAGE_NAME = "eclipse-temurin";
 
-	constructor() {
-		super();
+	constructor(testCasesDir?: string) {
+		super(testCasesDir);
 	}
 
 	private getWrapperCode(): string {

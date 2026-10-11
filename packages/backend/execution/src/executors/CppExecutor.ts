@@ -5,8 +5,8 @@ import Docker from "dockerode";
 export class CPPExecutor extends Executor {
 	private static IMAGE_NAME = "gcc:latest";
 
-	constructor() {
-		super();
+	constructor(testCasesDir?: string) {
+		super(testCasesDir);
 	}
 
 	private getWrapperCode(solutionFile: string): string {

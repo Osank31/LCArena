@@ -5,8 +5,8 @@ import Docker from "dockerode";
 export class JSExecutor extends Executor {
 	private static IMAGE_NAME = "node:20-slim";
 
-	constructor() {
-		super();
+	constructor(testCasesDir?: string) {
+		super(testCasesDir);
 	}
 
 	private getWrapperCode(): string {

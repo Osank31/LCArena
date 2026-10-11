@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test \"test/api_test/*.test.js\"",
+    "test": "npm run test:unit",
+    "test:unit": "node --import tsx --test \"test/unit/*.test.ts\"",
+    "test:api": "node --test \"test/api_test/*.test.js\"",
     "test:load": "node test/load_test/submission.load.test.js",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +19,8 @@
     "@LCArena/utils": "*",
     "@LCArena/models": "*",
     "@LCArena/middlewares": "*",
-    "@LCArena/config": "*"
+    "@LCArena/config": "*",
+    "@LCArena/execution": "*",
+    "zod": "^4.4.3"
   }
 }

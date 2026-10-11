@@ -5,8 +5,8 @@ import {logger} from "@LCArena/utils"
 export class PythonExecutor extends Executor {
 	private static IMAGE_NAME = "python:3.11-slim";
 
-	constructor() {
-		super();
+	constructor(testCasesDir?: string) {
+		super(testCasesDir);
 	}
 
 	private getWrapperCode(): string {

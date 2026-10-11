@@ -5,9 +5,23 @@ import path from "path";
 import tar from "tar-stream";
 import { Writable } from "stream";
 import { ExecutionResult } from "./executionResult.type.js";
+import { TestCasesUnavailableError } from "../errors.js";
 
 export abstract class Executor {
 	static docker: Docker = new Docker();
+
+	/**
+	 * Host directory whose *contents* become `/workspace/testcases` inside the
+	 * container. Defaults to `<cwd>/testcases` to preserve the original
+	 * behaviour, but callers (e.g. the evaluation worker) can point it at an
+	 * isolated per-submission workspace so concurrent runs cannot clobber each
+	 * other's test files.
+	 */
+	protected readonly testCasesDir: string;
+
+	constructor(testCasesDir?: string) {
+		this.testCasesDir = testCasesDir ?? path.join(process.cwd(), "testcases");
+	}
 
 	protected async pullImage(imageName: string): Promise<any> {
 		logger.info(`Checking if image exists: ${imageName}`);
@@ -99,7 +113,8 @@ export abstract class Executor {
 	): Promise<void> {
 		logger.info("Starting to copy test cases to container...");
 		const pack = tar.pack();
-		const testCasesDir = path.join(process.cwd(), "testcases");
+		const testCasesDir = this.testCasesDir;
+		let packedFiles = 0;
 
 		const addFilesRecursively = async (dir: string, baseDir: string) => {
 			const items = await fs.readdir(dir);
@@ -113,16 +128,29 @@ export abstract class Executor {
 					const relativePath = path.relative(baseDir, itemPath);
 					const posixPath = relativePath.split(path.sep).join("/");
 					pack.entry({ name: `testcases/${posixPath}` }, content);
+					packedFiles += 1;
 				}
 			}
 		};
 
 		try {
 			await addFilesRecursively(testCasesDir, testCasesDir);
-			logger.info(`Successfully packed testcases from ${testCasesDir}`);
 		} catch (err) {
-			logger.warn(`Failed to read testcases directory: ${err}`);
+			pack.destroy();
+			logger.error(`Failed to read testcases directory ${testCasesDir}: ${err}`);
+			throw new TestCasesUnavailableError(
+				`Unable to read test cases from ${testCasesDir}`
+			);
 		}
+
+		if (packedFiles === 0) {
+			pack.destroy();
+			throw new TestCasesUnavailableError(
+				`No test cases found in ${testCasesDir}`
+			);
+		}
+
+		logger.info(`Successfully packed testcases from ${testCasesDir}`);
 
 		pack.finalize();
 

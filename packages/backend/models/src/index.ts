@@ -9,6 +9,7 @@ export {
     UserModel,
     UserType,
     Submission,
+    ISubmission,
     ELanguage,
     Problem,
     IProblem

@@ -1,5 +1,5 @@
 import { dbConnect } from "./db.config.js";
-import { channel, connectToQueue, queue } from "./rabbitMQ.config.js";
+import { channel, closeQueue, connectToQueue, queue } from "./rabbitMQ.config.js";
 import { getRedisClient, redisConnect } from "./redis.config.js";
 
 export {
@@ -8,5 +8,6 @@ export {
     dbConnect,
     channel, 
     queue,
-    connectToQueue
+    connectToQueue,
+    closeQueue
 }
