@@ -1,22 +1,40 @@
-# Dependencies
+# Dependencies (installed inside the image)
 node_modules
 **/node_modules
 
 # Build outputs (rebuilt inside the image)
 **/dist
 **/.turbo
+.turbo
 
-# VCS / env
+# VCS / env / editor
 .git
+.gitignore
 .env
 .env.*
 !/.env.example
+.idea
+.agents
+.freebuff
+graphify-out
+
+# Tests are not needed at runtime
+**/test
+**/*.test.ts
+**/*.test.js
+coverage
+
+# Frontend is out of scope for the backend images (keep package.json for workspace discovery)
+apps/frontend/src
+apps/frontend/public
+apps/frontend/dist
+apps/frontend/index.html
+apps/frontend/*.config.*
+packages/ui/src
 
 # Python service local artifacts
 apps/apis/ai-suggestion-service/venv
 **/__pycache__
 
-# Misc
-coverage
+# Docs
 *.md
-.idea

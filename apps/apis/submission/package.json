@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "check-types": "tsc --noEmit",
     "test": "npm run test:unit",
     "test:unit": "node --import tsx --test \"test/unit/*.test.ts\"",
-    "test:api": "node --test \"test/api_test/*.test.js\"",
-    "test:load": "node test/load_test/submission.load.test.js",
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc"
+    "test:integration": "node --test \"test/integration/*.test.js\"",
+    "test:load": "node test/load_test/submission.load.test.js"
   },
   "keywords": [],
   "author": "",

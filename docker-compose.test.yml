@@ -1,0 +1,50 @@
+# Isolated infrastructure for backend integration / e2e tests.
+#
+# This is NOT the development stack: it uses a separate Compose project
+# (`lcarena-test`), alternate host ports and a throwaway database, so running
+# the integration suite can never touch development or production data.
+#
+# You normally do not run this by hand — `npm run test:integration` starts it,
+# waits for the healthchecks, runs the suites and tears it down again.
+#
+#   docker compose -p lcarena-test -f docker-compose.test.yml up -d --wait
+#   docker compose -p lcarena-test -f docker-compose.test.yml down -v
+name: lcarena-test
+
+x-infra-healthcheck: &infra-healthcheck
+  interval: 5s
+  timeout: 5s
+  retries: 20
+  start_period: 10s
+
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "127.0.0.1:27018:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      <<: *infra-healthcheck
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      <<: *infra-healthcheck
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    ports:
+      - "127.0.0.1:5673:5672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+
+# No named volumes on purpose: test data is disposable and disappears with
+# `down -v`, so no state can leak between runs.

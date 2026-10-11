@@ -1,149 +1,243 @@
+# LCArena backend — local development stack.
+#
+# Start everything:
+#   cp .env.example .env   # then fill in the secrets you need
+#   docker compose up --build
+#
+# This file is a DEVELOPMENT setup. Databases, the broker and the execution
+# worker's Docker-socket access are intentionally convenient, not hardened:
+# do not expose these ports or the Docker socket in a production environment.
+#
+# Every variable can be overridden from `.env`; the `:-` defaults below keep a
+# bare `docker compose up` working on a fresh checkout.
+name: lcarena
+
+x-node-service: &node-service
+  restart: unless-stopped
+  # PID 1 init so SIGTERM/SIGINT reach Node and containers stop cleanly.
+  init: true
+
+x-infra-healthcheck: &infra-healthcheck
+  interval: 10s
+  timeout: 5s
+  retries: 10
+  start_period: 20s
+
 services:
-  # ---------- Infrastructure ----------
+  # ------------------------------------------------------------------
+  # Infrastructure
+  # ------------------------------------------------------------------
   mongo:
     image: mongo:7
     restart: unless-stopped
+    # Bound to loopback: the database is never reachable from outside the host.
     ports:
-      - "27017:27017"
+      - "127.0.0.1:${MONGO_HOST_PORT:-27017}:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      <<: *infra-healthcheck
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
     ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
+      - "127.0.0.1:${REDIS_HOST_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      <<: *infra-healthcheck
 
   rabbitmq:
     image: rabbitmq:3.13-management
     restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
     ports:
-      - "5672:5672" # AMQP
-      - "15672:15672" # Management UI (guest/guest)
+      - "127.0.0.1:${RABBITMQ_HOST_PORT:-5672}:5672" # AMQP
+      - "127.0.0.1:${RABBITMQ_UI_HOST_PORT:-15672}:15672" # management UI (dev only)
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
       interval: 10s
       timeout: 10s
-      retries: 5
-      start_period: 20s
+      retries: 10
+      start_period: 30s
 
-  # ---------- App services (TypeScript) ----------
-  auth:
+  # ------------------------------------------------------------------
+  # Application services (TypeScript / Node)
+  # ------------------------------------------------------------------
+  gateway:
+    <<: *node-service
     build:
       context: .
       args:
-        SERVICE: "@LCArena/auth"
-    restart: unless-stopped
+        SERVICE: "@LCArena/gateway"
     ports:
-      - "3000:3000"
+      - "127.0.0.1:${GATEWAY_HOST_PORT:-3000}:3000" # public API entry point
     environment:
       PORT: 3000
-      MONGODB_URL: mongodb://mongo:27017/lcarena
+      MONGODB_URL: mongodb://mongo:27017/${MONGO_DB:-lcarena}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      PROBLEM_SERVICE_URL: http://problem:3001
+      SUBMISSION_SERVICE_URL: http://submission:3002
       MAIL_SERVICE_URL: http://mail:3003
-      ACCESS_TOKEN_JWT_KEY: ${ACCESS_TOKEN_JWT_KEY}
-      REFRESH_TOKEN_JWT_KEY: ${REFRESH_TOKEN_JWT_KEY}
-      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      MAIL_SERVICE_TOKEN: ${MAIL_SERVICE_TOKEN:-}
+      # Dev-only fallbacks. Set real values in .env for anything shared.
+      ACCESS_TOKEN_JWT_KEY: ${ACCESS_TOKEN_JWT_KEY:-dev-only-access-secret}
+      REFRESH_TOKEN_JWT_KEY: ${REFRESH_TOKEN_JWT_KEY:-dev-only-refresh-secret}
+      ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
+      REFRESH_TOKEN_TTL_SECONDS: ${REFRESH_TOKEN_TTL_SECONDS:-604800}
+      PROXY_TIMEOUT_MS: ${PROXY_TIMEOUT_MS:-15000}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
     depends_on:
       mongo:
         condition: service_healthy
       redis:
         condition: service_healthy
+      problem:
+        condition: service_healthy
+      submission:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   problem:
+    <<: *node-service
     build:
       context: .
       args:
         SERVICE: "@LCArena/problem"
-    restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "127.0.0.1:${PROBLEM_HOST_PORT:-3001}:3001"
     environment:
       PORT: 3001
-      MONGODB_URL: mongodb://mongo:27017/lcarena
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      MONGODB_URL: mongodb://mongo:27017/${MONGO_DB:-lcarena}
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     depends_on:
       mongo:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   submission:
+    <<: *node-service
     build:
       context: .
       args:
         SERVICE: "@LCArena/submission"
-    restart: unless-stopped
     ports:
-      - "3002:3002"
+      - "127.0.0.1:${SUBMISSION_HOST_PORT:-3002}:3002"
     environment:
       PORT: 3002
-      MONGODB_URL: mongodb://mongo:27017/lcarena
-      PROBLEM_URL: http://problem:3001
+      MONGODB_URL: mongodb://mongo:27017/${MONGO_DB:-lcarena}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672
     depends_on:
       mongo:
         condition: service_healthy
-      problem:
-        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      # The service exposes no health route, so just prove it accepts HTTP.
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3002/').then(()=>process.exit(0)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   mail:
+    <<: *node-service
     build:
       context: .
       args:
         SERVICE: "@LCArena/mail"
-    restart: unless-stopped
     ports:
-      - "3003:3003"
+      - "127.0.0.1:${MAIL_HOST_PORT:-3003}:3003"
     environment:
       PORT: 3003
-      MAIL_USER: ${MAIL_USER}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_HOST: ${MAIL_HOST:-localhost}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_SECURE: ${MAIL_SECURE:-false}
+      MAIL_FROM: ${MAIL_FROM:-LCArena <no-reply@lcarena.local>}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_SERVICE_TOKEN: ${MAIL_SERVICE_TOKEN:-}
+      MAIL_CONNECTION_TIMEOUT_MS: ${MAIL_CONNECTION_TIMEOUT_MS:-10000}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3003/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
-  sockets:
-    build:
-      context: .
-      args:
-        SERVICE: "@LCArena/socket"
-    restart: unless-stopped
-    ports:
-      - "3007:3007"
-    environment:
-      PORT: 3007
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-
-  # Evaluation worker: consumes submission.created, runs untrusted code in
+  # Evaluation worker. Consumes submission.created, runs untrusted code in
   # ephemeral sibling containers and publishes submission.completed.
-  # It needs the host Docker socket to spawn those sandboxes.
+  #
+  # SECURITY: mounting the Docker socket gives this container control over the
+  # host Docker daemon, which is effectively root on the host. That is why it
+  # runs as root here (the socket's group id is host-specific) and why this
+  # stack is development-only. On Linux you can drop privileges by uncommenting
+  # `group_add` below and setting DOCKER_GID to the host's docker group id
+  # (`getent group docker | cut -d: -f3`).
   execution:
+    <<: *node-service
     build:
       context: .
       args:
         SERVICE: "@LCArena/evaluator"
-    restart: unless-stopped
+    user: root
+    # group_add: ["${DOCKER_GID:-999}"]
     ports:
-      - "3004:3004" # health endpoint only
+      - "127.0.0.1:${EXECUTION_HOST_PORT:-3004}:3004" # /health only
     environment:
       PORT: 3004
-      MONGODB_URL: mongodb://mongo:27017/lcarena
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      MONGODB_URL: mongodb://mongo:27017/${MONGO_DB:-lcarena}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672
+      EXECUTION_MAX_ATTEMPTS: ${EXECUTION_MAX_ATTEMPTS:-3}
+      EXECUTION_MAX_TESTCASES_BYTES: ${EXECUTION_MAX_TESTCASES_BYTES:-67108864}
+      EXECUTION_MAX_TESTCASES_ENTRIES: ${EXECUTION_MAX_TESTCASES_ENTRIES:-10000}
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -151,16 +245,43 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3004/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
-  # ---------- App services (Python) ----------
+  # ------------------------------------------------------------------
+  # Application services (Python)
+  # ------------------------------------------------------------------
   ai-suggestion:
     build:
       context: ./apps/apis/ai-suggestion-service
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "127.0.0.1:${AI_SUGGESTION_HOST_PORT:-8000}:8000"
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/docs')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   mongo_data:
-  redis_data:
   rabbitmq_data:

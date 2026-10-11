@@ -1,7 +1,10 @@
 # syntax=docker/dockerfile:1
-# Shared Dockerfile for the TypeScript services.
-# Build with: docker build --build-arg SERVICE=@LCArena/auth -t lcarena-auth .
-# (docker-compose.yml passes the right SERVICE arg for each service.)
+# Shared multi-stage Dockerfile for the TypeScript backend services.
+#
+# Build one service with:
+#   docker build --build-arg SERVICE=@LCArena/gateway -t lcarena-gateway .
+# docker-compose.yml passes the right SERVICE for each service. The SERVICE must
+# be a workspace package that defines a `build` and a `start` script.
 
 ARG NODE_VERSION=24
 
@@ -11,6 +14,7 @@ RUN npm install -g turbo@^2
 WORKDIR /app
 COPY . .
 ARG SERVICE
+RUN test -n "$SERVICE" || (echo "ERROR: SERVICE build arg is required" && exit 1)
 RUN turbo prune ${SERVICE} --docker --out-dir=/out
 
 # ---- builder: install deps, then build the service and its workspace deps ----
@@ -18,18 +22,22 @@ FROM node:${NODE_VERSION}-slim AS builder
 # git is needed by npm to resolve workspace link dependencies in the pruned lockfile
 RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY --from=pruner /out/json/ .
+COPY --from=pruner /out/json/ ./
 RUN npm ci
-COPY --from=pruner /out/full/ .
+COPY --from=pruner /out/full/ ./
 ARG SERVICE
 RUN npx turbo run build --filter=${SERVICE}
 
-# ---- runner: full workspace with dev dependencies pruned out ----
+# ---- runner: production deps only, non-root user ----
 FROM node:${NODE_VERSION}-slim AS runner
 ENV NODE_ENV=production
 WORKDIR /app
-COPY --from=builder /app .
-RUN npm prune --omit=dev
+COPY --from=builder /app ./
+# Drop dev dependencies and hand the workspace to the unprivileged `node` user.
+RUN npm prune --omit=dev && chown -R node:node /app
 ARG SERVICE
 ENV SERVICE_NAME=${SERVICE}
-CMD npm run start --workspace ${SERVICE_NAME}
+USER node
+# `start` must exist on the workspace package; compose adds `init: true` so
+# SIGTERM/SIGINT are forwarded to this process for a clean shutdown.
+CMD ["sh", "-c", "npm run start --workspace \"$SERVICE_NAME\""]

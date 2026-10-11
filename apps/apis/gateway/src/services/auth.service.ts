@@ -2,6 +2,7 @@ import mongoose, { type HydratedDocument } from "mongoose"
 import { User, type IUser, type IUserMethods, type UserType } from "@LCArena/models"
 import { BadRequestError, NotFoundError, UnauthorizedError } from "@LCArena/utils"
 import * as otpService from "./otp.service"
+import { mailClient } from "./mail.service"
 import {
     isSessionActive,
     revokeAccessToken,
@@ -58,8 +59,14 @@ const issueTokens = async (user: UserDocument) => {
     return { accessToken, refreshToken }
 }
 
-export const sendOtp = async (email: string): Promise<string> => {
-    return otpService.generateAndSaveOtp(email)
+export const sendOtp = async (email: string): Promise<void> => {
+    const otp = await otpService.generateAndSaveOtp(email)
+
+    // Persist first, then deliver. Delivery is best-effort: a mail-provider
+    // outage is logged but does not fail the request, so `/auth/send-otp`
+    // cannot be used as an oracle for which accounts exist or for provider
+    // health. The user can simply request a new code.
+    await mailClient.notifyOtp({ email, otp })
 }
 
 export const registerWithOtp = async (data: RegisterWithOtpInput) => {

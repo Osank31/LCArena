@@ -1,0 +1,47 @@
+name: Backend CI
+
+# Runs the checks that need NO infrastructure: typecheck, build, unit tests and
+# coverage. Integration tests, load tests and the Docker Compose stack are
+# deliberately separate — they need MongoDB/Redis/RabbitMQ and a Docker daemon,
+# so they belong in an environment that can provide them (see docs/BACKEND.md).
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  backend:
+    name: typecheck / build / unit / coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck backend
+        run: npm run check-types:backend
+
+      - name: Build backend
+        run: npm run build:backend
+
+      - name: Unit tests
+        run: npm run test:backend
+
+      - name: Coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: coverage/
+          if-no-files-found: ignore

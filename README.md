@@ -147,24 +147,25 @@ npm exec turbo link
 npm exec turbo link
 ```
 
-## Docker
+## Backend
 
-Run the whole stack (all APIs + MongoDB, Redis, RabbitMQ) with Docker Compose:
+Run the whole backend (all APIs + MongoDB, Redis, RabbitMQ) with Docker Compose:
 
 ```sh
 cp .env.example .env   # then fill in the secrets (JWT keys, AWS, OpenAI, mail)
-docker compose up -d
+npm run docker:up      # docker compose up --build -d --wait
+npm run docker:health  # per-service health table
 ```
 
 Services and ports:
 
 | Service       | Port | Endpoint                |
 | ------------- | ---- | ----------------------- |
-| auth          | 3000 | http://localhost:3000   |
+| gateway       | 3000 | http://localhost:3000   |
 | problem       | 3001 | http://localhost:3001   |
 | submission    | 3002 | http://localhost:3002   |
 | mail          | 3003 | http://localhost:3003   |
-| sockets       | 3007 | http://localhost:3007   |
+| execution     | 3004 | `/health` only          |
 | ai-suggestion | 8000 | http://localhost:8000   |
 | mongo         | 27017|                         |
 | redis         | 6379 |                         |
@@ -172,13 +173,21 @@ Services and ports:
 
 The TypeScript services are built from the single root `Dockerfile` (parameterized with a `SERVICE` build arg, pruned with `turbo prune`); the Python FastAPI service has its own Dockerfile at `apps/apis/ai-suggestion-service/Dockerfile`. Required environment variables are documented in `.env.example` — services crash at boot if any are missing.
 
-Useful commands:
+Build, test and operate commands:
 
 ```sh
-docker compose build          # rebuild images
-docker compose logs -f auth   # follow one service's logs
-docker compose down -v        # stop and remove volumes
+npm run build:backend     # build all TypeScript backend workspaces
+npm run check-types:backend
+npm run test:backend      # backend unit tests (no infrastructure needed)
+npm run test:coverage     # unit tests + aggregated coverage reports
+npm run test:integration  # isolated infra + real services (needs Docker)
+npm run test:load         # load tests: smoke / normal / stress profiles
+npm run seed:problems     # seed sample problems into MongoDB
+npm run docker:logs       # follow all service logs
+npm run docker:down       # stop containers (keeps data volumes)
 ```
+
+See **[docs/BACKEND.md](docs/BACKEND.md)** for the full guide: prerequisites, environment setup, health checks, every test command, load-test profiles, data-preserving vs. destructive cleanup, and troubleshooting.
 
 ## Useful Links
 

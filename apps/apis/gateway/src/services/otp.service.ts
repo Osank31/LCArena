@@ -1,6 +1,5 @@
 import crypto from "node:crypto"
 import { getRedisClient } from "@LCArena/config"
-import { logger } from "@LCArena/utils"
 
 const OTP_TTL_SECONDS = 300 // 5 minutes
 
@@ -13,7 +12,8 @@ export const generateAndSaveOtp = async (email: string): Promise<string> => {
     const key = otpKey(email)
     await getRedisClient().set(key, otp, { EX: OTP_TTL_SECONDS })
 
-    logger.info(`[OTP Service] Generated OTP for ${email}: ${otp}`)
+    // The OTP is deliberately never logged: logs are retained far longer than
+    // the 5-minute code lifetime and would otherwise leak a login credential.
 
     return otp
 }

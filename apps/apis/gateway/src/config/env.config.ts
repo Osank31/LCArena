@@ -27,6 +27,16 @@ export const REFRESH_TOKEN_JWT_KEY = getEnvVariable("REFRESH_TOKEN_JWT_KEY")
 export const PROBLEM_SERVICE_URL = getEnvVariable("PROBLEM_SERVICE_URL")
 export const SUBMISSION_SERVICE_URL = getEnvVariable("SUBMISSION_SERVICE_URL")
 
+// Mail microservice used to deliver login/registration OTPs. It lives on the
+// internal network, so a default keeps local development working without it.
+export const MAIL_SERVICE_URL =
+    getEnvVariable("MAIL_SERVICE_URL", false) || "http://localhost:3003"
+
+// Shared secret sent to the mail service. Optional so local development works
+// without it; set it in any environment where the mail service is reachable.
+export const MAIL_SERVICE_TOKEN =
+    getEnvVariable("MAIL_SERVICE_TOKEN", false) || undefined
+
 // Optional environment variables with defaults
 export const ACCESS_TOKEN_TTL_SECONDS = Number(
     getEnvVariable("ACCESS_TOKEN_TTL_SECONDS", false) || 15 * 60
