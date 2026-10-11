@@ -167,6 +167,7 @@ Services and ports:
 | mail          | 3003 | http://localhost:3003   |
 | execution     | 3004 | `/health` only          |
 | ai-suggestion | 8000 | http://localhost:8000   |
+| minio         | 9000 | http://localhost:9000 (Console: 9001) |
 | mongo         | 27017|                         |
 | redis         | 6379 |                         |
 | rabbitmq      | 5672 | mgmt UI on 15672        |

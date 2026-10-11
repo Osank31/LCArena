@@ -30,6 +30,7 @@ import {
   SupportedLanguage,
 } from "../types/submission.types";
 import { DEFAULT_STARTER_CODE } from "../utils/starterCode";
+import { runCode } from "../utils/codeRunner";
 
 export const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -137,23 +138,29 @@ export const ProblemDetailPage: React.FC = () => {
     setShowResetModal(false);
   };
 
-  // Run code against sample
+  // Run code against sample test cases
   const handleRun = () => {
-    if (isEvaluating) return;
+    if (isEvaluating || !problem) return;
     setIsEvaluating(true);
     setRunOutput(null);
     setExecutionResult(null);
 
-    // Simulate standard compilation / test run against sample
+    // Evaluate code against problem sample test cases
     setTimeout(() => {
-      setIsEvaluating(false);
-      setRunOutput(
-        `[Run Evaluation]\nCode compiled successfully.\nTested against sample input:\n${
-          problem?.examples[0]?.input || ""
-        }\nOutput matches expected sample.`
-      );
-      setMobileTab("console");
-    }, 800);
+      try {
+        const evaluation = runCode(currentCode, language, problem);
+        setRunOutput(evaluation.outputMessage);
+      } catch (err: any) {
+        setRunOutput(
+          `[Run Evaluation - Error]\nTested against sample input:\nExecution failed: ${
+            err.message || String(err)
+          }`
+        );
+      } finally {
+        setIsEvaluating(false);
+        setMobileTab("console");
+      }
+    }, 300);
   };
 
   // Submit code to backend judge

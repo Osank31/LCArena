@@ -43,12 +43,29 @@ const GATEWAY_URL = `http://127.0.0.1:${GATEWAY_PORT}`;
 const PROBLEM_SERVICE_URL = `http://127.0.0.1:${PROBLEM_PORT}`;
 const SUBMISSION_SERVICE_URL = `http://127.0.0.1:${SUBMISSION_PORT}`;
 
+const S3_ENDPOINT = "http://127.0.0.1:9002";
+const S3_REGION = "us-east-1";
+const S3_ACCESS_KEY_ID = "minioadmin";
+const S3_SECRET_ACCESS_KEY = "minioadmin";
+const S3_BUCKET_NAME = "lcarena-testcases";
+const S3_FORCE_PATH_STYLE = "true";
+
+const COMMON_S3_ENV = {
+  S3_ENDPOINT,
+  S3_REGION,
+  S3_ACCESS_KEY_ID,
+  S3_SECRET_ACCESS_KEY,
+  S3_BUCKET_NAME,
+  S3_FORCE_PATH_STYLE,
+};
+
 const COMMON_SERVICE_ENV = {
   MONGODB_URL: MONGO_URL,
   RABBITMQ_URL,
   REDIS_HOST,
   REDIS_PORT,
   LOG_LEVEL: process.env.LOG_LEVEL || "error",
+  ...COMMON_S3_ENV,
 };
 
 /** Services that must be running before the suites execute. */
@@ -61,6 +78,7 @@ const SERVICES = [
       PORT: String(SUBMISSION_PORT),
       MONGODB_URL: MONGO_URL,
       RABBITMQ_URL,
+      ...COMMON_S3_ENV,
     },
     // No health route exists, so a TCP connect is the readiness signal.
     ready: "tcp",
@@ -72,6 +90,7 @@ const SERVICES = [
     env: {
       PORT: String(PROBLEM_PORT),
       MONGODB_URL: MONGO_URL,
+      ...COMMON_S3_ENV,
     },
     ready: `http://127.0.0.1:${PROBLEM_PORT}/health`,
   },
@@ -84,6 +103,7 @@ const SERVICES = [
       MONGODB_URL: MONGO_URL,
       RABBITMQ_URL,
       EXECUTION_MAX_ATTEMPTS: "3",
+      ...COMMON_S3_ENV,
     },
     ready: `http://127.0.0.1:${EXECUTION_PORT}/health`,
   },
@@ -108,6 +128,7 @@ const SERVICES = [
     },
     // Started last: it proxies to the services above.
     dependsOn: ["problem", "submission"],
+    ready: "tcp",
   },
 ];
 
@@ -116,27 +137,34 @@ const SUITES = {
   api: [
     {
       name: "problem-service",
+      needs: ["submission", "problem", "gateway"],
       cmd: ["--test", "apps/apis/problem/test/integration/problem.api.test.js"],
+      env: { ...COMMON_S3_ENV },
     },
     {
       name: "submission-service",
+      needs: ["submission", "problem", "gateway"],
       cmd: ["--test", "apps/apis/submission/test/integration/submission.api.test.js"],
+      env: { ...COMMON_S3_ENV },
     },
     {
       name: "gateway",
+      needs: ["submission", "problem", "gateway"],
       cmd: ["--test", "apps/apis/gateway/test/integration/gateway.api.test.js"],
+      env: { ...COMMON_S3_ENV },
     },
   ],
   "submission-pipeline": [
     {
       name: "evaluation-flow",
+      needs: ["submission", "problem", "gateway", "execution"],
       cmd: [
         "--import",
         "tsx",
         "--test",
         "apps/apis/execution/test/integration/full-flow.e2e.ts",
       ],
-      env: { E2E: "1" },
+      env: { E2E: "1", ...COMMON_S3_ENV },
       // First run pulls the sandbox image; give it room.
       timeoutMs: 420_000,
     },
@@ -144,6 +172,7 @@ const SUITES = {
   "language-execution": [
     {
       name: "language-matrix",
+      needs: ["submission", "problem", "gateway", "execution"],
       cmd: [
         "--import",
         "tsx",
@@ -282,6 +311,19 @@ async function waitForService(service) {
   }
 }
 
+async function ensureService(name) {
+  if (started.includes(name)) return;
+  const service = SERVICES.find((s) => s.name === name);
+  if (!service) throw new Error(`Unknown service: ${name}`);
+  if (service.dependsOn) {
+    for (const dep of service.dependsOn) {
+      await ensureService(dep);
+    }
+  }
+  startService(service);
+  await waitForService(service);
+}
+
 function compose(argsList, options = {}) {
   return run(
     ["docker", "compose", "-p", COMPOSE_PROJECT, "-f", COMPOSE_FILE, ...argsList],
@@ -356,20 +398,6 @@ async function main() {
     process.exit(1);
   }
 
-  try {
-    for (const service of SERVICES) {
-      if (service.dependsOn) {
-        // Dependencies were started earlier in the list, so nothing to do here.
-      }
-      startService(service);
-      await waitForService(service);
-    }
-  } catch (error) {
-    console.error(`[integration] ${error.message}`);
-    await shutdown(null, 1);
-    return;
-  }
-
   const suiteEnv = {
     MONGODB_URL: MONGO_URL,
     RABBITMQ_URL,
@@ -386,6 +414,18 @@ async function main() {
 
   for (const suiteName of requested) {
     for (const suite of SUITES[suiteName]) {
+      try {
+        if (suite.needs) {
+          for (const svcName of suite.needs) {
+            await ensureService(svcName);
+          }
+        }
+      } catch (error) {
+        console.error(`[integration] ${error.message}`);
+        await shutdown(null, 1);
+        return;
+      }
+
       log(`running suite "${suite.name}" (${suiteName})`);
 
       const code = await run([process.execPath, ...suite.cmd], {

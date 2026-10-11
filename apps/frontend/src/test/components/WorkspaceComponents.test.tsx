@@ -233,4 +233,45 @@ describe("CodeEditorPane component", () => {
     );
     expect(screen.getByTestId("code-editor-textarea")).toHaveValue("// Java");
   });
+
+  it("handles increasing, decreasing, and resetting font size", () => {
+    const handleChange = vi.fn();
+    const handleFontSizeChange = vi.fn();
+
+    render(
+      <CodeEditorPane
+        value="const a = 1;"
+        onChange={handleChange}
+        language="js"
+        onFontSizeChange={handleFontSizeChange}
+      />
+    );
+
+    expect(screen.getByTestId("editor-font-size-controls")).toBeInTheDocument();
+    expect(screen.getByText("13px")).toBeInTheDocument();
+
+    const increaseBtn = screen.getByRole("button", { name: /increase font size/i });
+    const decreaseBtn = screen.getByRole("button", { name: /decrease font size/i });
+    const resetBtn = screen.getByRole("button", { name: /reset font size/i });
+
+    // Increase font size
+    fireEvent.click(increaseBtn);
+    expect(screen.getByText("14px")).toBeInTheDocument();
+    expect(handleFontSizeChange).toHaveBeenCalledWith(14);
+
+    // Increase again
+    fireEvent.click(increaseBtn);
+    expect(screen.getByText("15px")).toBeInTheDocument();
+    expect(handleFontSizeChange).toHaveBeenCalledWith(15);
+
+    // Decrease font size
+    fireEvent.click(decreaseBtn);
+    expect(screen.getByText("14px")).toBeInTheDocument();
+    expect(handleFontSizeChange).toHaveBeenCalledWith(14);
+
+    // Reset font size
+    fireEvent.click(resetBtn);
+    expect(screen.getByText("13px")).toBeInTheDocument();
+    expect(handleFontSizeChange).toHaveBeenCalledWith(13);
+  });
 });

@@ -2,10 +2,12 @@ import mongoose, { Document, Model } from "mongoose";
 
 export interface IProblem extends Document {
     description: string;
-    difficulty: "Easy" | "Medium" | "Hard",
+    difficulty: "Easy" | "Medium" | "Hard";
     sampleTestCaseUrl: string;
     testCasesUrl: string;
     time_limit: number;
+    testCaseStoragePrefix?: string;
+    testCasesCount?: number;
 }
 
 export type ProblemModel = Model<IProblem, {}>
@@ -19,7 +21,9 @@ const problemSchema = new mongoose.Schema<IProblem, ProblemModel>({
         },
         sampleTestCaseUrl: { type: String, required: true },
         testCasesUrl: { type: String, required: true },
-        time_limit: {type: Number, required: true, default: 5000}
+        time_limit: { type: Number, required: true, default: 5000 },
+        testCaseStoragePrefix: { type: String, required: false },
+        testCasesCount: { type: Number, required: false, default: 0 },
     }, { timestamps: true }
 );
 

@@ -4,6 +4,7 @@ import { Footer } from "./components/common/Footer";
 import { Navbar } from "./components/common/Navbar";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { ServerStatusModal } from "./components/common/ServerStatusModal";
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -22,6 +23,7 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0f1117] text-slate-100">
+      <ServerStatusModal />
       <Navbar />
       <main className="flex-1 flex flex-col">
         <Routes>

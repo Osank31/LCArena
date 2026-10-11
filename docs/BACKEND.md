@@ -17,13 +17,14 @@ frontend is out of scope for every command in this document.
 | Submission | `apps/apis/submission` | 3002 | Submission intake; publishes `submission.created`. |
 | Mail | `apps/apis/mail` | 3003 | SMTP delivery of OTP emails. |
 | Execution worker | `apps/apis/execution` | 3004 (`/health` only) | Consumes `submission.created`, runs code in ephemeral containers, publishes `submission.completed`. |
+| MinIO Storage | Docker container | 9000 (S3 API), 9001 (Console) | S3-compatible test-case object storage (MinIO for dev/testing, Cloudflare R2 compatible). |
 | Sockets | — | — | **Not implemented in this repository.** The AGENTS.md/README references are aspirational; there is no `apps/apis/sockets` workspace. |
 | AI suggestion | `apps/apis/ai-suggestion-service` | 8000 | Python/FastAPI code completion. Own Dockerfile; excluded from the TypeScript test commands. |
 
 Shared packages live in `packages/backend/*` (`config`, `models`, `middlewares`,
 `utils`, `execution`).
 
-Infrastructure: **MongoDB 7**, **Redis 7**, **RabbitMQ 3.13** (management UI), and
+Infrastructure: **MongoDB 7**, **Redis 7**, **RabbitMQ 3.13** (management UI), **MinIO Object Storage** (S3-compatible, on Docker), and
 the **host Docker daemon** (used by the execution worker to launch sandboxes).
 
 RabbitMQ queues:
@@ -214,7 +215,71 @@ npm run seed:problems -- --dry-run
 Idempotent: only documents tagged with a `https://seed.lcarena.local/...`
 test-case URL are replaced.
 
-## 10. Logs
+## 10. Object Storage & Sandboxed Evaluation Pipeline
+
+### Object Storage Architecture
+
+LCArena uses an S3-compatible storage layer implemented via the AWS SDK v3 (`@aws-sdk/client-s3`). In local development and automated testing, MinIO (`coollabsio/minio:latest`) runs inside Docker. In production, any S3-compatible service can be used without code changes, including Cloudflare R2.
+
+#### Test-Case Key Hierarchy
+
+Test cases are stored as immutable, deterministic object keys with sequential 3-digit zero-padded numbering:
+
+```
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_001/input.in
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_001/output.ans
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_002/input.in
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_002/output.ans
+...
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_NNN/input.in
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_NNN/output.ans
+```
+
+- Whitespace, newlines, and trailing line endings in both inputs and expected answers are preserved verbatim in storage.
+- Private test cases are never publicly readable; presigned URLs with short TTLs or internal S3 streaming are used.
+
+#### Configuring Remote Cloudflare R2 (Free Tier)
+
+Cloudflare R2 provides a free tier of 10 GB storage and 10 million Class B read operations per month with zero egress fees:
+
+1. In the Cloudflare Dashboard, navigate to **R2 Object Storage** and create a bucket named `lcarena-testcases`.
+2. Under **Account Details**, copy your Account ID.
+3. Under **Manage R2 API Tokens**, create an API token with **Object Read & Write** permissions for the `lcarena-testcases` bucket.
+4. Copy the generated Access Key ID and Secret Access Key.
+5. In your production `.env`, set:
+   ```env
+   S3_ENDPOINT=https://<YOUR_CLOUDFLARE_ACCOUNT_ID>.r2.cloudflarestorage.com
+   S3_REGION=auto
+   S3_ACCESS_KEY_ID=<YOUR_R2_ACCESS_KEY_ID>
+   S3_SECRET_ACCESS_KEY=<YOUR_R2_SECRET_ACCESS_KEY>
+   S3_BUCKET_NAME=lcarena-testcases
+   S3_FORCE_PATH_STYLE=false
+   ```
+
+#### Problem Creation Flow & Failure Compensation
+
+1. **Validation**: Validates problem metadata (description, difficulty, sampleTestCaseUrl, time_limit) and test cases array (max 100 test cases, max 5MB per file).
+2. **S3 Upload**: Test cases are uploaded sequentially as `test_case_001/input.in`, `test_case_001/output.ans`, etc.
+3. **Database Insertion**: The problem is saved with `testCaseStoragePrefix` (e.g. `Evaluation_Test_Cases/Test_Cases_<ID>/`) and `testCasesCount`.
+4. **Compensating Cleanup**: If the MongoDB save fails after S3 upload, the uploaded S3 objects are automatically deleted to prevent orphaned storage.
+5. **Update & Deletion**: Modifying test cases or deleting a problem automatically deletes all S3 objects under that problem's prefix.
+
+#### Evaluation Pipeline Execution
+
+1. **Intake**: Submission service persists the submission as `PENDING` and publishes the event to `submission.created` in RabbitMQ.
+2. **Worker Consumption**: The execution worker consumes the message, checking whether the submission has already been finalized (ensuring duplicate queue deliveries are idempotent).
+3. **Isolated Workspace**: Creates a unique per-submission temporary directory (`mkdtemp`).
+4. **Download & Validation**: Downloads all objects under the problem prefix from S3 into `./testcases/` and enforces folder completeness (`input.in` and `output.ans` must both exist for every `test_case_XXX`).
+5. **Sandboxed Execution**: Executes untrusted code inside an ephemeral Docker container (`gcc:latest`, `eclipse-temurin`, `python:3.11-slim`, `node:20-slim`) under strict time limits (`timeout "$TIME_LIMIT"`). Untrusted host filesystem mounts and credentials are forbidden.
+6. **Judging Policy (`compareOutputs`)**:
+   - Normalizes CRLF and CR to LF.
+   - Trims trailing whitespace on each line.
+   - Ignores trailing blank lines at EOF while preserving token-level differences.
+7. **Verdicts**: Categorizes results into Accepted (`SUCCESS`), Wrong Answer (`WA`), Compilation Error (`COMPILE_ERROR`), Runtime Error (`RE`), Time Limit Exceeded (`TLE`), or Internal Evaluation Error (`INTERNAL_ERROR`).
+8. **Persistence & Notification**: Atomically updates MongoDB with passed/total counts, runtime stats, and sanitized errors, then publishes `submission.completed`.
+9. **Cleanup**: Temporary workspace folders and Docker containers are unconditionally destroyed in `finally` blocks on both success and error paths.
+
+## 11. Logs
 
 ```sh
 npm run docker:logs                    # all services
@@ -222,7 +287,7 @@ docker compose logs -f gateway         # one service
 docker compose logs -f execution       # sandbox/execution worker
 ```
 
-## 11. Cleaning up
+## 12. Cleaning up
 
 | Command | Data |
 | :--- | :--- |
@@ -233,7 +298,7 @@ docker compose logs -f execution       # sandbox/execution worker
 > ⚠️ `npm run docker:down:volumes` is irreversible. Use it only to reset local
 > development state on purpose, never on a shared machine.
 
-## 12. Troubleshooting
+## 13. Troubleshooting
 
 **A service exits immediately at boot.** Almost always a missing required env
 var. Check the container logs (`docker compose logs <service>`) — `getEnvVariable()`

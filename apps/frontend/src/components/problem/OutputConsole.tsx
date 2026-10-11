@@ -96,11 +96,36 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
               </div>
             ) : runOutput ? (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Run Finished</span>
+                <div
+                  className={`flex items-center gap-2 font-semibold text-sm ${
+                    runOutput.includes("Compilation Error") ||
+                    runOutput.includes("Runtime Error")
+                      ? "text-rose-400"
+                      : runOutput.includes("Wrong Answer")
+                      ? "text-amber-400"
+                      : "text-emerald-400"
+                  }`}
+                >
+                  {runOutput.includes("Compilation Error") ||
+                  runOutput.includes("Runtime Error") ? (
+                    <XCircle className="w-4 h-4" />
+                  ) : runOutput.includes("Wrong Answer") ? (
+                    <AlertCircle className="w-4 h-4" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4" />
+                  )}
+                  <span>
+                    Run Finished{" "}
+                    {runOutput.includes("Compilation Error")
+                      ? "(Compilation Error)"
+                      : runOutput.includes("Runtime Error")
+                      ? "(Runtime Error)"
+                      : runOutput.includes("Wrong Answer")
+                      ? "(Wrong Answer)"
+                      : "(All Passed)"}
+                  </span>
                 </div>
-                <pre className="bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-200 overflow-x-auto whitespace-pre-wrap">
+                <pre className="bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-200 overflow-x-auto whitespace-pre-wrap font-mono text-xs">
                   {runOutput}
                 </pre>
               </div>

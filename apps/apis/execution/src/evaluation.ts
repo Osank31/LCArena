@@ -18,6 +18,8 @@ export const evaluationDeps: EvaluationDeps = {
     acquireTestCases: (problem) =>
         acquireTestCases({
             testCasesUrl: problem.testCasesUrl,
+            testCaseStoragePrefix: problem.testCaseStoragePrefix,
+            problemId: String(problem._id),
             maxBytes: MAX_TESTCASES_BYTES,
             maxEntries: MAX_TESTCASES_ENTRIES,
         }),

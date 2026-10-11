@@ -273,11 +273,11 @@ Turborepo links internal packages via npm workspaces:
 
 | Package | Purpose & Key Exports |
 | :--- | :--- |
-| `@LCArena/config` | Singleton infrastructure connections: `dbConnect`, `getRedisClient`, `connectToQueue`, `channel`, `queue`. |
+| `@LCArena/config` | Singleton infrastructure connections: `dbConnect`, `getRedisClient`, `connectToQueue`, `channel`, `queue`, plus S3-compatible object storage SDK (`getS3Client`, `ensureBucketExists`, `putObject`, `getObject`, `listObjects`, `deleteObjectsWithPrefix`, `getProblemTestCasePrefix`, `getTestCaseInputKey`, `getTestCaseOutputKey`). |
 | `@LCArena/models` | Mongoose models & interfaces: `User`, `IUser`, `UserType`, `Problem`, `IProblem`, `Submission`, `ISubmission`, `ELanguage`. |
 | `@LCArena/middlewares` | Express middleware suite: `userValidation`, `roleValidation`, `appErrorHandler`, `AuthenticatedUser` type augmentation. |
 | `@LCArena/utils` | Shared primitives: `AppError` taxonomy (`BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `InternalServerError`), `sendSuccess`, `sendError`, `logger` (Winston), `getEnvVariable`. |
-| `@LCArena/execution` | Language execution interfaces and implementations: `Executor`, `CPPExecutor`, `JavaExecutor`, `PythonExecutor`, `JSExecutor`, `ExecutionResult`. |
+| `@LCArena/execution` | Language execution interfaces and implementations: `Executor`, `CPPExecutor`, `JavaExecutor`, `PythonExecutor`, `JSExecutor`, `ExecutionResult`, plus judging output comparison policy (`compareOutputs`). |
 
 ---
 
@@ -306,7 +306,9 @@ Turborepo links internal packages via npm workspaces:
   description: { type: String, required: true },
   difficulty: { type: String, enum: ["Easy", "Medium", "Hard"], required: true },
   sampleTestCaseUrl: { type: String, required: true },
-  testCasesUrl: { type: String, required: true },
+  testCasesUrl: { type: String, required: false },
+  testCaseStoragePrefix: { type: String, required: false }, // S3 object-key prefix e.g. "Evaluation_Test_Cases/Test_Cases_<ID>/"
+  testCasesCount: { type: Number, required: false, default: 0 },
   time_limit: { type: Number, required: true, default: 5000 }, // in milliseconds
   timestamps: true
 }
@@ -324,7 +326,33 @@ Turborepo links internal packages via npm workspaces:
 }
 ```
 
-### 5.2 Redis Key Topology & Policies
+### 5.2 Test-Case Storage Hierarchy (S3 / MinIO / Cloudflare R2)
+
+Test cases are stored as immutable S3 object keys using sequential, zero-padded 3-digit numbering:
+
+```
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_001/input.in
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_001/output.ans
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_002/input.in
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_002/output.ans
+...
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_NNN/input.in
+Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_NNN/output.ans
+```
+
+- Input and output contents are preserved verbatim in storage, including whitespace and trailing newlines.
+- The evaluation worker validates folder completeness: every `test_case_XXX` directory must have both `input.in` and `output.ans`.
+- Worker evaluations run in an isolated temporary directory per submission, with guaranteed cleanup on success and failure.
+
+### 5.3 Output Comparison & Judging Policy (`compareOutputs`)
+
+Output comparison normalizes line breaks and whitespace while strictly verifying semantic tokens:
+- Converts CRLF (`\r\n`) and CR (`\r`) to LF (`\n`).
+- Trims trailing whitespace from each line.
+- Strips trailing blank lines at the end of the file.
+- Distinguishes user code failures (WA, TLE, RE, CE) from infrastructure failures (Internal Evaluation Error).
+
+### 5.4 Redis Key Topology & Policies
 
 | Key Pattern | Data Type | Value | TTL | Purpose |
 | :--- | :--- | :--- | :--- | :--- |
@@ -332,7 +360,7 @@ Turborepo links internal packages via npm workspaces:
 | `revoked_access:<jti>` | String | `"1"` | Remaining JWT life | Instant blacklist for logged-out access tokens. |
 | `otp:<email>` | String | `123456` (6-digit) | 5 minutes (300s) | Ephemeral OTP code for email verification & passwordless auth. |
 
-### 5.3 RabbitMQ Queues & Payloads
+### 5.5 RabbitMQ Queues & Payloads
 
 - **`submission.created`**:
   - Published by: `Submission Service`
@@ -350,11 +378,14 @@ Turborepo links internal packages via npm workspaces:
 | Service | Port | Protocol | Purpose / Public Exposure |
 | :--- | :--- | :--- | :--- |
 | **API Gateway** | `3000` | HTTP | **Public Entry Point**. Authenticates, handles sessions, proxies downstream. |
-| **Problem Service** | `3001` | HTTP | Internal only. Handles problem catalog. |
+| **Problem Service** | `3001` | HTTP | Internal only. Handles problem catalog & testcase uploads. |
 | **Submission Service** | `3002` | HTTP | Internal only. Manages code submissions. |
 | **Mail Service** | `3003` | HTTP | Internal only. Email dispatching via Nodemailer. |
+| **Execution Worker** | `3004` | HTTP (`/health`) | Internal only. Consumes submissions, runs Docker sandboxes. |
 | **Sockets Service** | `3007` | WS / HTTP | **Public Entry Point**. Real-time submission status push notifications. |
 | **AI Suggestion Service**| `8000` | HTTP | **Public / Direct**. Code completion engine for Monaco Editor. |
+| **MinIO API** | `9000` | HTTP / S3 | Local S3-compatible object storage (ports 9002 in integration tests). |
+| **MinIO Console** | `9001` | HTTP | MinIO web management console (`minioadmin` / `minioadmin`). |
 | **Frontend** | `5173` | HTTP | Client web browser interface (Vite dev server). |
 | **MongoDB** | `27017`| TCP | Primary persistent database. |
 | **Redis** | `6379` | TCP | Caching, session store, token blacklist, OTP storage. |

@@ -9,6 +9,11 @@ import { pipeline } from "stream/promises";
 import yauzl from "yauzl";
 import tar from "tar-stream";
 import { TestCasesUnavailableError } from "@LCArena/execution";
+import {
+    getObject,
+    listObjects,
+    getProblemTestCasePrefix,
+} from "@LCArena/config";
 
 export class TestCaseSourceError extends Error {
     constructor(message: string) {
@@ -20,9 +25,11 @@ export class TestCaseSourceError extends Error {
 export interface AcquireTestCasesOptions {
     /**
      * `problem.testCasesUrl`. Either an `http(s)` URL to a `.zip`/`.tar[.gz]`
-     * archive or a local path to an archive or a directory.
+     * archive, an `s3://` URI, or a local path to an archive or directory.
      */
-    testCasesUrl: string;
+    testCasesUrl?: string;
+    testCaseStoragePrefix?: string;
+    problemId?: string;
     maxBytes?: number;
     maxEntries?: number;
 }
@@ -449,6 +456,88 @@ const resolveTestCasesRoot = async (
     );
 };
 
+export const extractPrefixFromStorageUrl = (url: string): string | null => {
+    if (url.startsWith("s3://")) {
+        const withoutScheme = url.slice(5); // "bucket/prefix..."
+        const firstSlash = withoutScheme.indexOf("/");
+        if (firstSlash !== -1) {
+            return withoutScheme.slice(firstSlash + 1);
+        }
+        return "";
+    }
+    if (url.startsWith("Evaluation_Test_Cases/")) {
+        return url;
+    }
+    return null;
+};
+
+export const downloadFromS3 = async (
+    prefix: string,
+    workspaceDir: string,
+    limits: ExtractionLimits
+): Promise<void> => {
+    const keys = await listObjects(prefix);
+    if (keys.length === 0) {
+        throw new TestCasesUnavailableError(
+            `No test-case objects found in storage under prefix: ${prefix}`
+        );
+    }
+
+    if (keys.length > limits.maxEntries) {
+        throw new TestCaseSourceError(
+            `Test-case collection contains too many entries: ${keys.length}`
+        );
+    }
+
+    let totalBytes = 0;
+    for (const key of keys) {
+        if (key.endsWith("/")) continue;
+
+        const relativePath = key.startsWith(prefix)
+            ? key.slice(prefix.length)
+            : path.basename(key);
+        const targetPath = resolveSafeEntryPath(workspaceDir, relativePath);
+
+        const content = await getObject(key);
+        totalBytes += content.length;
+
+        if (totalBytes > limits.maxBytes) {
+            throw new TestCaseSourceError(
+                "Test-case collection exceeds the configured size limit"
+            );
+        }
+
+        await fs.mkdir(path.dirname(targetPath), { recursive: true });
+        await fs.writeFile(targetPath, content, { mode: 0o600 });
+    }
+};
+
+export const validateTestCaseFolderCompleteness = async (
+    testCasesDir: string
+): Promise<void> => {
+    const entries = await fs.readdir(testCasesDir, { withFileTypes: true });
+    const directories = entries.filter((e) => e.isDirectory());
+
+    if (directories.length === 0) {
+        throw new TestCasesUnavailableError(
+            "No usable test cases (each case needs a .in and a .ans file) were found"
+        );
+    }
+
+    for (const dir of directories) {
+        const dirPath = path.join(testCasesDir, dir.name);
+        const files = await fs.readdir(dirPath);
+        const hasInput = files.some((f) => f.endsWith(".in"));
+        const hasOutput = files.some((f) => f.endsWith(".ans"));
+
+        if (!hasInput || !hasOutput) {
+            throw new TestCaseSourceError(
+                `Test case '${dir.name}' is incomplete: missing ${!hasInput ? "input (*.in)" : "expected output (*.ans)"}`
+            );
+        }
+    }
+};
+
 /**
  * Stages a problem's test cases into a fresh, private workspace and returns the
  * directory the executor should read from. On any failure the workspace is
@@ -473,36 +562,38 @@ export const acquireTestCases = async (
     };
 
     try {
-        if (isHttpUrl(options.testCasesUrl)) {
-            const downloaded = await downloadToFile(
-                options.testCasesUrl,
-                limits.maxBytes
-            );
+        const url = options.testCasesUrl || "";
+        const explicitPrefix = options.testCaseStoragePrefix;
+        const urlPrefix = url ? extractPrefixFromStorageUrl(url) : null;
+
+        if (explicitPrefix || urlPrefix) {
+            const prefix = explicitPrefix || urlPrefix!;
+            await downloadFromS3(prefix, workspaceDir, limits);
+        } else if (isHttpUrl(url)) {
+            const downloaded = await downloadToFile(url, limits.maxBytes);
 
             try {
                 await extractArchive(downloaded, workspaceDir, limits);
             } finally {
                 await fs.rm(downloaded, { force: true }).catch(() => undefined);
             }
-        } else {
-            let sourcePath = path.resolve(options.testCasesUrl);
+        } else if (url) {
+            let sourcePath = path.resolve(url);
             let stat = await fs.stat(sourcePath).catch(() => null);
 
             if (!stat) {
-                const isLegacyPlaceholder =
-                    options.testCasesUrl === "that" ||
-                    options.testCasesUrl === "this";
+                const isLegacyPlaceholder = url === "that" || url === "this";
                 const isBundledReference =
                     isLegacyPlaceholder ||
-                    options.testCasesUrl === "testcases" ||
-                    options.testCasesUrl.includes("packages/backend/execution/testcases");
+                    url === "testcases" ||
+                    url.includes("packages/backend/execution/testcases");
 
                 const candidates: string[] = [];
-                if (!path.isAbsolute(options.testCasesUrl)) {
+                if (!path.isAbsolute(url)) {
                     candidates.push(
-                        path.resolve(process.cwd(), options.testCasesUrl),
-                        path.resolve(__dirname, "../../../..", options.testCasesUrl),
-                        path.resolve(__dirname, "../../..", options.testCasesUrl)
+                        path.resolve(process.cwd(), url),
+                        path.resolve(__dirname, "../../../..", url),
+                        path.resolve(__dirname, "../../..", url)
                     );
                 }
                 if (isBundledReference) {
@@ -515,7 +606,9 @@ export const acquireTestCases = async (
                 }
 
                 for (const candidate of candidates) {
-                    const candidateStat = await fs.stat(candidate).catch(() => null);
+                    const candidateStat = await fs
+                        .stat(candidate)
+                        .catch(() => null);
                     if (candidateStat) {
                         sourcePath = candidate;
                         stat = candidateStat;
@@ -524,24 +617,35 @@ export const acquireTestCases = async (
                 }
             }
 
-            if (!stat) {
-                throw new TestCaseSourceError(
-                    `Test-case source was not found: ${options.testCasesUrl}`
-                );
-            }
-
-            if (stat.isDirectory()) {
-                await copyDirectory(
-                    sourcePath,
-                    workspaceDir,
-                    limits.maxEntries
-                );
+            if (stat) {
+                if (stat.isDirectory()) {
+                    await copyDirectory(
+                        sourcePath,
+                        workspaceDir,
+                        limits.maxEntries
+                    );
+                } else {
+                    await extractArchive(sourcePath, workspaceDir, limits);
+                }
+            } else if (options.problemId) {
+                const fallbackPrefix = getProblemTestCasePrefix(options.problemId);
+                await downloadFromS3(fallbackPrefix, workspaceDir, limits);
             } else {
-                await extractArchive(sourcePath, workspaceDir, limits);
+                throw new TestCaseSourceError(
+                    `Test-case source was not found: ${url}`
+                );
             }
+        } else if (options.problemId) {
+            const problemPrefix = getProblemTestCasePrefix(options.problemId);
+            await downloadFromS3(problemPrefix, workspaceDir, limits);
+        } else {
+            throw new TestCaseSourceError(
+                "No test cases source or storage reference specified"
+            );
         }
 
         const testCasesDir = await resolveTestCasesRoot(workspaceDir);
+        await validateTestCaseFolderCompleteness(testCasesDir);
 
         return { testCasesDir, cleanup };
     } catch (error) {

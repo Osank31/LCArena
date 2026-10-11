@@ -150,6 +150,18 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Dispatch global event on network connectivity failure (server offline)
+    if (
+      !error.response &&
+      (error.code === "ERR_NETWORK" ||
+        error.code === "ECONNREFUSED" ||
+        error.message?.includes("Network Error"))
+    ) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("lcarena:server-connection-error"));
+      }
+    }
+
     return Promise.reject(error);
   }
 );

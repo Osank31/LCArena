@@ -90,6 +90,59 @@ describe("createProblemSchema", () => {
 
         assert.equal(result.success, false);
     });
+
+    it("accepts a problem with a valid testCases array without requiring testCasesUrl", () => {
+        const { testCasesUrl: _omitted, ...problemWithTestCases } = {
+            ...validProblem(),
+            testCases: [
+                { input: "1 2\n", output: "3\n" },
+                { input: "10 20\n", output: "30\n" },
+            ],
+        };
+
+        const parsed = createProblemSchema.parse(problemWithTestCases);
+        assert.equal(parsed.testCases?.length, 2);
+        assert.equal(parsed.testCases?.[0].input, "1 2\n");
+    });
+
+    it("rejects an empty testCases array when testCasesUrl is omitted", () => {
+        const { testCasesUrl: _omitted, ...withoutUrl } = {
+            ...validProblem(),
+            testCases: [],
+        };
+
+        const result = createProblemSchema.safeParse(withoutUrl);
+        assert.equal(result.success, false);
+    });
+
+    it("rejects test cases missing an input or output property", () => {
+        const missingInput = {
+            ...validProblem(),
+            testCases: [{ output: "3\n" } as any],
+        };
+        assert.equal(createProblemSchema.safeParse(missingInput).success, false);
+
+        const missingOutput = {
+            ...validProblem(),
+            testCases: [{ input: "1 2\n" } as any],
+        };
+        assert.equal(createProblemSchema.safeParse(missingOutput).success, false);
+    });
+
+    it("rejects test cases exceeding the maximum count of 100", () => {
+        const tooManyCases = Array.from({ length: 101 }, (_, i) => ({
+            input: `${i}\n`,
+            output: `${i}\n`,
+        }));
+
+        const result = createProblemSchema.safeParse({
+            description: "A valid problem description with too many test cases",
+            difficulty: "Medium",
+            testCases: tooManyCases,
+        });
+
+        assert.equal(result.success, false);
+    });
 });
 
 describe("updateProblemSchema", () => {
