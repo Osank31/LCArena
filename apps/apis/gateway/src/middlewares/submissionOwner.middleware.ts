@@ -23,7 +23,7 @@ export const requireSubmissionOwner = async (
             throw new BadRequestError("Invalid submission id")
         }
 
-        const submission = await Submission.findById(submissionId)
+        const submission = await Submission.findById(submissionId).select("userId").lean()
 
         if (!submission) throw new NotFoundError("Submission not found")
 

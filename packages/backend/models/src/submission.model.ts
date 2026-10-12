@@ -44,6 +44,8 @@ const submissionSchema = new mongoose.Schema<ISubmission, SubmissionModel>({
     { timestamps: true }
 )
 
+submissionSchema.index({ userId: 1, createdAt: -1 });
+submissionSchema.index({ problemId: 1, createdAt: -1 });
 
 const Submission = mongoose.model<ISubmission>(
     "Submission",
