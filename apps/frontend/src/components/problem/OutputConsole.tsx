@@ -106,7 +106,10 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
             ) : runOutput ? (
               <div data-output-reveal className="space-y-3">
                 <div className="flex items-center gap-2 font-serif font-bold text-sm text-ink">
-                  {runOutput.includes("Compilation Error") ||
+                  {runOutput.includes("Online Demo") ||
+                  runOutput.includes("Code Execution Unavailable") ? (
+                    <Terminal className="w-4 h-4 text-ink" />
+                  ) : runOutput.includes("Compilation Error") ||
                   runOutput.includes("Runtime Error") ? (
                     <XCircle className="w-4 h-4" />
                   ) : runOutput.includes("Wrong Answer") ? (
@@ -115,14 +118,16 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
                     <CheckCircle2 className="w-4 h-4" />
                   )}
                   <span>
-                    Run Finished{" "}
-                    {runOutput.includes("Compilation Error")
-                      ? "(Compilation Error)"
+                    {runOutput.includes("Online Demo") ||
+                    runOutput.includes("Code Execution Unavailable")
+                      ? "Notice: Execution Unavailable in Online Demo"
+                      : runOutput.includes("Compilation Error")
+                      ? "Run Finished (Compilation Error)"
                       : runOutput.includes("Runtime Error")
-                      ? "(Runtime Error)"
+                      ? "Run Finished (Runtime Error)"
                       : runOutput.includes("Wrong Answer")
-                      ? "(Wrong Answer)"
-                      : "(All Passed)"}
+                      ? "Run Finished (Wrong Answer)"
+                      : "Run Finished (All Passed)"}
                   </span>
                 </div>
                 <pre className="bg-paper p-3 rounded-sm border border-rule text-ink overflow-x-auto whitespace-pre-wrap font-mono text-xs">

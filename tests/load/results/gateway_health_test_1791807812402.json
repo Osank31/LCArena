@@ -1,0 +1,97 @@
+{
+  "testName": "gateway_health_test",
+  "scriptPath": "tests/load/k6/endpoints/01-gateway-health.js",
+  "timestamp": "2026-10-12T12:23:35.257Z",
+  "durationSeconds": 1,
+  "exitCode": 255,
+  "success": false,
+  "envVars": {
+    "VUS": 5,
+    "DURATION": "3s"
+  },
+  "k6Metrics": null,
+  "rawK6Metrics": null,
+  "resources": {
+    "sampleCount": 1,
+    "durationSeconds": 0,
+    "containers": {
+      "lcarena-gateway-1": {
+        "avgCpuPercent": 0.25,
+        "peakCpuPercent": 0.25,
+        "avgMemMb": 99.74,
+        "peakMemMb": 99.74,
+        "memGrowthMb": 0
+      },
+      "lcarena-submission-1": {
+        "avgCpuPercent": 0.16,
+        "peakCpuPercent": 0.16,
+        "avgMemMb": 90.76,
+        "peakMemMb": 90.76,
+        "memGrowthMb": 0
+      },
+      "lcarena-execution-1": {
+        "avgCpuPercent": 0.11,
+        "peakCpuPercent": 0.11,
+        "avgMemMb": 102.4,
+        "peakMemMb": 102.4,
+        "memGrowthMb": 0
+      },
+      "lcarena-problem-1": {
+        "avgCpuPercent": 9.42,
+        "peakCpuPercent": 9.42,
+        "avgMemMb": 94.33,
+        "peakMemMb": 94.33,
+        "memGrowthMb": 0
+      },
+      "lcarena-minio-init-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0,
+        "avgMemMb": 1.34,
+        "peakMemMb": 1.34,
+        "memGrowthMb": 0
+      },
+      "lcarena-redis-1": {
+        "avgCpuPercent": 0.71,
+        "peakCpuPercent": 0.71,
+        "avgMemMb": 7.87,
+        "peakMemMb": 7.87,
+        "memGrowthMb": 0
+      },
+      "lcarena-rabbitmq-1": {
+        "avgCpuPercent": 12.9,
+        "peakCpuPercent": 12.9,
+        "avgMemMb": 204.1,
+        "peakMemMb": 204.1,
+        "memGrowthMb": 0
+      },
+      "lcarena-ai-suggestion-1": {
+        "avgCpuPercent": 0.19,
+        "peakCpuPercent": 0.19,
+        "avgMemMb": 129.2,
+        "peakMemMb": 129.2,
+        "memGrowthMb": 0
+      },
+      "lcarena-mail-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0,
+        "avgMemMb": 126,
+        "peakMemMb": 126,
+        "memGrowthMb": 0
+      },
+      "lcarena-mongo-1": {
+        "avgCpuPercent": 0.76,
+        "peakCpuPercent": 0.76,
+        "avgMemMb": 297.9,
+        "peakMemMb": 297.9,
+        "memGrowthMb": 0
+      },
+      "lcarena-minio-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0,
+        "avgMemMb": 108.9,
+        "peakMemMb": 108.9,
+        "memGrowthMb": 0
+      }
+    }
+  }
+}

@@ -63,6 +63,15 @@ export const Navbar: React.FC = () => {
 
         {/* Right side Auth Controls */}
         <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"))}
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-sm border border-rule-2 bg-paper-2/60 hover:border-ink-3 text-ink-2 hover:text-ink transition-colors cursor-pointer"
+            title="Frontend Demo Mode — View Developer Apology Note"
+            aria-label="Open developer apology note"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-ink-3" />
+            <span>Demo Mode 🥹</span>
+          </button>
           {isAuthenticated && user ? (
             <div className="relative">
               <button
@@ -176,6 +185,17 @@ export const Navbar: React.FC = () => {
             <History className="w-3.5 h-3.5" />
             <span>Submissions</span>
           </NavLink>
+
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"));
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-mono text-ink-2 hover:text-ink border border-rule-2 rounded-sm bg-paper-2/60 text-left cursor-pointer"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-ink-3" />
+            <span>Demo Mode 🥹 (Developer Note)</span>
+          </button>
 
           <div className="pt-2 border-t border-rule">
             {isAuthenticated && user ? (

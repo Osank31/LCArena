@@ -450,3 +450,57 @@ export function runCode(
     results: testResults,
   };
 }
+
+/**
+ * Formats a friendly demo notice when users click Run in online demo mode.
+ * Clearly presents sample test cases as reference data without pretending
+ * to execute or compile code on a server.
+ */
+export function formatDemoRunNotice(problem: ParsedProblem): string {
+  const lines: string[] = [];
+  lines.push("[Online Demo Mode - Code Execution Unavailable]");
+  lines.push("");
+  lines.push(
+    "Live code execution is disabled in this hosted demo because running"
+  );
+  lines.push(
+    "sandboxed execution servers is expensive for an individual developer."
+  );
+  lines.push("");
+  lines.push("To execute code and run automated tests in isolated Docker containers:");
+  lines.push("  1. Clone repository: git clone https://github.com/Osank31/LCArena.git");
+  lines.push("  2. Start locally: docker compose up");
+  lines.push("");
+  lines.push("Repository: https://github.com/Osank31/LCArena");
+  lines.push("");
+  lines.push("----------------------------------------");
+  lines.push("Sample Test Cases (Provided for Reference - Not Executed):");
+  lines.push("Tested against sample input:");
+
+  const examples =
+    problem.examples && problem.examples.length > 0
+      ? problem.examples
+      : [
+          {
+            input: "Sample Input",
+            output: "Expected Output",
+          },
+        ];
+
+  examples.forEach((tc, idx) => {
+    lines.push(`----------------------------------------`);
+    lines.push(`Test Case ${idx + 1}:`);
+    lines.push(`Input:    ${tc.input}`);
+    lines.push(`Expected: ${tc.output}`);
+    lines.push(`Status:   Reference Only (Run locally for execution)`);
+    if (tc.explanation) {
+      lines.push(`Note:     ${tc.explanation}`);
+    }
+  });
+
+  lines.push(`----------------------------------------`);
+  lines.push("Note: No code was executed on a server.");
+
+  return lines.join("\n");
+}
+

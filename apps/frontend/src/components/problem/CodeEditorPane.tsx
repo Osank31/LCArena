@@ -20,6 +20,15 @@ const LANGUAGE_MAP: Record<SupportedLanguage, string> = {
   js: "javascript",
 };
 
+/**
+ * Base URL for the AI suggestion service. Follows the same env-driven pattern
+ * as `apiClient`: empty in dev (the Vite proxy handles `/suggestions`), and
+ * settable at build time via `VITE_AI_URL` when the app is deployed on an
+ * origin where the AI service is not reachable under the same host.
+ */
+const AI_BASE_URL =
+  import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || "";
+
 export const FONT_SIZE_STORAGE_KEY = "lcarena_editor_font_size";
 export const DEFAULT_FONT_SIZE = 13;
 export const MIN_FONT_SIZE = 10;
@@ -198,7 +207,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
         const suffix = code.slice(offset);
 
         await axios.post(
-          "/suggestions",
+          `${AI_BASE_URL}/suggestions`,
           {
             prefix,
             suffix,

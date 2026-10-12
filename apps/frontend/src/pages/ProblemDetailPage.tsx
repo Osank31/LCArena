@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Code2,
+  ExternalLink,
   FileText,
   History,
   Play,
@@ -12,6 +13,7 @@ import {
 import { Alert } from "../components/common/Alert";
 import { Button } from "../components/common/Button";
 import { Modal } from "../components/common/Modal";
+import { GithubIcon } from "../components/common/DeveloperApologyBanner";
 import { Skeleton } from "../components/common/Skeleton";
 import { Tabs } from "../components/common/Tabs";
 import { useWorkspaceReveal } from "../animations";
@@ -31,7 +33,7 @@ import {
   SupportedLanguage,
 } from "../types/submission.types";
 import { DEFAULT_STARTER_CODE } from "../utils/starterCode";
-import { runCode } from "../utils/codeRunner";
+import { formatDemoRunNotice, runCode } from "../utils/codeRunner";
 
 export const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -64,6 +66,7 @@ export const ProblemDetailPage: React.FC = () => {
   // Modals
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [showDemoNoticeModal, setShowDemoNoticeModal] = useState<boolean>(false);
 
   // Coordinated (opacity-only) reveal of the workspace chrome once the problem
   // resolves. The editor surface stays completely stable while the user works.
@@ -83,11 +86,22 @@ export const ProblemDetailPage: React.FC = () => {
         if (!isMounted) return;
         setProblem(prob);
 
-        // Load custom or starter code
-        const savedCode = localStorage.getItem(`lcarena_code_${id}_${language}`);
-        if (savedCode) {
-          setCodeMap((prev) => ({ ...prev, [language]: savedCode }));
-        }
+        // Load custom or starter code using problem templates
+        const initialMap: Record<SupportedLanguage, string> = {
+          cpp: prob.starterTemplates?.cpp || DEFAULT_STARTER_CODE.cpp,
+          py: prob.starterTemplates?.py || DEFAULT_STARTER_CODE.py,
+          java: prob.starterTemplates?.java || DEFAULT_STARTER_CODE.java,
+          js: prob.starterTemplates?.js || DEFAULT_STARTER_CODE.js,
+        };
+
+        (["cpp", "py", "java", "js"] as SupportedLanguage[]).forEach((lang) => {
+          const savedCode = localStorage.getItem(`lcarena_code_${id}_${lang}`);
+          if (savedCode) {
+            initialMap[lang] = savedCode;
+          }
+        });
+
+        setCodeMap(initialMap);
 
         // Load local submissions for this problem
         const effectiveUserId = user?.userId || (user as any)?.id;
@@ -131,14 +145,17 @@ export const ProblemDetailPage: React.FC = () => {
     setLanguage(newLang);
     if (id) {
       const savedCode = localStorage.getItem(`lcarena_code_${id}_${newLang}`);
-      if (!savedCode && DEFAULT_STARTER_CODE[newLang]) {
-        setCodeMap((prev) => ({ ...prev, [newLang]: DEFAULT_STARTER_CODE[newLang] }));
+      if (!savedCode) {
+        const defaultForLang =
+          problem?.starterTemplates?.[newLang] || DEFAULT_STARTER_CODE[newLang];
+        setCodeMap((prev) => ({ ...prev, [newLang]: defaultForLang }));
       }
     }
   };
 
   const handleResetCode = () => {
-    const defaultTemplate = DEFAULT_STARTER_CODE[language];
+    const defaultTemplate =
+      problem?.starterTemplates?.[language] || DEFAULT_STARTER_CODE[language];
     handleCodeChange(defaultTemplate);
     setShowResetModal(false);
   };
@@ -150,22 +167,13 @@ export const ProblemDetailPage: React.FC = () => {
     setRunOutput(null);
     setExecutionResult(null);
 
-    // Evaluate code against problem sample test cases
+    // Provide friendly notice explaining that live execution is unavailable in demo
+    // while displaying problem sample test cases for inspection
     setTimeout(() => {
-      try {
-        const evaluation = runCode(currentCode, language, problem);
-        setRunOutput(evaluation.outputMessage);
-      } catch (err: any) {
-        setRunOutput(
-          `[Run Evaluation - Error]\nTested against sample input:\nExecution failed: ${
-            err.message || String(err)
-          }`
-        );
-      } finally {
-        setIsEvaluating(false);
-        setMobileTab("console");
-      }
-    }, 300);
+      setRunOutput(formatDemoRunNotice(problem));
+      setIsEvaluating(false);
+      setMobileTab("console");
+    }, 250);
   };
 
   // Submit code to backend judge
@@ -207,13 +215,16 @@ export const ProblemDetailPage: React.FC = () => {
         ...prev.filter((s) => s._id !== finalSubmission._id),
       ]);
     } catch (err: any) {
-      setExecutionResult({
-        status: "INTERNAL_ERROR",
-        message:
-          err.response?.data?.message ||
-          err.message ||
-          "Submission failed. Check network or server status.",
-      });
+      setExecutionResult(null);
+      setRunOutput(
+        `[Online Demo Notice — Submissions Unavailable]\n\n` +
+          `Submitting code for sandboxed grading requires the LCArena backend execution worker and Docker engine.\n` +
+          `Because LCArena is currently hosted as a frontend demo to save infrastructure costs, remote submission grading is disabled.\n\n` +
+          `To evaluate code submissions against the full test suite, please clone and run the backend locally:\n\n` +
+          `  git clone https://github.com/Osank31/LCArena.git && docker compose up\n` +
+          `  Repository: https://github.com/Osank31/LCArena`
+      );
+      setShowDemoNoticeModal(true);
     } finally {
       setIsEvaluating(false);
     }
@@ -432,20 +443,78 @@ export const ProblemDetailPage: React.FC = () => {
         title="Sign In to Submit Solutions"
         description="To run submissions against the sandboxed Docker judge and record verdicts, please sign in or register."
       >
-        <div className="flex justify-end gap-3 mt-4">
-          <Button variant="ghost" size="sm" onClick={() => setShowAuthModal(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => {
-              setShowAuthModal(false);
-              navigate("/login");
-            }}
-          >
-            Go to Sign In
-          </Button>
+        <div className="space-y-4">
+          <div className="p-3 bg-paper-2 border border-rule-2 rounded-sm text-xs text-ink-2 space-y-1">
+            <span className="font-semibold text-ink">Online Demo Notice:</span>
+            <p>
+              Please note that in this free online demo, backend execution servers are not hosted.
+              Run LCArena locally with Docker Compose to evaluate submissions.
+            </p>
+          </div>
+          <div className="flex justify-end gap-3 mt-2">
+            <Button variant="ghost" size="sm" onClick={() => setShowAuthModal(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                setShowAuthModal(false);
+                navigate("/login");
+              }}
+            >
+              Go to Sign In
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Demo Notice Modal for Code Execution / Submission */}
+      <Modal
+        isOpen={showDemoNoticeModal}
+        onClose={() => setShowDemoNoticeModal(false)}
+        title="Code Execution Unavailable in Online Demo 🥹"
+        description="Submitting code for sandboxed execution requires the LCArena backend worker and Docker engine, which are not deployed in this online demo."
+      >
+        <div className="space-y-4 text-ink text-xs sm:text-sm">
+          <div className="p-3.5 bg-paper-2 border border-ink/20 border-l-4 border-l-ink rounded-sm space-y-2">
+            <p className="font-semibold text-ink">
+              Running execution servers gets expensive!
+            </p>
+            <p className="text-ink-2">
+              To evaluate solutions against complete test suites in Docker,
+              please run LCArena locally with Docker Compose:
+            </p>
+            <div className="bg-paper p-2.5 rounded-sm border border-rule-2 font-mono text-xs select-all text-ink overflow-x-auto">
+              <code>git clone https://github.com/Osank31/LCArena.git && docker compose up</code>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t border-rule">
+            <a
+              href="https://github.com/Osank31/LCArena"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex"
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<GithubIcon className="w-3.5 h-3.5" />}
+                rightIcon={<ExternalLink className="w-3 h-3 opacity-70" />}
+              >
+                GitHub Repository
+              </Button>
+            </a>
+
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setShowDemoNoticeModal(false)}
+            >
+              Got it!
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>

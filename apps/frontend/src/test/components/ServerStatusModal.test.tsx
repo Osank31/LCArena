@@ -5,6 +5,7 @@ import {
   ServerStatusModal,
   RUN_COMMAND,
   REPO_URL,
+  MODAL_TITLE,
 } from "../../components/common/ServerStatusModal";
 import { apiClient } from "../../services/apiClient";
 
@@ -13,16 +14,33 @@ describe("ServerStatusModal component", () => {
     vi.clearAllMocks();
   });
 
-  it("renders offline banner, clone command, and repo URL when opened", () => {
+  it("does not render or block the screen by default when initialOpen is not set", () => {
+    render(<ServerStatusModal />);
+    expect(screen.queryByText(MODAL_TITLE)).not.toBeInTheDocument();
+  });
+
+  it("renders apology message, GitHub button, and clone command when opened", () => {
     render(<ServerStatusModal initialOpen={true} />);
 
-    expect(screen.getByText("Server Connection Required")).toBeInTheDocument();
-    expect(screen.getByText("Backend Server is Offline")).toBeInTheDocument();
+    expect(screen.getByText(MODAL_TITLE)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Sorry, I haven't deployed the backend yet! T-T/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/running the code execution servers and supporting infrastructure gets pretty expensive/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/LCArena is available as a frontend demo/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(RUN_COMMAND)).toBeInTheDocument();
     expect(screen.getByText(REPO_URL)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /copy run command/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /copy repository url/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /retry connection/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /gitHub repository/i })).toHaveAttribute(
+      "href",
+      REPO_URL
+    );
   });
 
   it("copies run command to clipboard when Copy Command button is clicked", async () => {
@@ -67,7 +85,7 @@ describe("ServerStatusModal component", () => {
     fireEvent.click(dismissBtn);
 
     expect(handleDismiss).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText("Server Connection Required")).not.toBeInTheDocument();
+    expect(screen.queryByText(MODAL_TITLE)).not.toBeInTheDocument();
   });
 
   it("handles retry connection successfully when health check passes", async () => {

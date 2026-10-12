@@ -1,0 +1,21 @@
+# Docker Compose extension for running load tests inside the Docker network.
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.load.yml run --rm load-tester run k6/endpoints/01-gateway-health.js
+#   docker compose -f docker-compose.yml -f docker-compose.load.yml run --rm load-tester run -e PROFILE=smoke k6/profiles/workload-driver.js
+services:
+  load-tester:
+    image: grafana/k6:latest
+    networks:
+      - default
+    volumes:
+      - .:/workspace
+    working_dir: /workspace/tests/load
+    environment:
+      - K6_IN_DOCKER=1
+      - IN_DOCKER_NETWORK=1
+      - GATEWAY_URL=http://gateway:3000
+      - PROBLEM_SERVICE_URL=http://problem:3001
+      - SUBMISSION_SERVICE_URL=http://submission:3002
+      - MAIL_SERVICE_URL=http://mail:3003
+      - EXECUTION_SERVICE_URL=http://execution:3004
+      - AI_SERVICE_URL=http://ai-suggestion:8000

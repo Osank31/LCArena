@@ -1,0 +1,21 @@
+{
+  "adminUser": {
+    "id": "6acb3db878de73ea0b742ffb",
+    "email": "admin@lcarena.test",
+    "password": "Password123",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWNiM2RiODc4ZGU3M2VhMGI3NDJmZmIiLCJlbWFpbCI6ImFkbWluQGxjYXJlbmEudGVzdCIsIm5hbWUiOiJBZG1pbiBVc2VyIiwidXNlclJvbGUiOiJBZG1pbiIsImp0aSI6IjgwMWZhZGZkLTY2YjgtNDg5Yi05MmZiLTQ3NzQ3Njc5ZTkwZiIsImlhdCI6MTc5MTgwODI0OCwiZXhwIjoxNzkxODA5MTQ4fQ.i4oFxrSf8U90aGxJqXktUXADf2enlmgL7W1uHlDhzDo"
+  },
+  "regularUser": {
+    "id": "6acb3db878de73ea0b742ffc",
+    "email": "regular@lcarena.test",
+    "password": "Password123",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWNiM2RiODc4ZGU3M2VhMGI3NDJmZmMiLCJlbWFpbCI6InJlZ3VsYXJAbGNhcmVuYS50ZXN0IiwibmFtZSI6IlJlZ3VsYXIgVXNlciIsInVzZXJSb2xlIjoiUmVndWxhciIsImp0aSI6IjYwZDk0NjE3LTgxMmUtNDE0OS1hMmE3LTJjZWFiZDhkOWIzNSIsImlhdCI6MTc5MTgwODI0OCwiZXhwIjoxNzkxODA5MTQ4fQ.KpmXsOy8EUzEqLe6aEwTyW83F3pTX4RqqOmHab1Z0Mo",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWNiM2RiODc4ZGU3M2VhMGI3NDJmZmMiLCJqdGkiOiI0MmNkMjhhNC0wNDI1LTRhNjAtOGFhNC1lNTUzZmU5N2RjNWIiLCJpYXQiOjE3OTE4MDgyNDgsImV4cCI6MTc5MjQxMzA0OH0.k5_GXLTvaCIzDaD7iEMqwmmoBD-eovOsqWryTzV-HGU"
+  },
+  "problem": {
+    "id": "6acbe44e0037ad06dc5f0c20",
+    "difficulty": "Easy",
+    "timeLimit": 2000
+  },
+  "timestamp": "2026-10-12T12:30:48.551Z"
+}

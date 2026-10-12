@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import {
-  AlertTriangle,
   Check,
   Copy,
   ExternalLink,
   RefreshCw,
-  ServerOff,
   Terminal,
 } from "lucide-react";
 import { apiClient } from "../../services/apiClient";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
+import { GithubIcon } from "./DeveloperApologyBanner";
 
-export const REPO_URL = "https://github.com/Osank31/LCArena.git";
-export const RUN_COMMAND = `git clone ${REPO_URL} && docker compose up`;
+export const REPO_URL = "https://github.com/Osank31/LCArena";
+export const RUN_COMMAND = `git clone ${REPO_URL}.git && docker compose up`;
+export const MODAL_TITLE = "A Small Apology from the Developer 🥹";
 
 interface ServerStatusModalProps {
   initialOpen?: boolean;
@@ -24,45 +24,28 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
   initialOpen,
   onDismiss,
 }) => {
+  // Respect initialOpen if explicitly passed (e.g. in tests or when user clicks Demo Mode).
+  // Defaults to false so the modal NEVER blocks the application on startup.
   const [isOpen, setIsOpen] = useState<boolean>(initialOpen ?? false);
   const [isRetrying, setIsRetrying] = useState<boolean>(false);
   const [copiedCmd, setCopiedCmd] = useState<boolean>(false);
   const [copiedUrl, setCopiedUrl] = useState<boolean>(false);
-  const [retryError, setRetryError] = useState<string | null>(null);
+  const [retryMessage, setRetryMessage] = useState<string | null>(null);
 
-  // Check health on website mount
   useEffect(() => {
-    let isMounted = true;
-
-    // If initialOpen was explicitly passed (e.g. in tests), respect it
     if (initialOpen !== undefined) {
       setIsOpen(initialOpen);
-      return;
     }
-
-    const checkServerHealth = async () => {
-      try {
-        await apiClient.get("/health", { timeout: 3500 });
-        if (isMounted) setIsOpen(false);
-      } catch {
-        if (isMounted) setIsOpen(true);
-      }
-    };
-
-    checkServerHealth();
-
-    // Also listen for connection errors triggered by any failed requests
-    const handleConnectionError = () => {
-      if (isMounted) setIsOpen(true);
-    };
-
-    window.addEventListener("lcarena:server-connection-error", handleConnectionError);
-
-    return () => {
-      isMounted = false;
-      window.removeEventListener("lcarena:server-connection-error", handleConnectionError);
-    };
   }, [initialOpen]);
+
+  // Listen for user request to open the demo apology modal
+  useEffect(() => {
+    const handleOpenModal = () => setIsOpen(true);
+    window.addEventListener("lcarena:open-demo-modal", handleOpenModal);
+    return () => {
+      window.removeEventListener("lcarena:open-demo-modal", handleOpenModal);
+    };
+  }, []);
 
   const copyToClipboard = async (text: string, type: "cmd" | "url") => {
     try {
@@ -94,13 +77,13 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
 
   const handleRetry = async () => {
     setIsRetrying(true);
-    setRetryError(null);
+    setRetryMessage(null);
     try {
       await apiClient.get("/health", { timeout: 4000 });
       setIsOpen(false);
       if (onDismiss) onDismiss();
     } catch {
-      setRetryError(
+      setRetryMessage(
         "Server is still unreachable. Please ensure Docker is running and try again."
       );
     } finally {
@@ -119,19 +102,31 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Server Connection Required"
+      title={MODAL_TITLE}
       maxWidth="lg"
     >
       <div className="space-y-4 text-ink">
-        <div className="flex items-start gap-3 p-3 bg-paper-2 border border-ink-3 border-l-4 border-l-ink rounded-sm text-ink">
-          <ServerOff className="w-5 h-5 mt-0.5 shrink-0 text-ink" />
-          <div className="text-xs leading-relaxed">
-            <span className="font-serif font-bold text-ink block text-sm mb-1">
-              Backend Server is Offline
-            </span>
-            Unable to connect to the LCArena backend server. You need to run the server
-            by cloning and starting this GitHub repository:
-          </div>
+        {/* Friendly Message */}
+        <div className="p-4 bg-paper-2 border border-ink/20 border-l-4 border-l-ink rounded-sm text-ink space-y-2 text-xs sm:text-sm leading-relaxed">
+          <p className="font-semibold text-ink">
+            Sorry, I haven't deployed the backend yet! T-T
+          </p>
+          <p className="text-ink-2">
+            Running the code execution servers and supporting infrastructure gets
+            pretty expensive, so for now, LCArena is available as a frontend demo.
+          </p>
+          <p className="text-ink-2">
+            I still want you to explore what I've built! I've added a few sample
+            problems so you can check out the interface, explore the
+            problem-solving experience, and see how the platform is designed.
+          </p>
+          <p className="text-ink-2">
+            Want to experience LCArena's full potential? Clone the repository, set up
+            the backend locally using Docker Compose, and run it on your own machine.
+          </p>
+          <p className="font-medium text-ink">
+            Thanks for checking out my project! ❤️
+          </p>
         </div>
 
         {/* Command block with clipboard copy */}
@@ -139,7 +134,7 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
           <div className="flex items-center justify-between text-xs text-ink-3">
             <span className="flex items-center gap-1.5 font-medium">
               <Terminal className="w-3.5 h-3.5 text-ink-3" />
-              Run command in your terminal:
+              Run locally with Docker Compose:
             </span>
             <button
               onClick={() => copyToClipboard(RUN_COMMAND, "cmd")}
@@ -203,29 +198,48 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
           </button>
         </div>
 
-        {retryError && (
-          <div className="flex items-center gap-2 p-2.5 bg-paper-2 border border-dashed border-rule-2 rounded-sm text-ink text-xs">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-ink-3" />
-            <span>{retryError}</span>
+        {retryMessage && (
+          <div className="p-2.5 bg-paper-2 border border-dashed border-rule-2 rounded-sm text-ink text-xs">
+            <span>{retryMessage}</span>
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-rule">
-          <Button variant="ghost" size="sm" onClick={handleClose}>
-            Dismiss
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleRetry}
-            isLoading={isRetrying}
-            leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+        <div className="flex items-center justify-between pt-3 border-t border-rule gap-3">
+          <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex"
           >
-            Retry Connection
-          </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<GithubIcon className="w-3.5 h-3.5" />}
+              rightIcon={<ExternalLink className="w-3 h-3 opacity-70" />}
+            >
+              GitHub Repository
+            </Button>
+          </a>
+
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={handleClose}>
+              Dismiss
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleRetry}
+              isLoading={isRetrying}
+              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+            >
+              Retry Connection
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>
   );
 };
+
+export const DeveloperApologyModal = ServerStatusModal;

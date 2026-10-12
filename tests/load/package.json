@@ -1,0 +1,23 @@
+{
+  "name": "@lcarena/load-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Comprehensive backend load testing suite for LCArena",
+  "scripts": {
+    "seed": "node fixtures/seed-fixtures.js",
+    "cleanup": "node fixtures/cleanup-fixtures.js",
+    "test:smoke": "node runners/suite-runner.js --profile=smoke",
+    "test:baseline": "node runners/suite-runner.js --profile=baseline",
+    "test:load": "node runners/suite-runner.js --profile=load",
+    "test:stress": "node runners/suite-runner.js --profile=stress",
+    "test:spike": "node runners/suite-runner.js --profile=spike",
+    "test:soak": "node runners/suite-runner.js --profile=soak",
+    "test:recovery": "node runners/suite-runner.js --profile=recovery",
+    "test:endpoints": "node runners/suite-runner.js --type=endpoint",
+    "test:services": "node runners/suite-runner.js --type=service",
+    "test:lifecycle": "node runners/suite-runner.js --type=lifecycle",
+    "test:all": "node runners/suite-runner.js --type=all",
+    "report": "node reports/report-generator.js"
+  }
+}

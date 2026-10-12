@@ -174,35 +174,57 @@ describe("problemService", () => {
     time_limit: 2000,
   };
 
-  it("getAllProblems fetches and parses problems", async () => {
+  it("getAllProblems returns local sample problems in demo mode", async () => {
+    const problems = await problemService.getAllProblems();
+    expect(problems.length).toBeGreaterThanOrEqual(4);
+    expect(problems.some((p) => p.title === "Two Sum")).toBe(true);
+    expect(problems.some((p) => p.title === "Reverse a String")).toBe(true);
+    expect(problems.some((p) => p.title === "Valid Parentheses")).toBe(true);
+    expect(problems.some((p) => p.title === "Maximum Subarray Sum")).toBe(true);
+    expect(apiClient.get).not.toHaveBeenCalled();
+  });
+
+  it("getProblemById returns sample problem by id or slug", async () => {
+    const problem = await problemService.getProblemById("two-sum");
+    expect(problem.id).toBe("two-sum");
+    expect(problem.title).toBe("Two Sum");
+    expect(problem.difficulty).toBe("Easy");
+    expect(apiClient.get).not.toHaveBeenCalled();
+  });
+
+  it("getProblemById throws if problem is not found", async () => {
+    await expect(problemService.getProblemById("unknown-problem-id")).rejects.toThrow("Problem not found");
+  });
+
+  it("fetchRemoteProblems fetches and parses problems from backend API", async () => {
     (apiClient.get as any).mockResolvedValueOnce({
       data: { success: true, data: [mockProblem] },
     });
 
-    const problems = await problemService.getAllProblems();
+    const problems = await problemService.fetchRemoteProblems();
     expect(apiClient.get).toHaveBeenCalledWith("/api/problems");
     expect(problems).toHaveLength(1);
     expect(problems[0].id).toBe("p1");
     expect(problems[0].title).toBe("Sum Problem");
   });
 
-  it("getProblemById fetches single problem", async () => {
+  it("fetchRemoteProblemById fetches single problem from backend API", async () => {
     (apiClient.get as any).mockResolvedValueOnce({
       data: { success: true, data: mockProblem },
     });
 
-    const problem = await problemService.getProblemById("p1");
+    const problem = await problemService.fetchRemoteProblemById("p1");
     expect(apiClient.get).toHaveBeenCalledWith("/api/problems/p1");
     expect(problem.id).toBe("p1");
     expect(problem.difficulty).toBe("Easy");
   });
 
-  it("getProblemById throws if data is missing", async () => {
+  it("fetchRemoteProblemById throws if data is missing", async () => {
     (apiClient.get as any).mockResolvedValueOnce({
       data: { success: true, data: null },
     });
 
-    await expect(problemService.getProblemById("p1")).rejects.toThrow("Problem not found");
+    await expect(problemService.fetchRemoteProblemById("p1")).rejects.toThrow("Problem not found");
   });
 });
 

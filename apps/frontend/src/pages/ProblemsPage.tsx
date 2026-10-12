@@ -6,6 +6,7 @@ import { EmptyState } from "../components/common/EmptyState";
 import { TableSkeleton } from "../components/common/Skeleton";
 import { ProblemFilters } from "../components/problem/ProblemFilters";
 import { ProblemRow } from "../components/problem/ProblemRow";
+import { DeveloperApologyBanner } from "../components/common/DeveloperApologyBanner";
 import { useReveal } from "../animations";
 import { useAuth } from "../context/AuthContext";
 import { problemService } from "../services/problemService";
@@ -184,6 +185,9 @@ export const ProblemsPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Developer Apology / Demo Mode Notice */}
+      <DeveloperApologyBanner />
 
       {/* Filter Controls */}
       <div data-reveal>

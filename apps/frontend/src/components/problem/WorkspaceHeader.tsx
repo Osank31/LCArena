@@ -57,6 +57,13 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
           size="sm"
           className="hidden md:inline-flex shrink-0 text-[10px]"
         />
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"))}
+          className="hidden lg:inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-sm border border-rule-2 text-ink-3 hover:text-ink hover:border-ink-3 bg-paper transition-colors cursor-pointer"
+          title="Frontend Demo Mode — View Developer Apology Note"
+        >
+          <span>Demo 🥹</span>
+        </button>
       </div>
 
       {/* Middle/Right: Controls */}
