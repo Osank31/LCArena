@@ -42,6 +42,6 @@ describe("Tabs component", () => {
         variant="pill"
       />
     );
-    expect(screen.getByRole("tablist")).toHaveClass("bg-slate-900/80");
+    expect(screen.getByRole("tablist")).toHaveClass("bg-paper-2");
   });
 });

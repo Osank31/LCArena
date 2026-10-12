@@ -17,18 +17,21 @@ export const Badge: React.FC<BadgeProps> = ({
 }) => {
   const sizeClasses = size === "sm" ? "px-1.5 py-0.5 text-xs" : "px-2.5 py-1 text-xs font-medium";
 
+  // Near-monochrome "stamp" treatments: distinction comes from weight,
+  // rule style and ink inversion rather than hue.
   const variantClasses = {
-    default: "bg-slate-800 text-slate-300 border border-slate-700/60",
-    outline: "bg-transparent text-slate-400 border border-slate-700",
-    success: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-    danger: "bg-rose-500/10 text-rose-400 border border-rose-500/20",
-    info: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+    default: "bg-paper-2 text-ink border border-rule",
+    outline: "bg-transparent text-ink-2 border border-rule",
+    success: "bg-transparent text-ink border-2 border-ink",
+    warning: "bg-transparent text-ink border border-dashed border-ink-3",
+    danger: "bg-ink text-paper border border-ink",
+    info: "bg-paper-3 text-ink-2 border border-rule",
   }[variant];
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md font-medium tracking-wide ${sizeClasses} ${variantClasses} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-sm font-mono uppercase tracking-wider ${sizeClasses} ${variantClasses} ${className}`}
+      data-variant={variant}
     >
       {children}
     </span>

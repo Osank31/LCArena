@@ -14,6 +14,7 @@ import { Button } from "../components/common/Button";
 import { Modal } from "../components/common/Modal";
 import { Skeleton } from "../components/common/Skeleton";
 import { Tabs } from "../components/common/Tabs";
+import { useWorkspaceReveal } from "../animations";
 import { CodeEditorPane } from "../components/problem/CodeEditorPane";
 import { OutputConsole } from "../components/problem/OutputConsole";
 import { ProblemDescription } from "../components/problem/ProblemDescription";
@@ -63,6 +64,10 @@ export const ProblemDetailPage: React.FC = () => {
   // Modals
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+
+  // Coordinated (opacity-only) reveal of the workspace chrome once the problem
+  // resolves. The editor surface stays completely stable while the user works.
+  const workspaceScope = useWorkspaceReveal([problem?.id]);
 
   // Load problem details
   useEffect(() => {
@@ -216,7 +221,7 @@ export const ProblemDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-[calc(100vh-3.5rem)] flex flex-col p-6 space-y-4">
+      <div className="h-[calc(100vh-3.5rem)] flex flex-col p-6 space-y-4 bg-paper">
         <Skeleton className="h-10 w-1/3" />
         <div className="flex-1 grid grid-cols-2 gap-4">
           <Skeleton className="h-full rounded-xl" />
@@ -228,7 +233,7 @@ export const ProblemDetailPage: React.FC = () => {
 
   if (error || !problem) {
     return (
-      <div className="max-w-2xl mx-auto py-16 px-4 text-center">
+      <div className="max-w-2xl mx-auto py-16 px-4 text-center bg-paper">
         <Alert
           type="error"
           title="Problem Not Found"
@@ -243,28 +248,36 @@ export const ProblemDetailPage: React.FC = () => {
 
   return (
     <div
-      className="h-[calc(100vh-3.5rem)] flex flex-col bg-[#11131a] overflow-hidden"
+      ref={workspaceScope}
+      className="h-[calc(100vh-3.5rem)] flex flex-col bg-paper overflow-hidden"
       data-testid="problem-workspace"
     >
       {/* Header bar */}
-      <WorkspaceHeader
-        problem={problem}
-        selectedLanguage={language}
-        onLanguageChange={handleLanguageChange}
-        onRun={handleRun}
-        onSubmit={handleSubmit}
-        onReset={() => setShowResetModal(true)}
-        isEvaluating={isEvaluating}
-        aiEnabled={aiEnabled}
-        onToggleAi={() => setAiEnabled(!aiEnabled)}
-      />
+      <div data-workspace-reveal className="shrink-0">
+        <WorkspaceHeader
+          problem={problem}
+          selectedLanguage={language}
+          onLanguageChange={handleLanguageChange}
+          onRun={handleRun}
+          onSubmit={handleSubmit}
+          onReset={() => setShowResetModal(true)}
+          isEvaluating={isEvaluating}
+          aiEnabled={aiEnabled}
+          onToggleAi={() => setAiEnabled(!aiEnabled)}
+        />
+      </div>
 
       {/* Mobile Tab Bar */}
-      <div className="flex md:hidden border-b border-slate-800 bg-slate-950 px-2 py-1 justify-around text-xs">
+      <div
+        data-workspace-reveal
+        className="flex md:hidden border-b border-rule bg-paper-2/70 px-2 py-1 justify-around text-xs"
+      >
         <button
           onClick={() => setMobileTab("description")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded ${
-            mobileTab === "description" ? "bg-blue-600 text-white" : "text-slate-400"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono uppercase tracking-wide ${
+            mobileTab === "description"
+              ? "bg-ink text-paper"
+              : "text-ink-3"
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
@@ -272,8 +285,8 @@ export const ProblemDetailPage: React.FC = () => {
         </button>
         <button
           onClick={() => setMobileTab("editor")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded ${
-            mobileTab === "editor" ? "bg-blue-600 text-white" : "text-slate-400"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono uppercase tracking-wide ${
+            mobileTab === "editor" ? "bg-ink text-paper" : "text-ink-3"
           }`}
         >
           <Code2 className="w-3.5 h-3.5" />
@@ -281,8 +294,8 @@ export const ProblemDetailPage: React.FC = () => {
         </button>
         <button
           onClick={() => setMobileTab("console")}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded ${
-            mobileTab === "console" ? "bg-blue-600 text-white" : "text-slate-400"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono uppercase tracking-wide ${
+            mobileTab === "console" ? "bg-ink text-paper" : "text-ink-3"
           }`}
         >
           <Terminal className="w-3.5 h-3.5" />
@@ -291,13 +304,13 @@ export const ProblemDetailPage: React.FC = () => {
       </div>
 
       {/* Main Workspace Body */}
-      <div className="flex-1 overflow-hidden">
+      <div data-workspace-reveal className="flex-1 overflow-hidden">
         {/* Desktop Split-Pane Layout */}
         <div className="hidden md:block h-full">
           <Resizable direction="horizontal" initialSize={42} minSize={280}>
             {/* Left Panel: Description or Submissions */}
-            <div className="h-full flex flex-col bg-slate-950 border-r border-slate-800/80 overflow-hidden">
-              <div className="px-3 border-b border-slate-850 bg-slate-900/40">
+            <div className="h-full flex flex-col bg-paper border-r border-rule overflow-hidden">
+              <div className="px-3 border-b border-rule bg-paper-2/60">
                 <Tabs
                   tabs={[
                     {

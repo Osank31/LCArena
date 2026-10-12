@@ -5,6 +5,7 @@ import { Alert } from "../components/common/Alert";
 import { Button } from "../components/common/Button";
 import { Input } from "../components/common/Input";
 import { Tabs } from "../components/common/Tabs";
+import { useEntrance } from "../animations";
 import { useAuth } from "../context/AuthContext";
 
 export const LoginPage: React.FC = () => {
@@ -24,6 +25,9 @@ export const LoginPage: React.FC = () => {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Restrained card entrance: reads as a page being opened, not a popup.
+  const cardRef = useEntrance({ scale: 0.985, y: 8, duration: 0.36 });
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,11 +87,14 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-4 bg-paper">
+      <div
+        ref={cardRef}
+        className="w-full max-w-md bg-paper-3 border border-rule-2 rounded-sm p-6 sm:p-8 shadow-[6px_6px_0_0_rgba(33,30,25,0.10)] space-y-6"
+      >
         <div className="text-center space-y-1">
-          <h1 className="text-2xl font-bold text-slate-100">Welcome Back</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="text-2xl font-serif font-bold text-ink">Welcome Back</h1>
+          <p className="text-xs text-ink-3">
             Sign in to access your coding submissions and progress.
           </p>
         </div>
@@ -217,9 +224,12 @@ export const LoginPage: React.FC = () => {
           </form>
         )}
 
-        <div className="pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
+        <div className="pt-4 border-t border-rule text-center text-xs text-ink-3">
           Don't have an account yet?{" "}
-          <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium">
+          <Link
+            to="/register"
+            className="text-ink font-medium underline underline-offset-4 hover:text-ink-2"
+          >
             Register here
           </Link>
         </div>

@@ -17,20 +17,20 @@ export const ProblemRow: React.FC<ProblemRowProps> = ({
 }) => {
   return (
     <tr
-      className="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors group"
+      className="border-b border-rule hover:bg-paper-2/70 transition-colors group"
       data-testid={`problem-row-${problem.id}`}
     >
       {/* Solved Status */}
       <td className="py-3.5 px-4 w-12 text-center">
         {isSolved ? (
           <CheckCircle2
-            className="w-4 h-4 text-emerald-400 inline"
+            className="w-4 h-4 text-ink inline"
             aria-label="Solved"
             data-testid="solved-icon"
           />
         ) : (
           <Circle
-            className="w-3.5 h-3.5 text-slate-700 inline"
+            className="w-3.5 h-3.5 text-rule-2 inline"
             aria-label="Unsolved"
           />
         )}
@@ -41,10 +41,12 @@ export const ProblemRow: React.FC<ProblemRowProps> = ({
         <div className="flex flex-col">
           <Link
             to={`/problems/${problem.id}`}
-            className="text-sm font-medium text-slate-200 group-hover:text-blue-400 transition-colors flex items-center gap-2"
+            className="text-[15px] font-serif font-medium text-ink flex items-center gap-2"
           >
-            <span className="text-slate-500 font-mono text-xs w-6">{index}.</span>
-            <span>{problem.title}</span>
+            <span className="text-ink-3 font-mono text-xs w-6">{index}.</span>
+            <span className="relative after:absolute after:left-0 after:-bottom-0.5 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-200 group-hover:after:scale-x-100">
+              {problem.title}
+            </span>
           </Link>
 
           {/* Tags */}
@@ -55,7 +57,7 @@ export const ProblemRow: React.FC<ProblemRowProps> = ({
               </Badge>
             ))}
             {problem.tags.length > 3 && (
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[10px] text-ink-3">
                 +{problem.tags.length - 3}
               </span>
             )}
@@ -70,8 +72,8 @@ export const ProblemRow: React.FC<ProblemRowProps> = ({
 
       {/* Time Limit */}
       <td className="py-3.5 px-4 w-28 text-right hidden sm:table-cell">
-        <span className="inline-flex items-center gap-1 text-xs text-slate-400 font-mono">
-          <Clock className="w-3 h-3 text-slate-500" />
+        <span className="inline-flex items-center gap-1 text-xs text-ink-3 font-mono">
+          <Clock className="w-3 h-3 text-ink-3" />
           {(problem.timeLimit / 1000).toFixed(1)}s
         </span>
       </td>

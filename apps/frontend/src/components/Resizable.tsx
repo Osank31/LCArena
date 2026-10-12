@@ -139,10 +139,10 @@ export default function Resizable({
                     position: "relative",
                     flex: "0 0 1px",
                     backgroundColor: isDragging
-                        ? "#3b82f6"
+                        ? "#211e19" // ink while dragging
                         : hovered
-                            ? "#60a5fa"
-                            : "#262626", // IDE dark border
+                            ? "#6b6151"
+                            : "#d8cbb5", // paper rule
                     cursor: isHorizontal ? "col-resize" : "row-resize",
                     transition: "background-color 0.2s ease",
                     zIndex: 10,

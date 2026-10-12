@@ -1,11 +1,10 @@
 import React from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Footer } from "./components/common/Footer";
 import { Navbar } from "./components/common/Navbar";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { ServerStatusModal } from "./components/common/ServerStatusModal";
-import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProblemDetailPage } from "./pages/ProblemDetailPage";
@@ -22,12 +21,13 @@ export const AppLayout: React.FC = () => {
     location.pathname !== "/problems";
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0f1117] text-slate-100">
+    <div className="min-h-screen flex flex-col bg-paper text-ink">
       <ServerStatusModal />
       <Navbar />
       <main className="flex-1 flex flex-col">
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          {/* The problems catalog is the landing page for the platform. */}
+          <Route path="/" element={<Navigate to="/problems" replace />} />
           <Route path="/problems" element={<ProblemsPage />} />
           <Route path="/problems/:id" element={<ProblemDetailPage />} />
           <Route path="/login" element={<LoginPage />} />

@@ -24,13 +24,12 @@ describe("App Routing and Navigation", () => {
     );
   };
 
-  it("renders LandingPage at root '/'", async () => {
+  it("redirects the root path '/' to the problems catalog", async () => {
     vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce([]);
 
     renderRoute("/");
-    expect(
-      await screen.findByText(/next-generation competitive programming platform/i)
-    ).toBeInTheDocument();
+    // The problems catalog is now the landing page.
+    expect(await screen.findByText("Problems Catalog")).toBeInTheDocument();
     // Footer is rendered on non-workspace routes
     expect(screen.getByText(/sandboxed online judge/i)).toBeInTheDocument();
   });
@@ -109,11 +108,9 @@ describe("App Routing and Navigation", () => {
     expect(screen.queryByText(/sandboxed online judge/i)).not.toBeInTheDocument();
   });
 
-  it("renders full root App component without errors", async () => {
+  it("renders full root App component and lands on the problems catalog", async () => {
     vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce([]);
     render(<App />);
-    expect(
-      await screen.findByText(/next-generation competitive programming platform/i)
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Problems Catalog")).toBeInTheDocument();
   });
 });

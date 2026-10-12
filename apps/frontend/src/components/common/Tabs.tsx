@@ -27,8 +27,8 @@ export const Tabs: React.FC<TabsProps> = ({
       role="tablist"
       className={`flex items-center gap-1 ${
         variant === "underline"
-          ? "border-b border-slate-800"
-          : "bg-slate-900/80 p-1 rounded-lg border border-slate-800"
+          ? "border-b border-rule"
+          : "bg-paper-2 p-1 rounded-sm border border-rule"
       } ${className}`}
     >
       {tabs.map((tab) => {
@@ -41,18 +41,20 @@ export const Tabs: React.FC<TabsProps> = ({
               role="tab"
               aria-selected={isActive}
               onClick={() => onChange(tab.id)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-sm font-mono text-xs uppercase tracking-wide transition-colors cursor-pointer ${
                 isActive
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  ? "bg-ink text-paper"
+                  : "text-ink-2 hover:text-ink hover:bg-paper-3"
               }`}
             >
               {tab.icon}
               <span>{tab.label}</span>
               {typeof tab.count === "number" && (
                 <span
-                  className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
-                    isActive ? "bg-blue-700 text-blue-100" : "bg-slate-800 text-slate-400"
+                  className={`ml-1 px-1.5 py-0.2 rounded-sm text-[10px] ${
+                    isActive
+                      ? "bg-ink-2 text-paper"
+                      : "bg-paper-3 text-ink-3 border border-rule"
                   }`}
                 >
                   {tab.count}
@@ -68,16 +70,16 @@ export const Tabs: React.FC<TabsProps> = ({
             role="tab"
             aria-selected={isActive}
             onClick={() => onChange(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-wide border-b-2 -mb-px transition-colors cursor-pointer ${
               isActive
-                ? "border-blue-500 text-blue-400 font-semibold"
-                : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700"
+                ? "border-ink text-ink font-semibold"
+                : "border-transparent text-ink-3 hover:text-ink hover:border-rule-2"
             }`}
           >
             {tab.icon}
             <span>{tab.label}</span>
             {typeof tab.count === "number" && (
-              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-400">
+              <span className="ml-1 px-1.5 py-0.5 rounded-sm text-[10px] bg-paper-2 text-ink-3 border border-rule">
                 {tab.count}
               </span>
             )}

@@ -122,11 +122,11 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
       title="Server Connection Required"
       maxWidth="lg"
     >
-      <div className="space-y-4 text-slate-200">
-        <div className="flex items-start gap-3 p-3 bg-rose-950/40 border border-rose-800/60 rounded-xl text-rose-300">
-          <ServerOff className="w-5 h-5 mt-0.5 shrink-0 text-rose-400" />
+      <div className="space-y-4 text-ink">
+        <div className="flex items-start gap-3 p-3 bg-paper-2 border border-ink-3 border-l-4 border-l-ink rounded-sm text-ink">
+          <ServerOff className="w-5 h-5 mt-0.5 shrink-0 text-ink" />
           <div className="text-xs leading-relaxed">
-            <span className="font-semibold text-rose-200 block text-sm mb-1">
+            <span className="font-serif font-bold text-ink block text-sm mb-1">
               Backend Server is Offline
             </span>
             Unable to connect to the LCArena backend server. You need to run the server
@@ -136,20 +136,22 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
 
         {/* Command block with clipboard copy */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center justify-between text-xs text-ink-3">
             <span className="flex items-center gap-1.5 font-medium">
-              <Terminal className="w-3.5 h-3.5 text-blue-400" />
+              <Terminal className="w-3.5 h-3.5 text-ink-3" />
               Run command in your terminal:
             </span>
             <button
               onClick={() => copyToClipboard(RUN_COMMAND, "cmd")}
               aria-label="Copy run command to clipboard"
-              className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
+              className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-sm bg-paper-2 hover:bg-rule text-ink-2 hover:text-ink transition-colors cursor-pointer border border-rule-2 ${
+                copiedCmd ? "confirmation-pop" : ""
+              }`}
             >
               {copiedCmd ? (
                 <>
-                  <Check className="w-3 h-3 text-emerald-400" />
-                  <span className="text-emerald-400 font-medium">Copied!</span>
+                  <Check className="w-3 h-3" />
+                  <span className="font-medium">Copied!</span>
                 </>
               ) : (
                 <>
@@ -160,20 +162,20 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
             </button>
           </div>
 
-          <div className="relative group bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs text-cyan-300 overflow-x-auto select-all">
+          <div className="relative group bg-paper p-3 rounded-sm border border-rule-2 font-mono text-xs text-ink overflow-x-auto select-all">
             <code>{RUN_COMMAND}</code>
           </div>
         </div>
 
         {/* Repository URL with direct copy */}
-        <div className="flex items-center justify-between p-2.5 bg-slate-950/70 border border-slate-800/80 rounded-lg text-xs">
+        <div className="flex items-center justify-between p-2.5 bg-paper-2/70 border border-rule rounded-sm text-xs">
           <div className="flex items-center gap-2 truncate mr-2">
-            <span className="text-slate-400 font-medium shrink-0">Repository:</span>
+            <span className="text-ink-3 font-medium shrink-0">Repository:</span>
             <a
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 underline underline-offset-2 truncate flex items-center gap-1"
+              className="text-ink-2 hover:text-ink underline underline-offset-4 truncate flex items-center gap-1"
             >
               <span className="truncate">{REPO_URL}</span>
               <ExternalLink className="w-3 h-3 shrink-0" />
@@ -183,12 +185,14 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
           <button
             onClick={() => copyToClipboard(REPO_URL, "url")}
             aria-label="Copy repository URL to clipboard"
-            className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer shrink-0 border border-slate-700"
+            className={`inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-sm bg-paper-2 hover:bg-rule text-ink-2 hover:text-ink transition-colors cursor-pointer shrink-0 border border-rule-2 ${
+              copiedUrl ? "confirmation-pop" : ""
+            }`}
           >
             {copiedUrl ? (
               <>
-                <Check className="w-3 h-3 text-emerald-400" />
-                <span className="text-emerald-400 font-medium">URL Copied!</span>
+                <Check className="w-3 h-3" />
+                <span className="font-medium">URL Copied!</span>
               </>
             ) : (
               <>
@@ -200,14 +204,14 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
         </div>
 
         {retryError && (
-          <div className="flex items-center gap-2 p-2.5 bg-amber-950/40 border border-amber-800/50 rounded-lg text-amber-300 text-xs">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+          <div className="flex items-center gap-2 p-2.5 bg-paper-2 border border-dashed border-rule-2 rounded-sm text-ink text-xs">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-ink-3" />
             <span>{retryError}</span>
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-rule">
           <Button variant="ghost" size="sm" onClick={handleClose}>
             Dismiss
           </Button>

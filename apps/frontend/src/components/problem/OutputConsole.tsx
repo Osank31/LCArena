@@ -7,6 +7,7 @@ import {
   Terminal,
   XCircle,
 } from "lucide-react";
+import { useReveal } from "../../animations";
 import { ParsedProblem } from "../../types/problem.types";
 import { ExecutionResult } from "../../types/submission.types";
 import { parseVerdict } from "../../utils/verdictHelper";
@@ -27,6 +28,14 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<string>("result");
 
+  // Verdict/results surface fades in when execution finishes or the tab
+  // changes — never on every polling update, so feedback stays immediate.
+  const contentScope = useReveal({
+    selector: "[data-output-reveal]",
+    stagger: 0.05,
+    deps: [activeTab, isEvaluating],
+  });
+
   const verdictInfo = result ? parseVerdict(result) : null;
 
   const tabs = [
@@ -36,11 +45,11 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
 
   return (
     <div
-      className="h-full flex flex-col bg-slate-950 border-t border-slate-800 text-xs text-slate-300"
+      className="h-full flex flex-col bg-paper-2/40 border-t border-rule text-xs text-ink-2"
       data-testid="output-console"
     >
       {/* Console Tab Header */}
-      <div className="flex items-center justify-between px-3 border-b border-slate-850 bg-slate-900/50">
+      <div className="flex items-center justify-between px-3 border-b border-rule bg-paper-2/60">
         <Tabs
           tabs={tabs}
           activeTab={activeTab}
@@ -50,7 +59,7 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
         />
 
         {isEvaluating && (
-          <div className="flex items-center gap-1.5 text-blue-400 font-mono text-[11px] animate-pulse">
+          <div className="flex items-center gap-1.5 text-ink-2 font-mono text-[11px] animate-pulse">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
             <span>Executing inside Docker...</span>
           </div>
@@ -58,23 +67,23 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
       </div>
 
       {/* Console Tab Content */}
-      <div className="flex-1 overflow-y-auto p-4 font-mono">
+      <div ref={contentScope} className="flex-1 overflow-y-auto p-4 font-mono">
         {activeTab === "sample" && (
           <div className="space-y-4">
-            <div>
-              <div className="text-slate-500 mb-1 select-none text-[11px]">
+            <div data-output-reveal>
+              <div className="text-ink-3 mb-1 select-none text-[11px]">
                 Sample Input:
               </div>
-              <pre className="bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-200 overflow-x-auto">
+              <pre className="bg-paper p-3 rounded-sm border border-rule text-ink overflow-x-auto">
                 {problem.examples[0]?.input || "No sample input"}
               </pre>
             </div>
 
-            <div>
-              <div className="text-slate-500 mb-1 select-none text-[11px]">
+            <div data-output-reveal>
+              <div className="text-ink-3 mb-1 select-none text-[11px]">
                 Expected Output:
               </div>
-              <pre className="bg-slate-900 p-3 rounded-lg border border-slate-800 text-cyan-300 overflow-x-auto">
+              <pre className="bg-paper p-3 rounded-sm border border-rule text-ink overflow-x-auto">
                 {problem.examples[0]?.output || "No sample output"}
               </pre>
             </div>
@@ -85,27 +94,18 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
           <div>
             {isEvaluating ? (
               <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
-                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                <div className="text-sm font-semibold text-slate-200">
+                <Loader2 className="w-8 h-8 text-ink-3 animate-spin" />
+                <div className="text-sm font-serif font-bold text-ink">
                   Running Evaluation
                 </div>
-                <p className="text-xs text-slate-500 max-w-sm">
+                <p className="text-xs text-ink-3 max-w-sm font-serif">
                   Compiling and executing your code against the test suite in an
                   isolated Docker container.
                 </p>
               </div>
             ) : runOutput ? (
-              <div className="space-y-3">
-                <div
-                  className={`flex items-center gap-2 font-semibold text-sm ${
-                    runOutput.includes("Compilation Error") ||
-                    runOutput.includes("Runtime Error")
-                      ? "text-rose-400"
-                      : runOutput.includes("Wrong Answer")
-                      ? "text-amber-400"
-                      : "text-emerald-400"
-                  }`}
-                >
+              <div data-output-reveal className="space-y-3">
+                <div className="flex items-center gap-2 font-serif font-bold text-sm text-ink">
                   {runOutput.includes("Compilation Error") ||
                   runOutput.includes("Runtime Error") ? (
                     <XCircle className="w-4 h-4" />
@@ -125,7 +125,7 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
                       : "(All Passed)"}
                   </span>
                 </div>
-                <pre className="bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-200 overflow-x-auto whitespace-pre-wrap font-mono text-xs">
+                <pre className="bg-paper p-3 rounded-sm border border-rule text-ink overflow-x-auto whitespace-pre-wrap font-mono text-xs">
                   {runOutput}
                 </pre>
               </div>
@@ -133,21 +133,22 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
               <div className="space-y-4">
                 {/* Verdict Banner */}
                 <div
-                  className={`p-4 rounded-xl border flex items-center justify-between gap-4 ${verdictInfo.badgeClass}`}
+                  data-output-reveal
+                  className={`p-4 rounded-sm border flex items-center justify-between gap-4 ${verdictInfo.badgeClass}`}
                 >
                   <div className="flex items-center gap-3">
                     {verdictInfo.verdict === "Accepted" ? (
-                      <CheckCircle2 className="w-6 h-6 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="w-6 h-6 shrink-0" />
                     ) : verdictInfo.verdict === "Compilation Error" ||
                       verdictInfo.verdict === "Runtime Error" ||
                       verdictInfo.verdict === "Wrong Answer" ? (
-                      <XCircle className="w-6 h-6 text-rose-400 shrink-0" />
+                      <XCircle className="w-6 h-6 shrink-0" />
                     ) : (
-                      <AlertCircle className="w-6 h-6 text-amber-400 shrink-0" />
+                      <AlertCircle className="w-6 h-6 shrink-0" />
                     )}
 
                     <div>
-                      <h3 className="text-base font-bold tracking-tight">
+                      <h3 className="text-base font-serif font-bold tracking-tight">
                         {verdictInfo.verdict}
                       </h3>
                       <p className="text-xs opacity-90">{verdictInfo.summary}</p>
@@ -155,7 +156,7 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
                   </div>
 
                   {typeof verdictInfo.timeMs === "number" && (
-                    <div className="flex items-center gap-1.5 font-mono text-xs bg-slate-950/60 px-3 py-1.5 rounded-lg border border-current/20 shrink-0">
+                    <div className="flex items-center gap-1.5 font-mono text-xs bg-paper/60 px-3 py-1.5 rounded-sm border border-rule shrink-0">
                       <Clock className="w-3.5 h-3.5" />
                       <span>{verdictInfo.timeMs} ms</span>
                     </div>
@@ -165,11 +166,14 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
                 {/* Test case passed counter */}
                 {typeof verdictInfo.passedCount === "number" &&
                   typeof verdictInfo.totalCount === "number" && (
-                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-800 flex items-center justify-between">
-                      <span className="text-slate-400 text-xs">
+                    <div
+                      data-output-reveal
+                      className="bg-paper p-3 rounded-sm border border-rule flex items-center justify-between"
+                    >
+                      <span className="text-ink-3 text-xs">
                         Test Cases Passed:
                       </span>
-                      <span className="font-bold text-slate-100">
+                      <span className="font-bold text-ink">
                         {verdictInfo.passedCount} / {verdictInfo.totalCount}
                       </span>
                     </div>
@@ -177,20 +181,20 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
 
                 {/* Compilation / Error Details */}
                 {verdictInfo.details && (
-                  <div>
-                    <div className="text-slate-400 text-xs mb-1 font-semibold">
+                  <div data-output-reveal>
+                    <div className="text-ink-2 text-xs mb-1 font-semibold">
                       Diagnostic Output:
                     </div>
-                    <pre className="bg-slate-900/90 text-rose-300 p-3 rounded-lg border border-rose-900/40 text-xs overflow-x-auto whitespace-pre-wrap">
+                    <pre className="bg-paper text-ink p-3 rounded-sm border border-rule-2 text-xs overflow-x-auto whitespace-pre-wrap">
                       {verdictInfo.details}
                     </pre>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-10 text-slate-600 gap-2">
+              <div className="flex flex-col items-center justify-center py-10 text-ink-3 gap-2">
                 <Terminal className="w-8 h-8 opacity-40" />
-                <p>Run code or submit to view execution results.</p>
+                <p className="font-serif">Run code or submit to view execution results.</p>
               </div>
             )}
           </div>

@@ -33,13 +33,15 @@ describe("Button component", () => {
 
   it("applies variant classes", () => {
     const { rerender } = render(<Button variant="danger">Delete</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-rose-600");
+    // Paper theme: danger is a strong ink outline, success a solid ink fill,
+    // outline uses the soft rule border token.
+    expect(screen.getByRole("button")).toHaveClass("border-ink");
 
     rerender(<Button variant="success">Accept</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-emerald-600");
+    expect(screen.getByRole("button")).toHaveClass("bg-ink-3");
 
     rerender(<Button variant="outline">Outline</Button>);
-    expect(screen.getByRole("button")).toHaveClass("border-slate-700");
+    expect(screen.getByRole("button")).toHaveClass("border-rule-2");
   });
 
   it("renders leftIcon and rightIcon", () => {

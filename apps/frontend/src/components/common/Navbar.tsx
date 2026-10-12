@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import {
-  Code2,
-  Cpu,
-  History,
-  LayoutGrid,
-  LogOut,
-  Menu,
-  User,
-  X,
-} from "lucide-react";
+import { History, LayoutGrid, LogOut, Menu, User, X } from "lucide-react";
+import { useEntrance } from "../../animations";
 import { useAuth } from "../../context/AuthContext";
 import { RoleBadge } from "./Badge";
 import { Button } from "./Button";
@@ -20,44 +12,50 @@ export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
+  // Menus drop in with a short fade + translate; the same tween is replayed
+  // whenever the corresponding menu is (re)opened.
+  const dropdownRef = useEntrance({ deps: [userDropdownOpen], y: -4 });
+  const mobileDrawerRef = useEntrance({ deps: [mobileMenuOpen], y: -6 });
+
   const handleLogout = async () => {
     await logout();
     setUserDropdownOpen(false);
+    // "/" now redirects to the problems catalog.
     navigate("/");
   };
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+    `flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors ${
       isActive
-        ? "text-blue-400 bg-blue-500/10"
-        : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+        ? "text-ink border-b-2 border-ink"
+        : "text-ink-3 border-b-2 border-transparent hover:text-ink hover:border-rule-2"
     }`;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full border-b border-rule bg-paper/95 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Brand */}
         <div className="flex items-center gap-8">
           <Link
-            to="/"
-            className="flex items-center gap-2 font-bold text-lg text-slate-100 hover:opacity-90 transition-opacity"
+            to="/problems"
+            className="flex items-baseline gap-2 text-ink hover:opacity-80 transition-opacity"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <Code2 className="w-5 h-5" />
-            </div>
-            <span className="tracking-tight bg-gradient-to-r from-slate-100 via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            <span className="font-serif text-xl font-bold tracking-tight">
               LCArena
+            </span>
+            <span className="hidden sm:inline text-[10px] font-mono uppercase tracking-widest text-ink-3">
+              Online Judge
             </span>
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
             <NavLink to="/problems" className={navLinkClass}>
-              <LayoutGrid className="w-4 h-4" />
+              <LayoutGrid className="w-3.5 h-3.5" />
               <span>Problems</span>
             </NavLink>
             <NavLink to="/submissions" className={navLinkClass}>
-              <History className="w-4 h-4" />
+              <History className="w-3.5 h-3.5" />
               <span>Submissions</span>
             </NavLink>
           </nav>
@@ -69,18 +67,18 @@ export const Navbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2.5 p-1.5 rounded-lg border border-slate-800 hover:border-slate-700 bg-slate-900/60 transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 p-1.5 rounded-sm border border-rule hover:border-ink-3 bg-paper-2/60 transition-colors cursor-pointer"
                 aria-expanded={userDropdownOpen}
                 aria-haspopup="true"
               >
-                <div className="w-7 h-7 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-semibold text-xs">
+                <div className="w-7 h-7 rounded-full border border-ink flex items-center justify-center text-ink font-serif font-bold text-xs">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="text-left hidden lg:block">
-                  <div className="text-xs font-medium text-slate-200 leading-tight">
+                  <div className="text-xs font-medium text-ink leading-tight">
                     {user.name}
                   </div>
-                  <div className="text-[10px] text-slate-400 leading-tight">
+                  <div className="text-[10px] text-ink-3 leading-tight">
                     {user.email}
                   </div>
                 </div>
@@ -93,26 +91,31 @@ export const Navbar: React.FC = () => {
                     className="fixed inset-0 z-20"
                     onClick={() => setUserDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-52 rounded-xl bg-slate-900 border border-slate-800 shadow-xl py-1.5 z-30 text-xs">
-                    <div className="px-3 py-2 border-b border-slate-800/80 mb-1">
-                      <p className="font-semibold text-slate-200">{user.name}</p>
-                      <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                  <div
+                    ref={dropdownRef}
+                    className="absolute right-0 mt-2 w-56 rounded-sm bg-paper-3 border border-rule-2 shadow-[4px_4px_0_0_rgba(33,30,25,0.12)] py-1.5 z-30 text-xs"
+                  >
+                    <div className="px-3 py-2 border-b border-rule mb-1">
+                      <p className="font-serif font-bold text-ink">{user.name}</p>
+                      <p className="text-[11px] text-ink-3 truncate">
+                        {user.email}
+                      </p>
                     </div>
 
                     <Link
                       to="/profile"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 text-ink-2 hover:bg-paper-2 hover:text-ink transition-colors"
                     >
-                      <User className="w-4 h-4 text-slate-400" />
-                      <span>Profile & Stats</span>
+                      <User className="w-4 h-4 text-ink-3" />
+                      <span>Profile &amp; Stats</span>
                     </Link>
 
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-rose-400 hover:bg-slate-800 hover:text-rose-300 transition-colors text-left cursor-pointer"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-ink hover:bg-paper-2 transition-colors text-left cursor-pointer"
                     >
-                      <LogOut className="w-4 h-4" />
+                      <LogOut className="w-4 h-4 text-ink-3" />
                       <span>Sign Out</span>
                     </button>
                   </div>
@@ -139,23 +142,30 @@ export const Navbar: React.FC = () => {
         <div className="flex md:hidden items-center">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-sm text-ink-2 hover:text-ink hover:bg-paper-2 transition-colors"
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-800 bg-slate-950 px-4 pt-2 pb-4 space-y-2">
+        <div
+          ref={mobileDrawerRef}
+          className="md:hidden border-b border-rule bg-paper-2 px-4 pt-2 pb-4 space-y-2"
+        >
           <NavLink
             to="/problems"
             onClick={() => setMobileMenuOpen(false)}
             className={navLinkClass}
           >
-            <LayoutGrid className="w-4 h-4" />
+            <LayoutGrid className="w-3.5 h-3.5" />
             <span>Problems</span>
           </NavLink>
           <NavLink
@@ -163,31 +173,33 @@ export const Navbar: React.FC = () => {
             onClick={() => setMobileMenuOpen(false)}
             className={navLinkClass}
           >
-            <History className="w-4 h-4" />
+            <History className="w-3.5 h-3.5" />
             <span>Submissions</span>
           </NavLink>
 
-          <div className="pt-2 border-t border-slate-800/80">
+          <div className="pt-2 border-t border-rule">
             {isAuthenticated && user ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-3 py-1">
-                  <span className="text-xs text-slate-300 font-medium">{user.name}</span>
+                  <span className="text-xs text-ink font-medium">
+                    {user.name}
+                  </span>
                   <RoleBadge role={user.userRole} />
                 </div>
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-ink-2 hover:text-ink"
                 >
                   <User className="w-4 h-4" />
-                  <span>Profile & Stats</span>
+                  <span>Profile &amp; Stats</span>
                 </Link>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     handleLogout();
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-rose-400 hover:text-rose-300 text-left"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink hover:text-ink-2 text-left"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>

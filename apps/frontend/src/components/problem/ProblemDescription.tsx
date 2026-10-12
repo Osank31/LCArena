@@ -1,20 +1,31 @@
 import React from "react";
 import { Clock, Hash, Tag } from "lucide-react";
+import { useReveal } from "../../animations";
 import { ParsedProblem } from "../../types/problem.types";
 import { Badge, DifficultyBadge } from "../common/Badge";
 
 export const ProblemDescription: React.FC<{ problem: ParsedProblem }> = ({
   problem,
 }) => {
+  // Quiet mount reveal of the statement. Deliberately no ScrollTrigger here:
+  // the statement lives in its own scroll container and text must never move
+  // while it is being read.
+  const scope = useReveal<HTMLElement>({ stagger: 0.05, duration: 0.3 });
+
   return (
-    <div className="h-full overflow-y-auto p-5 text-slate-300 text-sm leading-relaxed space-y-6">
+    <article
+      ref={scope}
+      className="h-full overflow-y-auto px-6 py-7 text-ink text-sm leading-relaxed space-y-7 max-w-3xl mx-auto"
+    >
       {/* Title & Metadata */}
-      <div>
+      <header data-reveal>
         <div className="flex items-center gap-3 mb-2 flex-wrap">
-          <h1 className="text-xl font-bold text-slate-100">{problem.title}</h1>
+          <h1 className="font-serif text-2xl font-bold text-ink leading-snug">
+            {problem.title}
+          </h1>
           <DifficultyBadge difficulty={problem.difficulty} />
-          <span className="flex items-center gap-1 text-xs text-slate-400 font-mono bg-slate-900 border border-slate-800 px-2 py-0.5 rounded">
-            <Clock className="w-3 h-3 text-slate-500" />
+          <span className="flex items-center gap-1 text-xs text-ink-3 font-mono border border-rule px-2 py-0.5 rounded-sm">
+            <Clock className="w-3 h-3 text-ink-3" />
             {problem.timeLimit}ms
           </span>
         </div>
@@ -23,69 +34,71 @@ export const ProblemDescription: React.FC<{ problem: ParsedProblem }> = ({
         <div className="flex items-center gap-1.5 flex-wrap mt-2">
           {problem.tags.map((tag) => (
             <Badge key={tag} variant="outline" size="sm" className="text-[11px]">
-              <Tag className="w-2.5 h-2.5 text-slate-500" />
+              <Tag className="w-2.5 h-2.5 text-ink-3" />
               {tag}
             </Badge>
           ))}
         </div>
-      </div>
+      </header>
 
-      <hr className="border-slate-800" />
+      <hr data-reveal className="border-rule" />
 
       {/* Description Statement */}
-      <div className="space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <section data-reveal className="space-y-3">
+        <h2 className="font-serif text-sm font-bold uppercase tracking-[0.18em] text-ink-2">
           Problem Description
         </h2>
-        <div className="whitespace-pre-line text-slate-300 leading-relaxed font-sans">
+        <div className="whitespace-pre-line text-ink-2 leading-loose text-[15px]">
           {problem.statement}
         </div>
-      </div>
+      </section>
 
       {/* Examples */}
-      <div className="space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <section data-reveal className="space-y-4">
+        <h2 className="font-serif text-sm font-bold uppercase tracking-[0.18em] text-ink-2">
           Examples
         </h2>
         {problem.examples.map((ex, index) => (
           <div
             key={index}
-            className="bg-slate-900/80 border border-slate-800/90 rounded-lg p-3.5 space-y-2 text-xs"
+            className="bg-paper-2/60 border border-rule rounded-sm p-4 space-y-2.5 text-xs"
           >
-            <div className="font-semibold text-slate-200">Example {index + 1}:</div>
-            <div className="font-mono bg-slate-950/80 p-2.5 rounded border border-slate-850 space-y-1">
+            <div className="font-serif font-bold text-ink text-sm">
+              Example {index + 1}
+            </div>
+            <div className="font-mono bg-paper p-3 rounded-sm border border-rule space-y-1">
               <div>
-                <span className="text-slate-500 select-none">Input: </span>
-                <span className="text-emerald-300">{ex.input}</span>
+                <span className="text-ink-3 select-none">Input: </span>
+                <span className="text-ink">{ex.input}</span>
               </div>
               <div>
-                <span className="text-slate-500 select-none">Output: </span>
-                <span className="text-cyan-300">{ex.output}</span>
+                <span className="text-ink-3 select-none">Output: </span>
+                <span className="text-ink">{ex.output}</span>
               </div>
             </div>
             {ex.explanation && (
-              <div className="text-slate-400 text-xs">
-                <span className="font-semibold text-slate-300">Explanation: </span>
+              <div className="text-ink-3 text-xs leading-relaxed">
+                <span className="font-semibold text-ink-2">Explanation: </span>
                 {ex.explanation}
               </div>
             )}
           </div>
         ))}
-      </div>
+      </section>
 
       {/* Constraints */}
-      <div className="space-y-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <section data-reveal className="space-y-2">
+        <h2 className="font-serif text-sm font-bold uppercase tracking-[0.18em] text-ink-2">
           Constraints
         </h2>
-        <ul className="list-disc list-inside space-y-1 text-xs text-slate-400 bg-slate-900/40 p-3 rounded-lg border border-slate-800/60 font-mono">
+        <ul className="list-disc list-inside space-y-1 text-xs text-ink-2 bg-paper-2/50 p-3.5 rounded-sm border border-rule font-mono">
           {problem.constraints.map((c, i) => (
-            <li key={i} className="leading-normal">
+            <li key={i} className="leading-relaxed">
               {c}
             </li>
           ))}
         </ul>
-      </div>
-    </div>
+      </section>
+    </article>
   );
 };

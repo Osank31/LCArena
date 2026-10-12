@@ -22,7 +22,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "inline-flex items-center justify-center font-medium rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer";
+    "inline-flex items-center justify-center font-serif font-medium rounded-md transition-[color,background-color,border-color,transform] duration-150 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 select-none cursor-pointer";
 
   const sizeClasses = {
     sm: "px-2.5 py-1.5 text-xs gap-1.5",
@@ -32,17 +32,17 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantClasses = {
     primary:
-      "bg-blue-600 hover:bg-blue-500 text-white shadow-sm focus-visible:ring-blue-500 active:bg-blue-700",
+      "bg-ink text-paper hover:bg-ink-2 active:bg-ink focus-visible:ring-ink",
     secondary:
-      "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 focus-visible:ring-slate-400 active:bg-slate-850",
+      "bg-paper-2 text-ink border border-rule-2 hover:bg-rule focus-visible:ring-rule-2",
     outline:
-      "border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white focus-visible:ring-slate-400",
+      "bg-transparent border border-rule-2 text-ink hover:bg-paper-2 focus-visible:ring-rule-2",
     ghost:
-      "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 focus-visible:ring-slate-400",
+      "bg-transparent text-ink-2 hover:bg-paper-2 hover:text-ink focus-visible:ring-rule-2",
     danger:
-      "bg-rose-600 hover:bg-rose-500 text-white shadow-sm focus-visible:ring-rose-500 active:bg-rose-700",
+      "bg-transparent border-2 border-ink text-ink hover:bg-ink hover:text-paper focus-visible:ring-ink",
     success:
-      "bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm focus-visible:ring-emerald-500 active:bg-emerald-700",
+      "bg-ink-3 text-paper hover:bg-ink-2 focus-visible:ring-ink-3",
   }[variant];
 
   return (

@@ -16,6 +16,7 @@ import { Badge, RoleBadge } from "../components/common/Badge";
 import { Button } from "../components/common/Button";
 import { Input } from "../components/common/Input";
 import { Modal } from "../components/common/Modal";
+import { useReveal } from "../animations";
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/authService";
 import { problemService } from "../services/problemService";
@@ -45,6 +46,9 @@ export const ProfilePage: React.FC = () => {
   const [deletePassword, setDeletePassword] = useState("");
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Gentle commission of the profile page blocks on entry.
+  const pageScope = useReveal({ stagger: 0.05, duration: 0.34 });
 
   useEffect(() => {
     if (!user) return;
@@ -169,23 +173,29 @@ export const ProfilePage: React.FC = () => {
   if (!user) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div
+      ref={pageScope}
+      className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
+    >
       {/* Profile Header Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div
+        data-reveal
+        className="bg-paper-3 border border-rule-2 rounded-sm p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+      >
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 border-2 border-blue-400/40 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-500/20">
+          <div className="w-16 h-16 rounded-sm border border-ink flex items-center justify-center text-ink font-serif font-bold text-2xl">
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-slate-100">{user.name}</h1>
+              <h1 className="font-serif text-xl font-bold text-ink">{user.name}</h1>
               <RoleBadge role={user.userRole} />
             </div>
-            <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-1">
+            <p className="text-xs text-ink-3 flex items-center gap-1.5 mt-1 font-mono">
               <Mail className="w-3.5 h-3.5" />
               <span>{user.email}</span>
             </p>
-            <p className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+            <p className="text-[11px] text-ink-3 flex items-center gap-1.5 mt-0.5 font-mono">
               <Calendar className="w-3 h-3" />
               <span>
                 Member since{" "}
@@ -196,30 +206,30 @@ export const ProfilePage: React.FC = () => {
         </div>
 
         {/* Overview Stats */}
-        <div className="flex items-center gap-6 bg-slate-950/60 border border-slate-800 px-6 py-3 rounded-xl">
+        <div className="flex items-center gap-6 bg-paper-2/60 border border-rule px-6 py-3 rounded-sm">
           <div className="text-center">
-            <div className="text-xl font-bold text-emerald-400 font-mono">
+            <div className="text-xl font-bold text-ink font-mono">
               {stats.solvedCount}
             </div>
-            <div className="text-[10px] text-slate-500 uppercase tracking-wider">
+            <div className="text-[10px] text-ink-3 uppercase tracking-wider font-mono">
               Solved
             </div>
           </div>
-          <div className="text-slate-800">|</div>
+          <div className="text-rule-2">|</div>
           <div className="text-center">
-            <div className="text-xl font-bold text-blue-400 font-mono">
+            <div className="text-xl font-bold text-ink font-mono">
               {stats.totalSubmissions}
             </div>
-            <div className="text-[10px] text-slate-500 uppercase tracking-wider">
+            <div className="text-[10px] text-ink-3 uppercase tracking-wider font-mono">
               Submissions
             </div>
           </div>
-          <div className="text-slate-800">|</div>
+          <div className="text-rule-2">|</div>
           <div className="text-center">
-            <div className="text-xl font-bold text-purple-400 font-mono">
+            <div className="text-xl font-bold text-ink font-mono">
               {stats.acceptanceRate}%
             </div>
-            <div className="text-[10px] text-slate-500 uppercase tracking-wider">
+            <div className="text-[10px] text-ink-3 uppercase tracking-wider font-mono">
               Acceptance
             </div>
           </div>
@@ -229,22 +239,25 @@ export const ProfilePage: React.FC = () => {
       {/* Grid: Solved Breakdown & Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Difficulty Stats */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+        <div
+          data-reveal
+          className="bg-paper-2/40 border border-rule rounded-sm p-6 space-y-4"
+        >
+          <h2 className="font-serif text-sm font-bold uppercase tracking-[0.18em] text-ink-2">
             Difficulty Breakdown
           </h2>
 
           <div className="space-y-3">
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-emerald-400 font-medium">Easy</span>
-                <span className="text-slate-300 font-mono font-semibold">
+                <span className="text-ink font-medium">Easy</span>
+                <span className="text-ink-2 font-mono font-semibold">
                   {stats.easySolved}
                 </span>
               </div>
-              <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+              <div className="w-full bg-paper h-2 rounded-sm overflow-hidden border border-rule">
                 <div
-                  className="bg-emerald-500 h-full rounded-full transition-all"
+                  className="bg-ink h-full transition-all"
                   style={{ width: `${Math.min(100, stats.easySolved * 10)}%` }}
                 />
               </div>
@@ -252,14 +265,14 @@ export const ProfilePage: React.FC = () => {
 
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-amber-400 font-medium">Medium</span>
-                <span className="text-slate-300 font-mono font-semibold">
+                <span className="text-ink font-medium">Medium</span>
+                <span className="text-ink-2 font-mono font-semibold">
                   {stats.medSolved}
                 </span>
               </div>
-              <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+              <div className="w-full bg-paper h-2 rounded-sm overflow-hidden border border-rule">
                 <div
-                  className="bg-amber-500 h-full rounded-full transition-all"
+                  className="bg-ink-3 h-full transition-all"
                   style={{ width: `${Math.min(100, stats.medSolved * 8)}%` }}
                 />
               </div>
@@ -267,14 +280,14 @@ export const ProfilePage: React.FC = () => {
 
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-rose-400 font-medium">Hard</span>
-                <span className="text-slate-300 font-mono font-semibold">
+                <span className="text-ink font-medium">Hard</span>
+                <span className="text-ink-2 font-mono font-semibold">
                   {stats.hardSolved}
                 </span>
               </div>
-              <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+              <div className="w-full bg-paper h-2 rounded-sm overflow-hidden border border-rule">
                 <div
-                  className="bg-rose-500 h-full rounded-full transition-all"
+                  className="bg-ink-2 h-full transition-all"
                   style={{ width: `${Math.min(100, stats.hardSolved * 15)}%` }}
                 />
               </div>
@@ -283,25 +296,28 @@ export const ProfilePage: React.FC = () => {
         </div>
 
         {/* Right Column (2 cols): Recent Submissions */}
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+        <div
+          data-reveal
+          className="lg:col-span-2 bg-paper-2/40 border border-rule rounded-sm p-6 space-y-4"
+        >
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+            <h2 className="font-serif text-sm font-bold uppercase tracking-[0.18em] text-ink-2">
               Recent Submissions
             </h2>
             <Link
               to="/submissions"
-              className="text-xs text-blue-400 hover:text-blue-300"
+              className="text-xs text-ink underline underline-offset-4 hover:text-ink-2"
             >
               View Full History →
             </Link>
           </div>
 
           {submissions.length === 0 ? (
-            <div className="text-center py-8 text-slate-500 text-xs">
+            <div className="text-center py-8 text-ink-3 text-xs">
               No recent submissions recorded on this device yet.
             </div>
           ) : (
-            <div className="divide-y divide-slate-800/80">
+            <div className="divide-y divide-rule">
               {submissions.slice(0, 5).map((sub) => {
                 const verdict = parseVerdict(sub.status);
                 const prob = problemMap.get(sub.problemId);
@@ -319,18 +335,18 @@ export const ProfilePage: React.FC = () => {
                       </span>
                       <Link
                         to={`/problems/${sub.problemId}`}
-                        className="font-medium text-slate-200 hover:text-blue-400 truncate max-w-xs"
+                        className="font-medium text-ink hover:underline underline-offset-4 truncate max-w-xs"
                       >
                         {prob?.title || `Problem ${sub.problemId.slice(-4)}`}
                       </Link>
                     </div>
 
-                    <div className="flex items-center gap-4 text-slate-400">
+                    <div className="flex items-center gap-4 text-ink-3">
                       <span className="uppercase font-mono text-[11px]">
                         {sub.language}
                       </span>
                       {typeof verdict.timeMs === "number" && (
-                        <span className="font-mono text-slate-500 hidden sm:inline">
+                        <span className="font-mono text-ink-3 hidden sm:inline">
                           {verdict.timeMs}ms
                         </span>
                       )}
@@ -344,9 +360,12 @@ export const ProfilePage: React.FC = () => {
       </div>
 
       {/* Account Settings / Security */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-        <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-          <Shield className="w-5 h-5 text-blue-400" />
+      <div
+        data-reveal
+        className="bg-paper-2/40 border border-rule rounded-sm p-6 space-y-6"
+      >
+        <h2 className="font-serif text-base font-bold text-ink flex items-center gap-2">
+          <Shield className="w-5 h-5 text-ink-3" />
           <span>Security & Account Settings</span>
         </h2>
 
@@ -389,13 +408,13 @@ export const ProfilePage: React.FC = () => {
           </Button>
         </form>
 
-        <hr className="border-slate-800" />
+        <hr className="border-rule" />
 
         {/* Delete Account */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
           <div>
-            <h3 className="text-sm font-semibold text-rose-400">Danger Zone</h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h3 className="font-serif text-sm font-bold text-ink">Danger Zone</h3>
+            <p className="text-xs text-ink-3 mt-0.5">
               Permanently delete your LCArena profile and revoke all active sessions.
             </p>
           </div>

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Clock, Code, Eye } from "lucide-react";
+import { Clock, Eye } from "lucide-react";
 import { ISubmission } from "../../types/submission.types";
 import { parseVerdict } from "../../utils/verdictHelper";
-import { Badge } from "../common/Badge";
 import { Button } from "../common/Button";
 import { EmptyState } from "../common/EmptyState";
 import { Modal } from "../common/Modal";
@@ -30,7 +29,7 @@ export const SubmissionHistoryTab: React.FC<SubmissionHistoryTabProps> = ({
 
   return (
     <div className="h-full overflow-y-auto p-4 space-y-3" data-testid="submissions-list">
-      <div className="divide-y divide-slate-800">
+      <div className="divide-y divide-rule">
         {submissions.map((sub) => {
           const info = parseVerdict(sub.status);
           const dateStr = sub.createdAt
@@ -45,19 +44,19 @@ export const SubmissionHistoryTab: React.FC<SubmissionHistoryTabProps> = ({
           return (
             <div
               key={sub._id}
-              className="py-3 flex items-center justify-between gap-3 text-xs hover:bg-slate-900/40 p-2 rounded-lg transition-colors"
+              className="py-3 flex items-center justify-between gap-3 text-xs hover:bg-paper-2/60 p-2 rounded-sm transition-colors"
             >
               <div className="flex items-center gap-3">
                 <span
-                  className={`px-2 py-0.5 rounded font-semibold text-xs ${info.badgeClass}`}
+                  className={`px-2 py-0.5 rounded-sm font-mono uppercase tracking-wide text-xs ${info.badgeClass}`}
                 >
                   {info.verdict}
                 </span>
-                <span className="text-slate-400 uppercase font-mono text-[11px]">
+                <span className="text-ink-3 uppercase font-mono text-[11px]">
                   {sub.language}
                 </span>
                 {typeof info.timeMs === "number" && (
-                  <span className="text-slate-500 font-mono flex items-center gap-1">
+                  <span className="text-ink-3 font-mono flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {info.timeMs}ms
                   </span>
@@ -65,7 +64,7 @@ export const SubmissionHistoryTab: React.FC<SubmissionHistoryTabProps> = ({
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-slate-500 text-[11px] hidden sm:inline">
+                <span className="text-ink-3 text-[11px] hidden sm:inline">
                   {dateStr}
                 </span>
                 <Button
@@ -94,7 +93,7 @@ export const SubmissionHistoryTab: React.FC<SubmissionHistoryTabProps> = ({
           <div className="space-y-4">
             {/* Verdict summary */}
             <div
-              className={`p-3 rounded-lg border flex items-center justify-between ${
+              className={`p-3 rounded-sm border flex items-center justify-between ${
                 parseVerdict(selectedSubmission.status).badgeClass
               }`}
             >
@@ -109,14 +108,14 @@ export const SubmissionHistoryTab: React.FC<SubmissionHistoryTabProps> = ({
             {/* Submitted Code */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-slate-400">
+                <span className="text-xs font-semibold text-ink-2">
                   Submitted Code:
                 </span>
-                <span className="text-[11px] text-slate-500 font-mono">
+                <span className="text-[11px] text-ink-3 font-mono">
                   ID: {selectedSubmission._id}
                 </span>
               </div>
-              <pre className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-slate-200 text-xs font-mono max-h-72 overflow-y-auto">
+              <pre className="bg-paper p-4 rounded-sm border border-rule text-ink text-xs font-mono max-h-72 overflow-y-auto">
                 {selectedSubmission.code}
               </pre>
             </div>

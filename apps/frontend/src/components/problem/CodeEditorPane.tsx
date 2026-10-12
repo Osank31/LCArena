@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Editor, { type OnMount } from "@monaco-editor/react";
+import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react";
 import axios from "axios";
 import { Minus, Plus } from "lucide-react";
 import { SupportedLanguage } from "../../types/submission.types";
@@ -24,6 +24,110 @@ export const FONT_SIZE_STORAGE_KEY = "lcarena_editor_font_size";
 export const DEFAULT_FONT_SIZE = 13;
 export const MIN_FONT_SIZE = 10;
 export const MAX_FONT_SIZE = 32;
+
+/** Monaco theme id for the paper/book look. */
+export const PAPER_EDITOR_THEME = "lcarena-paper";
+
+/**
+ * Paper-toned Monaco theme. Reuses the design-system palette so the editor
+ * background matches the page (`#F4EBDD`) and every token stays near-black,
+ * with only small tonal differences to preserve syntax readability.
+ */
+export const definePaperEditorTheme: BeforeMount = (monaco) => {
+  monaco.editor.defineTheme(PAPER_EDITOR_THEME, {
+    base: "vs",
+    inherit: true,
+    rules: [
+      { token: "", foreground: "211E19" },
+      { token: "comment", foreground: "7A7264", fontStyle: "italic" },
+      { token: "keyword", foreground: "211E19", fontStyle: "bold" },
+      { token: "keyword.control", foreground: "211E19", fontStyle: "bold" },
+      { token: "operator", foreground: "4A4238" },
+      { token: "string", foreground: "4A4238" },
+      { token: "string.escape", foreground: "3D382F" },
+      { token: "number", foreground: "2E2A24" },
+      { token: "type", foreground: "2E2A24" },
+      { token: "type.identifier", foreground: "2E2A24" },
+      { token: "function", foreground: "26221C" },
+      { token: "identifier", foreground: "34302A" },
+      { token: "variable", foreground: "34302A" },
+      { token: "constant", foreground: "211E19" },
+      { token: "delimiter", foreground: "5A5246" },
+      { token: "delimiter.bracket", foreground: "211E19" },
+      { token: "tag", foreground: "211E19", fontStyle: "bold" },
+      { token: "attribute.name", foreground: "4A4238" },
+    ],
+    colors: {
+      "editor.background": "#F4EBDD",
+      "editor.foreground": "#211E19",
+      "editorGutter.background": "#F4EBDD",
+      "editorLineNumber.foreground": "#A99E8A",
+      "editorLineNumber.activeForeground": "#211E19",
+      "editor.lineHighlightBackground": "#EAE0CF",
+      "editor.lineHighlightBorder": "#00000000",
+      "editor.selectionBackground": "#D8CBB5",
+      "editor.inactiveSelectionBackground": "#E8DDC9",
+      "editor.selectionHighlightBackground": "#E8DDC9",
+      "editorCursor.foreground": "#211E19",
+      "editorWhitespace.foreground": "#C6B79C",
+      "editorIndentGuide.background1": "#DED2BE",
+      "editorIndentGuide.activeBackground1": "#B9A98C",
+      "editorBracketMatch.background": "#D8CBB5",
+      "editorBracketMatch.border": "#C6B79C",
+      "editorError.foreground": "#211E19",
+      "editorWarning.foreground": "#6B6151",
+      "editorInfo.foreground": "#6B6151",
+      "editorHint.foreground": "#6B6151",
+      // Widgets: suggestions, hovers, find
+      "editorWidget.background": "#EFE7D8",
+      "editorWidget.foreground": "#211E19",
+      "editorWidget.border": "#D8CBB5",
+      "editorSuggestWidget.background": "#EFE7D8",
+      "editorSuggestWidget.border": "#D8CBB5",
+      "editorSuggestWidget.foreground": "#211E19",
+      "editorSuggestWidget.selectedBackground": "#D8CBB5",
+      "editorSuggestWidget.selectedForeground": "#211E19",
+      "editorSuggestWidget.highlightForeground": "#211E19",
+      "editorSuggestWidget.focusHighlightForeground": "#211E19",
+      "editorHoverWidget.background": "#EFE7D8",
+      "editorHoverWidget.border": "#D8CBB5",
+      "editorHoverWidget.foreground": "#211E19",
+      "editorHoverWidget.statusBarBackground": "#E8DDC9",
+      // Inputs & dropdowns inside widgets
+      "input.background": "#F4EBDD",
+      "input.border": "#D8CBB5",
+      "input.foreground": "#211E19",
+      "input.placeholderForeground": "#6B6151",
+      "dropdown.background": "#EFE7D8",
+      "dropdown.border": "#D8CBB5",
+      "dropdown.foreground": "#211E19",
+      "list.hoverBackground": "#E8DDC9",
+      "list.focusBackground": "#D8CBB5",
+      "list.activeSelectionBackground": "#D8CBB5",
+      "list.activeSelectionForeground": "#211E19",
+      "list.highlightForeground": "#211E19",
+      "list.inactiveSelectionBackground": "#E8DDC9",
+      "menu.background": "#EFE7D8",
+      "menu.foreground": "#211E19",
+      "menu.selectionBackground": "#D8CBB5",
+      "menu.selectionForeground": "#211E19",
+      "menu.border": "#D8CBB5",
+      "menu.separatorBackground": "#D8CBB5",
+      // Find / replace widget
+      "editorFindMatchHighlight": "#D8CBB5",
+      "editor.findMatchBackground": "#C6B79C",
+      "editor.findMatchBorder": "#211E19",
+      // Minimap & scrollbar
+      "minimap.background": "#F4EBDD",
+      "scrollbar.shadow": "#00000000",
+      "scrollbarSlider.background": "#D8CBB580",
+      "scrollbarSlider.hoverBackground": "#C6B79C99",
+      "scrollbarSlider.activeBackground": "#C6B79CAF",
+      // Overview ruler
+      "editorOverviewRuler.border": "#00000000",
+    },
+  });
+};
 
 export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
   value,
@@ -133,13 +237,13 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
 
   return (
     <div
-      className="w-full h-full relative bg-[#1e1e1e] flex flex-col"
+      className="w-full h-full relative bg-paper flex flex-col"
       data-testid="code-editor-container"
     >
       {/* Editor top toolbar with font size controls */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-[#18181b] border-b border-slate-800 text-xs text-slate-400 select-none shrink-0">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-paper-2 border-b border-rule text-xs text-ink-3 select-none shrink-0">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px] font-semibold text-slate-300 uppercase">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-ink-2">
             {monacoLang}
           </span>
         </div>
@@ -149,7 +253,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
           className="flex items-center gap-1"
           data-testid="editor-font-size-controls"
         >
-          <span className="text-[11px] text-slate-400 mr-1 hidden sm:inline">
+          <span className="text-[11px] text-ink-3 mr-1 hidden sm:inline font-mono">
             Font Size:
           </span>
           <button
@@ -157,7 +261,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
             disabled={currentFontSize <= MIN_FONT_SIZE}
             title="Decrease font size"
             aria-label="Decrease font size"
-            className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer border border-transparent hover:border-slate-700"
+            className="p-1 rounded-sm text-ink-3 hover:text-ink hover:bg-paper-3 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90 cursor-pointer border border-transparent hover:border-rule-2"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
@@ -165,7 +269,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
             onClick={handleResetFontSize}
             title="Reset font size to default (13px)"
             aria-label="Reset font size"
-            className="text-[11px] font-mono px-1.5 py-0.5 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            className="text-[11px] font-mono px-1.5 py-0.5 rounded-sm text-ink-2 hover:text-ink hover:bg-paper-3 transition cursor-pointer"
           >
             {currentFontSize}px
           </button>
@@ -174,7 +278,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
             disabled={currentFontSize >= MAX_FONT_SIZE}
             title="Increase font size"
             aria-label="Increase font size"
-            className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer border border-transparent hover:border-slate-700"
+            className="p-1 rounded-sm text-ink-3 hover:text-ink hover:bg-paper-3 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90 cursor-pointer border border-transparent hover:border-rule-2"
           >
             <Plus className="w-3.5 h-3.5" />
           </button>
@@ -185,14 +289,16 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
         <Editor
           height="100%"
           language={monacoLang}
-          theme="vs-dark"
+          theme={PAPER_EDITOR_THEME}
+          beforeMount={definePaperEditorTheme}
           value={value}
           onChange={(val) => onChange(val || "")}
           onMount={handleEditorMount}
           options={{
             fontSize: currentFontSize,
             mouseWheelZoom: true,
-            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+            fontFamily:
+              '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             automaticLayout: true,
@@ -201,6 +307,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
             renderWhitespace: "selection",
             suggestOnTriggerCharacters: true,
             formatOnPaste: true,
+            fixedOverflowWidgets: true,
           }}
         />
       </div>

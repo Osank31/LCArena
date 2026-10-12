@@ -16,9 +16,9 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
   if (!status || status.status === "PENDING") {
     return {
       verdict: "Pending",
-      badgeClass: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-      bgClass: "bg-amber-500/10",
-      textClass: "text-amber-400",
+      badgeClass: "bg-transparent text-ink-3 border border-dashed border-rule-2",
+      bgClass: "bg-transparent",
+      textClass: "text-ink-3",
       summary: "Judging solution in ephemeral Docker container...",
     };
   }
@@ -26,9 +26,9 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
   if (status.status === "COMPILE_ERROR") {
     return {
       verdict: "Compilation Error",
-      badgeClass: "bg-rose-500/10 text-rose-400 border border-rose-500/20",
-      bgClass: "bg-rose-500/10",
-      textClass: "text-rose-400",
+      badgeClass: "bg-paper-2 text-ink border-2 border-ink",
+      bgClass: "bg-paper-2",
+      textClass: "text-ink",
       summary: "Compilation or syntax check failed.",
       details: status.compileError,
     };
@@ -37,9 +37,9 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
   if (status.status === "INTERNAL_ERROR") {
     return {
       verdict: "Internal Error",
-      badgeClass: "bg-neutral-500/10 text-neutral-400 border border-neutral-500/20",
-      bgClass: "bg-neutral-500/10",
-      textClass: "text-neutral-400",
+      badgeClass: "bg-paper-2 text-ink-3 border border-rule",
+      bgClass: "bg-paper-2",
+      textClass: "text-ink-3",
       summary: status.message || "An internal error occurred during execution.",
     };
   }
@@ -52,9 +52,9 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
     if (failedCases.tle && failedCases.tle.length > 0) {
       return {
         verdict: "Time Limit Exceeded",
-        badgeClass: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-        bgClass: "bg-amber-500/10",
-        textClass: "text-amber-400",
+        badgeClass: "bg-transparent text-ink border border-dashed border-ink-3",
+        bgClass: "bg-transparent",
+        textClass: "text-ink",
         summary: `Time limit exceeded on test case ${failedCases.tle[0]}`,
         passedCount: passed,
         totalCount: total,
@@ -66,9 +66,9 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
     if (failedCases.re && failedCases.re.length > 0) {
       return {
         verdict: "Runtime Error",
-        badgeClass: "bg-rose-500/10 text-rose-400 border border-rose-500/20",
-        bgClass: "bg-rose-500/10",
-        textClass: "text-rose-400",
+        badgeClass: "bg-paper-2 text-ink border-2 border-ink",
+        bgClass: "bg-paper-2",
+        textClass: "text-ink",
         summary: `Runtime error on test case ${failedCases.re[0]}`,
         passedCount: passed,
         totalCount: total,
@@ -80,9 +80,9 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
     if (failedCases.wa && failedCases.wa.length > 0) {
       return {
         verdict: "Wrong Answer",
-        badgeClass: "bg-rose-500/10 text-rose-400 border border-rose-500/20",
-        bgClass: "bg-rose-500/10",
-        textClass: "text-rose-400",
+        badgeClass: "bg-paper-2 text-ink border-2 border-ink",
+        bgClass: "bg-paper-2",
+        textClass: "text-ink",
         summary: `Wrong answer on test case ${failedCases.wa[0]}`,
         passedCount: passed,
         totalCount: total,
@@ -94,9 +94,9 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
     // All passed!
     return {
       verdict: "Accepted",
-      badgeClass: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-      bgClass: "bg-emerald-500/10",
-      textClass: "text-emerald-400",
+      badgeClass: "bg-ink text-paper border border-ink",
+      bgClass: "bg-ink",
+      textClass: "text-paper",
       summary: `All ${total} test cases passed!`,
       passedCount: passed,
       totalCount: total,
@@ -106,9 +106,9 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
 
   return {
     verdict: "Pending",
-    badgeClass: "bg-neutral-500/10 text-neutral-400 border border-neutral-500/20",
-    bgClass: "bg-neutral-500/10",
-    textClass: "text-neutral-400",
+    badgeClass: "bg-paper-2 text-ink-3 border border-rule",
+    bgClass: "bg-paper-2",
+    textClass: "text-ink-3",
     summary: "Status unknown.",
   };
 }

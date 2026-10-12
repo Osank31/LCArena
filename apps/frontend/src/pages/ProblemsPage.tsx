@@ -6,6 +6,7 @@ import { EmptyState } from "../components/common/EmptyState";
 import { TableSkeleton } from "../components/common/Skeleton";
 import { ProblemFilters } from "../components/problem/ProblemFilters";
 import { ProblemRow } from "../components/problem/ProblemRow";
+import { useReveal } from "../animations";
 import { useAuth } from "../context/AuthContext";
 import { problemService } from "../services/problemService";
 import { submissionService } from "../services/submissionService";
@@ -27,6 +28,21 @@ export const ProblemsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ProblemFilterState>(INITIAL_FILTERS);
+
+  // Editorial entrance for the masthead, summary and filter bar. Runs once on
+  // load only, so filtering, searching and pagination never replay it.
+  const pageScope = useReveal({ stagger: 0.06, duration: 0.34 });
+
+  // Problem rows are revealed in small batches: the visible first rows animate
+  // immediately, later rows as they scroll into view. Keyed on the initial
+  // load so filter/search/pagination updates apply instantly.
+  const rowsScope = useReveal({
+    selector: "tbody tr",
+    batch: true,
+    immediate: 10,
+    stagger: 0.035,
+    deps: [isLoading],
+  });
 
   const fetchProblems = async () => {
     setIsLoading(true);
@@ -116,37 +132,51 @@ export const ProblemsPage: React.FC = () => {
   const hardCount = problems.filter((p) => p.difficulty === "Hard").length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Top Banner / Stats */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Problems Catalog</h1>
-          <p className="text-xs text-slate-400 mt-1">
+    <div
+      ref={pageScope}
+      className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6"
+    >
+      {/* Masthead / Stats */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-2 border-ink pb-5">
+        <div className="max-w-xl">
+          <div
+            data-reveal
+            className="text-[11px] font-mono uppercase tracking-[0.25em] text-ink-3 mb-2"
+          >
+            The Index
+          </div>
+          <h1 data-reveal className="font-serif text-3xl font-bold text-ink">
+            Problems Catalog
+          </h1>
+          <p data-reveal className="text-sm text-ink-3 mt-2 leading-relaxed">
             Browse and solve algorithmic challenges across all difficulty tiers.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 text-xs bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl">
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <span className="font-semibold text-slate-100">{problems.length}</span>
+        <div
+          data-reveal
+          className="flex flex-wrap items-center gap-3 text-xs bg-paper-2/60 border border-rule px-4 py-2 rounded-sm font-mono"
+        >
+          <div className="flex items-center gap-1.5 text-ink-2">
+            <span className="font-semibold text-ink">{problems.length}</span>
             <span>Total</span>
           </div>
-          <span className="text-slate-700">•</span>
-          <div className="text-emerald-400">
-            <span className="font-semibold">{easyCount}</span> Easy
+          <span className="text-rule-2">•</span>
+          <div className="text-ink-3">
+            <span className="font-semibold text-ink">{easyCount}</span> Easy
           </div>
-          <span className="text-slate-700">•</span>
-          <div className="text-amber-400">
-            <span className="font-semibold">{medCount}</span> Med
+          <span className="text-rule-2">•</span>
+          <div className="text-ink-3">
+            <span className="font-semibold text-ink">{medCount}</span> Med
           </div>
-          <span className="text-slate-700">•</span>
-          <div className="text-rose-400">
-            <span className="font-semibold">{hardCount}</span> Hard
+          <span className="text-rule-2">•</span>
+          <div className="text-ink-3">
+            <span className="font-semibold text-ink">{hardCount}</span> Hard
           </div>
           {solvedProblemIds.size > 0 && (
             <>
-              <span className="text-slate-700">•</span>
-              <div className="text-cyan-400 flex items-center gap-1">
+              <span className="text-rule-2">•</span>
+              <div className="text-ink flex items-center gap-1">
                 <CheckCircle className="w-3 h-3" />
                 <span className="font-semibold">{solvedProblemIds.size}</span> Solved
               </div>
@@ -156,12 +186,14 @@ export const ProblemsPage: React.FC = () => {
       </div>
 
       {/* Filter Controls */}
-      <ProblemFilters
-        filters={filters}
-        onChange={(partial) => setFilters((prev: ProblemFilterState) => ({ ...prev, ...partial }))}
-        onReset={() => setFilters(INITIAL_FILTERS)}
-        availableTags={availableTags}
-      />
+      <div data-reveal>
+        <ProblemFilters
+          filters={filters}
+          onChange={(partial) => setFilters((prev: ProblemFilterState) => ({ ...prev, ...partial }))}
+          onReset={() => setFilters(INITIAL_FILTERS)}
+          availableTags={availableTags}
+        />
+      </div>
 
       {/* Error Notice */}
       {error && (
@@ -174,7 +206,10 @@ export const ProblemsPage: React.FC = () => {
       )}
 
       {/* Problems Table View */}
-      <div className="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden shadow-sm">
+      <div
+        ref={rowsScope}
+        className="border border-rule rounded-sm bg-paper-2/20 overflow-hidden"
+      >
         {isLoading ? (
           <TableSkeleton rows={10} />
         ) : paginatedProblems.length === 0 ? (
@@ -190,7 +225,7 @@ export const ProblemsPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-950/60 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                <tr className="border-b-2 border-ink/70 text-[11px] font-mono font-semibold text-ink-2 uppercase tracking-[0.15em]">
                   <th className="py-3 px-4 w-12 text-center">Status</th>
                   <th className="py-3 px-4">Title</th>
                   <th className="py-3 px-4 w-28 text-center">Difficulty</th>
@@ -219,17 +254,17 @@ export const ProblemsPage: React.FC = () => {
 
         {/* Pagination Footer */}
         {!isLoading && totalPages > 1 && (
-          <div className="px-4 py-3 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <div className="px-4 py-3 bg-paper-2/60 border-t border-rule flex items-center justify-between text-xs text-ink-3 font-mono">
             <div>
               Showing{" "}
-              <span className="font-semibold text-slate-200">
+              <span className="font-semibold text-ink">
                 {(currentPage - 1) * filters.pageSize + 1}
               </span>{" "}
               to{" "}
-              <span className="font-semibold text-slate-200">
+              <span className="font-semibold text-ink">
                 {Math.min(currentPage * filters.pageSize, totalItems)}
               </span>{" "}
-              of <span className="font-semibold text-slate-200">{totalItems}</span> problems
+              of <span className="font-semibold text-ink">{totalItems}</span> problems
             </div>
 
             <div className="flex items-center gap-1">
@@ -246,7 +281,7 @@ export const ProblemsPage: React.FC = () => {
                 Prev
               </Button>
 
-              <span className="px-2 font-mono text-slate-300">
+              <span className="px-2 font-mono text-ink-2">
                 {currentPage} / {totalPages}
               </span>
 
