@@ -1,0 +1,320 @@
+{
+  "testName": "endpoint_gateway_health",
+  "scriptPath": "k6/endpoints/01-gateway-health.js",
+  "timestamp": "2026-10-14T15:02:45.459Z",
+  "durationSeconds": 16,
+  "exitCode": 0,
+  "success": true,
+  "envVars": {
+    "VUS": 20,
+    "DURATION": "12s"
+  },
+  "k6Metrics": {
+    "totalRequests": 23220,
+    "successRequests": 23220,
+    "failedRequests": 0,
+    "rps": 1934.23,
+    "errorRatePercent": 0,
+    "p50_ms": 8.52,
+    "p90_ms": 17.65,
+    "p95_ms": 21.19,
+    "p99_ms": 31.61,
+    "min_ms": 0.17,
+    "max_ms": 93.35,
+    "avg_ms": 10.01,
+    "vusMax": 20
+  },
+  "rawK6Metrics": {
+    "root_group": {
+      "checks": {
+        "status is 200": {
+          "id": "6210a8cd14cd70477eba5c5e4cb3fb5f",
+          "passes": 23220,
+          "fails": 0,
+          "name": "status is 200",
+          "path": "::status is 200"
+        },
+        "has healthy message": {
+          "fails": 0,
+          "name": "has healthy message",
+          "path": "::has healthy message",
+          "id": "7ae526cd772bf2efabf70348cd31dfb7",
+          "passes": 23220
+        }
+      },
+      "name": "",
+      "path": "",
+      "id": "d41d8cd98f00b204e9800998ecf8427e",
+      "groups": {}
+    },
+    "metrics": {
+      "http_req_failed": {
+        "passes": 0,
+        "fails": 23220,
+        "thresholds": {
+          "rate<0.01": false
+        },
+        "value": 0
+      },
+      "checks": {
+        "fails": 0,
+        "passes": 46440,
+        "value": 1
+      },
+      "data_sent": {
+        "count": 1718280,
+        "rate": 143133.06596035295
+      },
+      "http_req_duration{expected_response:true}": {
+        "p(99)": 31.609669200000024,
+        "avg": 10.014738927562423,
+        "min": 0.17055,
+        "med": 8.519618000000001,
+        "max": 93.348419,
+        "p(50)": 8.519618000000001,
+        "p(90)": 17.654015500000003,
+        "p(95)": 21.18839455
+      },
+      "http_req_tls_handshaking": {
+        "p(50)": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 0,
+        "avg": 0,
+        "min": 0,
+        "med": 0,
+        "max": 0
+      },
+      "data_received": {
+        "count": 6849900,
+        "rate": 570598.033220326
+      },
+      "vus": {
+        "value": 20,
+        "min": 20,
+        "max": 20
+      },
+      "vus_max": {
+        "value": 20,
+        "min": 20,
+        "max": 20
+      },
+      "http_req_duration": {
+        "avg": 10.014738927562423,
+        "min": 0.17055,
+        "med": 8.519618000000001,
+        "max": 93.348419,
+        "p(50)": 8.519618000000001,
+        "p(90)": 17.654015500000003,
+        "p(95)": 21.18839455,
+        "p(99)": 31.609669200000024,
+        "thresholds": {
+          "p(95)<150": false,
+          "p(99)<300": false,
+          "p(50)<50": false,
+          "p(90)<100": false
+        }
+      },
+      "iterations": {
+        "count": 23220,
+        "rate": 1934.2306210858505
+      },
+      "http_req_connecting": {
+        "p(50)": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 0,
+        "avg": 0.00145746714039621,
+        "min": 0,
+        "med": 0,
+        "max": 2.775502
+      },
+      "http_req_sending": {
+        "p(90)": 0.039681700000000035,
+        "p(95)": 0.08061924999999998,
+        "p(99)": 0.2967496700000003,
+        "avg": 0.03751723746770021,
+        "min": 0.003165,
+        "med": 0.015185,
+        "max": 17.119502,
+        "p(50)": 0.015185
+      },
+      "http_reqs": {
+        "count": 23220,
+        "rate": 1934.2306210858505
+      },
+      "http_req_blocked": {
+        "p(90)": 0.00879,
+        "p(95)": 0.01093005,
+        "p(99)": 0.058699490000000035,
+        "avg": 0.014998593583117973,
+        "min": 0.000955,
+        "med": 0.005353,
+        "max": 42.77689,
+        "p(50)": 0.005353
+      },
+      "http_req_receiving": {
+        "med": 0.0662185,
+        "max": 38.531615,
+        "p(50)": 0.0662185,
+        "p(90)": 0.18998150000000005,
+        "p(95)": 0.29470485,
+        "p(99)": 2.0163144100000094,
+        "avg": 0.15481850628768426,
+        "min": 0.011167
+      },
+      "iteration_duration": {
+        "p(95)": 21.734746050000002,
+        "p(99)": 32.38011213,
+        "avg": 10.306808671274776,
+        "min": 0.232264,
+        "med": 8.762206500000001,
+        "max": 108.908935,
+        "p(50)": 8.762206500000001,
+        "p(90)": 18.04436890000001
+      },
+      "http_req_waiting": {
+        "p(95)": 20.8087656,
+        "p(99)": 31.181628050000047,
+        "avg": 9.82240318380713,
+        "min": 0.146852,
+        "med": 8.360339,
+        "max": 88.091761,
+        "p(50)": 8.360339,
+        "p(90)": 17.356622200000004
+      }
+    }
+  },
+  "resources": {
+    "sampleCount": 7,
+    "durationSeconds": 16,
+    "containers": {
+      "brave_noyce": {
+        "avgCpuPercent": 96.71,
+        "peakCpuPercent": 96.71,
+        "avgMemMb": 0.8,
+        "peakMemMb": 0.8,
+        "memGrowthMb": 0
+      },
+      "lcarena-gateway-1": {
+        "avgCpuPercent": 74.83,
+        "peakCpuPercent": 124.37,
+        "avgMemMb": 273.91,
+        "peakMemMb": 274.2,
+        "memGrowthMb": 0.4
+      },
+      "lcarena-problem-1": {
+        "avgCpuPercent": 7.36,
+        "peakCpuPercent": 25.96,
+        "avgMemMb": 99.5,
+        "peakMemMb": 99.5,
+        "memGrowthMb": 0
+      },
+      "lcarena-execution-1": {
+        "avgCpuPercent": 9.5,
+        "peakCpuPercent": 39.44,
+        "avgMemMb": 105.63,
+        "peakMemMb": 105.7,
+        "memGrowthMb": 0.1
+      },
+      "lcarena-minio-init-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0.01,
+        "avgMemMb": 1.61,
+        "peakMemMb": 1.61,
+        "memGrowthMb": 0
+      },
+      "lcarena-submission-1": {
+        "avgCpuPercent": 5.63,
+        "peakCpuPercent": 29.66,
+        "avgMemMb": 151.1,
+        "peakMemMb": 151.1,
+        "memGrowthMb": 0
+      },
+      "lcarena-ai-suggestion-1": {
+        "avgCpuPercent": 0.27,
+        "peakCpuPercent": 0.36,
+        "avgMemMb": 121.2,
+        "peakMemMb": 121.2,
+        "memGrowthMb": 0
+      },
+      "lcarena-mail-1": {
+        "avgCpuPercent": 7.64,
+        "peakCpuPercent": 27.63,
+        "avgMemMb": 120.3,
+        "peakMemMb": 120.3,
+        "memGrowthMb": 0
+      },
+      "lcarena-redis-1": {
+        "avgCpuPercent": 2.46,
+        "peakCpuPercent": 6.54,
+        "avgMemMb": 6.56,
+        "peakMemMb": 6.58,
+        "memGrowthMb": 0.02
+      },
+      "lcarena-rabbitmq-1": {
+        "avgCpuPercent": 71.87,
+        "peakCpuPercent": 268.93,
+        "avgMemMb": 129.83,
+        "peakMemMb": 172.4,
+        "memGrowthMb": 59.4
+      },
+      "lcarena-minio-1": {
+        "avgCpuPercent": 2.91,
+        "peakCpuPercent": 15.86,
+        "avgMemMb": 121,
+        "peakMemMb": 124.3,
+        "memGrowthMb": 6.5
+      },
+      "lcarena-mongo-1": {
+        "avgCpuPercent": 12.72,
+        "peakCpuPercent": 65.94,
+        "avgMemMb": 179,
+        "peakMemMb": 227.9,
+        "memGrowthMb": 57.1
+      },
+      "wonderful_feistel": {
+        "avgCpuPercent": 132.94,
+        "peakCpuPercent": 159.67,
+        "avgMemMb": 22.08,
+        "peakMemMb": 24.88,
+        "memGrowthMb": 4.85
+      },
+      "--": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0,
+        "avgMemMb": 0,
+        "peakMemMb": 0,
+        "memGrowthMb": 0
+      },
+      "elegant_brattain": {
+        "avgCpuPercent": 82.51,
+        "peakCpuPercent": 82.51,
+        "avgMemMb": 4.51,
+        "peakMemMb": 4.51,
+        "memGrowthMb": 0
+      },
+      "exciting_napier": {
+        "avgCpuPercent": 54.28,
+        "peakCpuPercent": 54.28,
+        "avgMemMb": 9.46,
+        "peakMemMb": 9.46,
+        "memGrowthMb": 0
+      },
+      "agitated_nash": {
+        "avgCpuPercent": 65.22,
+        "peakCpuPercent": 65.22,
+        "avgMemMb": 0.8,
+        "peakMemMb": 0.8,
+        "memGrowthMb": 0
+      },
+      "zen_wilbur": {
+        "avgCpuPercent": 72.98,
+        "peakCpuPercent": 72.98,
+        "avgMemMb": 0.8,
+        "peakMemMb": 0.8,
+        "memGrowthMb": 0
+      }
+    }
+  }
+}

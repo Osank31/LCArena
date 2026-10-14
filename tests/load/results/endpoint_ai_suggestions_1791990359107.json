@@ -1,0 +1,320 @@
+{
+  "testName": "endpoint_ai_suggestions",
+  "scriptPath": "k6/endpoints/12-ai-suggestions.js",
+  "timestamp": "2026-10-14T15:06:19.314Z",
+  "durationSeconds": 17,
+  "exitCode": 99,
+  "success": false,
+  "envVars": {
+    "VUS": 15,
+    "DURATION": "12s"
+  },
+  "k6Metrics": {
+    "totalRequests": 1327,
+    "successRequests": 107,
+    "failedRequests": 1220,
+    "rps": 109.79,
+    "errorRatePercent": 91.94,
+    "p50_ms": 109.01,
+    "p90_ms": 191.21,
+    "p95_ms": 222.4,
+    "p99_ms": 1511.65,
+    "min_ms": 0.78,
+    "max_ms": 2175.12,
+    "avg_ms": 135.91,
+    "vusMax": 15
+  },
+  "rawK6Metrics": {
+    "metrics": {
+      "http_req_duration": {
+        "min": 0.783443,
+        "med": 109.007743,
+        "max": 2175.119853,
+        "p(50)": 109.007743,
+        "p(90)": 191.21464160000002,
+        "p(95)": 222.39642060000006,
+        "p(99)": 1511.64514786,
+        "avg": 135.90742920120562,
+        "thresholds": {
+          "p(50)<100": true,
+          "p(90)<250": false,
+          "p(95)<400": false,
+          "p(99)<800": true
+        }
+      },
+      "http_req_failed": {
+        "passes": 1220,
+        "fails": 107,
+        "thresholds": {
+          "rate<0.01": true
+        },
+        "value": 0.9193669932177845
+      },
+      "http_req_blocked": {
+        "p(50)": 0.006332,
+        "p(90)": 0.009840400000000003,
+        "p(95)": 0.012691800000000001,
+        "p(99)": 4.4796827400000065,
+        "avg": 0.07328106103993992,
+        "min": 0.001355,
+        "med": 0.006332,
+        "max": 7.055013
+      },
+      "checks": {
+        "passes": 1327,
+        "fails": 0,
+        "value": 1
+      },
+      "data_received": {
+        "count": 419118,
+        "rate": 34677.03032579327
+      },
+      "data_sent": {
+        "count": 312107,
+        "rate": 25823.142656465145
+      },
+      "http_req_waiting": {
+        "med": 108.687157,
+        "max": 2174.550009,
+        "p(50)": 108.687157,
+        "p(90)": 190.9563104,
+        "p(95)": 222.30022220000006,
+        "p(99)": 1511.50242224,
+        "avg": 135.66149570158234,
+        "min": 0.670111
+      },
+      "iterations": {
+        "count": 1009,
+        "rate": 83.48275091674756
+      },
+      "vus": {
+        "max": 15,
+        "value": 15,
+        "min": 15
+      },
+      "http_req_connecting": {
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 0.09757744000000008,
+        "avg": 0.007361924642049736,
+        "min": 0,
+        "med": 0,
+        "max": 2.80919,
+        "p(50)": 0
+      },
+      "http_reqs": {
+        "count": 1327,
+        "rate": 109.793469243334
+      },
+      "http_req_tls_handshaking": {
+        "max": 0,
+        "p(50)": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 0,
+        "avg": 0,
+        "min": 0,
+        "med": 0
+      },
+      "vus_max": {
+        "max": 15,
+        "value": 15,
+        "min": 15
+      },
+      "iteration_duration": {
+        "avg": 179.1796706818633,
+        "min": 18.171103,
+        "med": 131.843653,
+        "max": 2277.417176,
+        "p(50)": 131.843653,
+        "p(90)": 263.8430458,
+        "p(95)": 310.16669619999976,
+        "p(99)": 2073.8162337199997
+      },
+      "http_req_sending": {
+        "p(95)": 0.10050470000000006,
+        "p(99)": 0.22947464000000012,
+        "avg": 0.03864803315749809,
+        "min": 0.005462,
+        "med": 0.024225,
+        "max": 1.890012,
+        "p(50)": 0.024225,
+        "p(90)": 0.07919820000000001
+      },
+      "http_req_receiving": {
+        "p(90)": 0.31953140000000013,
+        "p(95)": 0.4432302000000001,
+        "p(99)": 1.5499623200000003,
+        "avg": 0.20728546646571225,
+        "min": 0.015258,
+        "med": 0.13406,
+        "max": 14.290224,
+        "p(50)": 0.13406
+      },
+      "http_req_duration{expected_response:true}": {
+        "p(90)": 49.9475636,
+        "p(95)": 60.05727319999993,
+        "p(99)": 93.86395193999998,
+        "avg": 20.911375607476636,
+        "min": 0.783443,
+        "med": 13.471179,
+        "max": 94.794428,
+        "p(50)": 13.471179
+      }
+    },
+    "root_group": {
+      "groups": {},
+      "checks": {
+        "empty prefix/suffix returns 400": {
+          "name": "empty prefix/suffix returns 400",
+          "path": "::empty prefix/suffix returns 400",
+          "id": "bd065c1f0dd740f651b23d1f2356fa77",
+          "passes": 1009,
+          "fails": 0
+        },
+        "missing required field returns 422": {
+          "name": "missing required field returns 422",
+          "path": "::missing required field returns 422",
+          "id": "f7fa4a1fc95c175bdcdac9eb383c06f1",
+          "passes": 211,
+          "fails": 0
+        },
+        "docs status is 200": {
+          "name": "docs status is 200",
+          "path": "::docs status is 200",
+          "id": "73b2e79b096aac29166baf7c092a29e1",
+          "passes": 107,
+          "fails": 0
+        }
+      },
+      "name": "",
+      "path": "",
+      "id": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  },
+  "resources": {
+    "sampleCount": 6,
+    "durationSeconds": 17,
+    "containers": {
+      "lcarena-gateway-1": {
+        "avgCpuPercent": 2.27,
+        "peakCpuPercent": 12.59,
+        "avgMemMb": 316.22,
+        "peakMemMb": 325.3,
+        "memGrowthMb": 10.9
+      },
+      "lcarena-problem-1": {
+        "avgCpuPercent": 5.7,
+        "peakCpuPercent": 25.26,
+        "avgMemMb": 215.13,
+        "peakMemMb": 221.8,
+        "memGrowthMb": 8
+      },
+      "lcarena-execution-1": {
+        "avgCpuPercent": 9.78,
+        "peakCpuPercent": 36.71,
+        "avgMemMb": 105.25,
+        "peakMemMb": 106,
+        "memGrowthMb": 0.9
+      },
+      "lcarena-minio-init-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0.01,
+        "avgMemMb": 1.61,
+        "peakMemMb": 1.61,
+        "memGrowthMb": 0
+      },
+      "lcarena-submission-1": {
+        "avgCpuPercent": 7.65,
+        "peakCpuPercent": 28.37,
+        "avgMemMb": 152.4,
+        "peakMemMb": 152.4,
+        "memGrowthMb": 0
+      },
+      "lcarena-ai-suggestion-1": {
+        "avgCpuPercent": 71.71,
+        "peakCpuPercent": 119.43,
+        "avgMemMb": 121.47,
+        "peakMemMb": 121.6,
+        "memGrowthMb": 0.4
+      },
+      "lcarena-mail-1": {
+        "avgCpuPercent": 7.89,
+        "peakCpuPercent": 30.04,
+        "avgMemMb": 123.57,
+        "peakMemMb": 135.9,
+        "memGrowthMb": 14.8
+      },
+      "lcarena-redis-1": {
+        "avgCpuPercent": 0.83,
+        "peakCpuPercent": 1.12,
+        "avgMemMb": 6.56,
+        "peakMemMb": 6.56,
+        "memGrowthMb": 0
+      },
+      "lcarena-rabbitmq-1": {
+        "avgCpuPercent": 37.26,
+        "peakCpuPercent": 217.75,
+        "avgMemMb": 115.2,
+        "peakMemMb": 115.2,
+        "memGrowthMb": 0
+      },
+      "lcarena-minio-1": {
+        "avgCpuPercent": 4.07,
+        "peakCpuPercent": 9.87,
+        "avgMemMb": 149.72,
+        "peakMemMb": 149.8,
+        "memGrowthMb": 0.1
+      },
+      "lcarena-mongo-1": {
+        "avgCpuPercent": 27.75,
+        "peakCpuPercent": 85.25,
+        "avgMemMb": 198.1,
+        "peakMemMb": 329.1,
+        "memGrowthMb": 157.2
+      },
+      "dazzling_lumiere": {
+        "avgCpuPercent": 8.89,
+        "peakCpuPercent": 8.89,
+        "avgMemMb": 0.79,
+        "peakMemMb": 0.79,
+        "memGrowthMb": 0
+      },
+      "ecstatic_cartwright": {
+        "avgCpuPercent": 72.59,
+        "peakCpuPercent": 72.59,
+        "avgMemMb": 2.93,
+        "peakMemMb": 2.93,
+        "memGrowthMb": 0
+      },
+      "strange_galois": {
+        "avgCpuPercent": 14.1,
+        "peakCpuPercent": 15.45,
+        "avgMemMb": 15.32,
+        "peakMemMb": 16.41,
+        "memGrowthMb": 2.49
+      },
+      "zen_volhard": {
+        "avgCpuPercent": 50.51,
+        "peakCpuPercent": 50.51,
+        "avgMemMb": 0.82,
+        "peakMemMb": 0.82,
+        "memGrowthMb": 0
+      },
+      "competent_kirch": {
+        "avgCpuPercent": 70.31,
+        "peakCpuPercent": 70.31,
+        "avgMemMb": 0.84,
+        "peakMemMb": 0.84,
+        "memGrowthMb": 0
+      },
+      "kind_tharp": {
+        "avgCpuPercent": 70.29,
+        "peakCpuPercent": 70.29,
+        "avgMemMb": 0.81,
+        "peakMemMb": 0.81,
+        "memGrowthMb": 0
+      }
+    }
+  }
+}

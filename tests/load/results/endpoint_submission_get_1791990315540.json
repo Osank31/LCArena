@@ -1,0 +1,332 @@
+{
+  "testName": "endpoint_submission_get",
+  "scriptPath": "k6/endpoints/10-submission-get.js",
+  "timestamp": "2026-10-14T15:05:34.947Z",
+  "durationSeconds": 16,
+  "exitCode": 99,
+  "success": false,
+  "envVars": {
+    "VUS": 20,
+    "DURATION": "12s"
+  },
+  "k6Metrics": {
+    "totalRequests": 2778,
+    "successRequests": 2650,
+    "failedRequests": 128,
+    "rps": 225.54,
+    "errorRatePercent": 4.61,
+    "p50_ms": 75.97,
+    "p90_ms": 134.6,
+    "p95_ms": 172.95,
+    "p99_ms": 274.66,
+    "min_ms": 9.28,
+    "max_ms": 354.05,
+    "avg_ms": 86.3,
+    "vusMax": 20
+  },
+  "rawK6Metrics": {
+    "root_group": {
+      "id": "d41d8cd98f00b204e9800998ecf8427e",
+      "groups": {},
+      "checks": {
+        "owner status is 200": {
+          "name": "owner status is 200",
+          "path": "::owner status is 200",
+          "id": "caa0f47c961f7ee4e34789f3f9d59991",
+          "passes": 2399,
+          "fails": 0
+        },
+        "has submission data": {
+          "fails": 0,
+          "name": "has submission data",
+          "path": "::has submission data",
+          "id": "48b5f7f4f53baf60b02a62bbb522a556",
+          "passes": 2399
+        },
+        "admin status is 200": {
+          "path": "::admin status is 200",
+          "id": "37b58929fa333ff6a17a8e58abdb376a",
+          "passes": 248,
+          "fails": 0,
+          "name": "admin status is 200"
+        },
+        "not found returns 404": {
+          "passes": 128,
+          "fails": 0,
+          "name": "not found returns 404",
+          "path": "::not found returns 404",
+          "id": "e360af9fbc92fb3da44f8fe8508c3a14"
+        }
+      },
+      "name": "",
+      "path": ""
+    },
+    "metrics": {
+      "data_sent": {
+        "count": 1293909,
+        "rate": 105047.87923598204
+      },
+      "data_received": {
+        "count": 1876327,
+        "rate": 152332.32947851237
+      },
+      "http_req_sending": {
+        "p(95)": 0.09338615000000001,
+        "p(99)": 0.7816563200000021,
+        "avg": 0.05868258171346322,
+        "min": 0.004958,
+        "med": 0.02309,
+        "max": 4.57017,
+        "p(50)": 0.02309,
+        "p(90)": 0.06634470000000003
+      },
+      "http_req_duration{expected_response:true}": {
+        "p(50)": 76.386345,
+        "p(90)": 132.63978559999998,
+        "p(95)": 172.55974119999993,
+        "p(99)": 255.25455624999998,
+        "avg": 86.22101598150931,
+        "min": 15.664124,
+        "med": 76.386345,
+        "max": 354.054393
+      },
+      "http_req_failed": {
+        "passes": 128,
+        "fails": 2650,
+        "thresholds": {
+          "rate<0.01": true
+        },
+        "value": 0.04607631389488841
+      },
+      "http_req_tls_handshaking": {
+        "p(99)": 0,
+        "avg": 0,
+        "min": 0,
+        "med": 0,
+        "max": 0,
+        "p(50)": 0,
+        "p(90)": 0,
+        "p(95)": 0
+      },
+      "http_req_duration": {
+        "p(99)": 274.6556176200001,
+        "avg": 86.30341515730734,
+        "min": 9.282808,
+        "med": 75.969426,
+        "max": 354.054393,
+        "p(50)": 75.969426,
+        "p(90)": 134.598608,
+        "p(95)": 172.95044225,
+        "thresholds": {
+          "p(50)<100": false,
+          "p(90)<250": false,
+          "p(95)<400": false,
+          "p(99)<800": false
+        }
+      },
+      "http_req_waiting": {
+        "med": 75.747461,
+        "max": 353.88395,
+        "p(50)": 75.747461,
+        "p(90)": 134.37092330000004,
+        "p(95)": 172.55118910000004,
+        "p(99)": 274.4503070100001,
+        "avg": 86.06456013246934,
+        "min": 9.130839
+      },
+      "checks": {
+        "fails": 0,
+        "passes": 5174,
+        "value": 1
+      },
+      "http_req_blocked": {
+        "max": 16.576963,
+        "p(50)": 0.007131500000000001,
+        "p(90)": 0.010740500000000002,
+        "p(95)": 0.014414000000000012,
+        "p(99)": 0.4530700100000016,
+        "avg": 0.05086587580993527,
+        "min": 0.001534,
+        "med": 0.007131500000000001
+      },
+      "iterations": {
+        "count": 2399,
+        "rate": 194.7662952241007
+      },
+      "vus_max": {
+        "value": 20,
+        "min": 20,
+        "max": 20
+      },
+      "http_req_connecting": {
+        "p(50)": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 0,
+        "avg": 0.026512816774658027,
+        "min": 0,
+        "med": 0,
+        "max": 7.317556
+      },
+      "vus": {
+        "value": 20,
+        "min": 20,
+        "max": 20
+      },
+      "http_reqs": {
+        "count": 2778,
+        "rate": 225.5359600385793
+      },
+      "http_req_receiving": {
+        "p(95)": 0.3782753000000001,
+        "p(99)": 1.30362423,
+        "avg": 0.18017244312455002,
+        "min": 0.015485,
+        "med": 0.126945,
+        "max": 9.42125,
+        "p(50)": 0.126945,
+        "p(90)": 0.26281550000000004
+      },
+      "iteration_duration": {
+        "med": 81.79317,
+        "max": 572.38595,
+        "p(50)": 81.79317,
+        "p(90)": 170.49120500000004,
+        "p(95)": 223.66452529999998,
+        "p(99)": 386.0799618599997,
+        "avg": 100.35294727177964,
+        "min": 27.797253
+      }
+    },
+    "setup_data": {
+      "adminToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWNiM2RiODc4ZGU3M2VhMGI3NDJmZmIiLCJlbWFpbCI6ImFkbWluQGxjYXJlbmEudGVzdCIsIm5hbWUiOiJBZG1pbiBVc2VyIiwidXNlclJvbGUiOiJBZG1pbiIsImp0aSI6IjMwMmUwYTgzLTYwNzUtNGUwNC04YjNhLWU1MGFhYTNjZDJjNCIsImlhdCI6MTc5MTk5MDMxOSwiZXhwIjoxNzkxOTkxMjE5fQ.zFkm6E-WUQqS24Z7gp7b_NUSPMfzrvNBDcGw1qpFQ8Y",
+      "ownerToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWNiM2RiODc4ZGU3M2VhMGI3NDJmZmMiLCJlbWFpbCI6InJlZ3VsYXJAbGNhcmVuYS50ZXN0IiwibmFtZSI6IlJlZ3VsYXIgVXNlciIsInVzZXJSb2xlIjoiUmVndWxhciIsImp0aSI6IjA5M2ZjZjZlLWIyNjMtNGVjNy04MTk3LTIwYzRlOTM3MDBmMSIsImlhdCI6MTc5MTk5MDMxOSwiZXhwIjoxNzkxOTkxMjE5fQ.NINOnHl7YkJJR5-7vkAlRGghSSYueGrrBS553OOuV0o",
+      "submissionId": "6acf9a2f1ebf82cf84a50d1a"
+    }
+  },
+  "resources": {
+    "sampleCount": 8,
+    "durationSeconds": 16,
+    "containers": {
+      "lcarena-gateway-1": {
+        "avgCpuPercent": 66.48,
+        "peakCpuPercent": 112.14,
+        "avgMemMb": 314.34,
+        "peakMemMb": 314.5,
+        "memGrowthMb": 0.4
+      },
+      "lcarena-problem-1": {
+        "avgCpuPercent": 3.72,
+        "peakCpuPercent": 28.03,
+        "avgMemMb": 213.8,
+        "peakMemMb": 213.8,
+        "memGrowthMb": 0
+      },
+      "lcarena-execution-1": {
+        "avgCpuPercent": 25.97,
+        "peakCpuPercent": 122.07,
+        "avgMemMb": 106,
+        "peakMemMb": 106,
+        "memGrowthMb": 0
+      },
+      "lcarena-minio-init-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0.01,
+        "avgMemMb": 1.61,
+        "peakMemMb": 1.61,
+        "memGrowthMb": 0
+      },
+      "lcarena-submission-1": {
+        "avgCpuPercent": 43.7,
+        "peakCpuPercent": 101.54,
+        "avgMemMb": 151.8,
+        "peakMemMb": 152.5,
+        "memGrowthMb": 1.9
+      },
+      "lcarena-ai-suggestion-1": {
+        "avgCpuPercent": 2.65,
+        "peakCpuPercent": 19.3,
+        "avgMemMb": 121.2,
+        "peakMemMb": 121.2,
+        "memGrowthMb": 0
+      },
+      "lcarena-mail-1": {
+        "avgCpuPercent": 3.86,
+        "peakCpuPercent": 30.83,
+        "avgMemMb": 120.7,
+        "peakMemMb": 120.7,
+        "memGrowthMb": 0
+      },
+      "lcarena-redis-1": {
+        "avgCpuPercent": 2.57,
+        "peakCpuPercent": 9.31,
+        "avgMemMb": 6.56,
+        "peakMemMb": 6.57,
+        "memGrowthMb": 0.01
+      },
+      "lcarena-rabbitmq-1": {
+        "avgCpuPercent": 28.32,
+        "peakCpuPercent": 184.72,
+        "avgMemMb": 125.6,
+        "peakMemMb": 173.8,
+        "memGrowthMb": 58.8
+      },
+      "lcarena-minio-1": {
+        "avgCpuPercent": 4.08,
+        "peakCpuPercent": 9.98,
+        "avgMemMb": 146.29,
+        "peakMemMb": 147.1,
+        "memGrowthMb": 1.3
+      },
+      "lcarena-mongo-1": {
+        "avgCpuPercent": 39.68,
+        "peakCpuPercent": 96.23,
+        "avgMemMb": 184.49,
+        "peakMemMb": 273.9,
+        "memGrowthMb": 102.5
+      },
+      "blissful_fermat": {
+        "avgCpuPercent": 60.73,
+        "peakCpuPercent": 60.73,
+        "avgMemMb": 0.8,
+        "peakMemMb": 0.8,
+        "memGrowthMb": 0
+      },
+      "condescending_wilbur": {
+        "avgCpuPercent": 23.34,
+        "peakCpuPercent": 31.2,
+        "avgMemMb": 18.15,
+        "peakMemMb": 19.02,
+        "memGrowthMb": 2.23
+      },
+      "brave_bohr": {
+        "avgCpuPercent": 89.09,
+        "peakCpuPercent": 89.09,
+        "avgMemMb": 2.24,
+        "peakMemMb": 2.24,
+        "memGrowthMb": 0
+      },
+      "quirky_maxwell": {
+        "avgCpuPercent": 81.18,
+        "peakCpuPercent": 81.18,
+        "avgMemMb": 2.5,
+        "peakMemMb": 2.5,
+        "memGrowthMb": 0
+      },
+      "beautiful_pare": {
+        "avgCpuPercent": 68.02,
+        "peakCpuPercent": 68.02,
+        "avgMemMb": 2.68,
+        "peakMemMb": 2.68,
+        "memGrowthMb": 0
+      },
+      "blissful_shirley": {
+        "avgCpuPercent": 27.8,
+        "peakCpuPercent": 27.8,
+        "avgMemMb": 0.8,
+        "peakMemMb": 0.8,
+        "memGrowthMb": 0
+      }
+    }
+  }
+}

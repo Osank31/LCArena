@@ -1,0 +1,267 @@
+{
+  "testName": "endpoint_auth_otp",
+  "scriptPath": "k6/endpoints/05-auth-otp-flow.js",
+  "timestamp": "2026-10-14T14:20:07.630Z",
+  "durationSeconds": 24,
+  "exitCode": 99,
+  "success": false,
+  "envVars": {
+    "VUS": 10,
+    "DURATION": "12s"
+  },
+  "k6Metrics": {
+    "totalRequests": 33,
+    "successRequests": 23,
+    "failedRequests": 10,
+    "rps": 1.63,
+    "errorRatePercent": 30.3,
+    "p50_ms": 5428.09,
+    "p90_ms": 10000.54,
+    "p95_ms": 10001.75,
+    "p99_ms": 0,
+    "min_ms": 1.97,
+    "max_ms": 10030.9,
+    "avg_ms": 4834.65,
+    "vusMax": 10
+  },
+  "rawK6Metrics": {
+    "metrics": {
+      "checks": {
+        "passes": 56,
+        "fails": 0,
+        "value": 1
+      },
+      "http_req_blocked": {
+        "min": 0.002602,
+        "med": 0.009764,
+        "max": 4.543751,
+        "p(90)": 3.6138514,
+        "p(95)": 4.2354174,
+        "avg": 0.9840338484848483
+      },
+      "http_req_receiving": {
+        "max": 1.038384,
+        "p(90)": 0.2767966,
+        "p(95)": 0.31214759999999997,
+        "avg": 0.1982681515151515,
+        "min": 0.059659,
+        "med": 0.155307
+      },
+      "iterations": {
+        "count": 23,
+        "rate": 1.1340009643478133
+      },
+      "http_req_waiting": {
+        "med": 5427.393501,
+        "max": 10030.691908,
+        "p(90)": 10000.336485,
+        "p(95)": 10001.5469916,
+        "avg": 4834.307764454546,
+        "min": 1.502401
+      },
+      "data_received": {
+        "count": 12002,
+        "rate": 591.7512858305415
+      },
+      "http_req_failed": {
+        "passes": 10,
+        "fails": 23,
+        "thresholds": {
+          "rate<0.02": true
+        },
+        "value": 0.30303030303030304
+      },
+      "vus": {
+        "min": 1,
+        "max": 10,
+        "value": 1
+      },
+      "http_reqs": {
+        "count": 33,
+        "rate": 1.6270448618903408
+      },
+      "http_req_tls_handshaking": {
+        "min": 0,
+        "med": 0,
+        "max": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "avg": 0
+      },
+      "http_req_sending": {
+        "max": 0.868327,
+        "p(90)": 0.45609160000000004,
+        "p(95)": 0.7072135999999999,
+        "avg": 0.14893169696969694,
+        "min": 0.012874,
+        "med": 0.050028
+      },
+      "http_req_duration": {
+        "avg": 4834.65496430303,
+        "min": 1.966065,
+        "med": 5428.086325,
+        "max": 10030.899429,
+        "p(90)": 10000.5435298,
+        "p(95)": 10001.7486068,
+        "thresholds": {
+          "p(90)<600": true,
+          "p(95)<1000": true,
+          "p(99)<2500": true,
+          "p(50)<250": true
+        }
+      },
+      "vus_max": {
+        "value": 10,
+        "min": 10,
+        "max": 10
+      },
+      "http_req_connecting": {
+        "p(95)": 2.3336859999999997,
+        "avg": 0.43978242424242425,
+        "min": 0,
+        "med": 0,
+        "max": 2.66856,
+        "p(90)": 1.5834496000000002
+      },
+      "iteration_duration": {
+        "min": 3897.398673,
+        "med": 6254.623552,
+        "max": 10036.308529,
+        "p(90)": 10006.5300574,
+        "p(95)": 10007.492741099999,
+        "avg": 6939.980060304348
+      },
+      "http_req_duration{expected_response:true}": {
+        "avg": 6935.5897383043475,
+        "min": 3897.157932,
+        "med": 6248.780873,
+        "max": 10030.899429,
+        "p(90)": 10001.3120012,
+        "p(95)": 10002.101422799999
+      },
+      "data_sent": {
+        "count": 5515,
+        "rate": 271.91370949470394
+      }
+    },
+    "root_group": {
+      "name": "",
+      "path": "",
+      "id": "d41d8cd98f00b204e9800998ecf8427e",
+      "groups": {},
+      "checks": {
+        "otp send status is 200": {
+          "name": "otp send status is 200",
+          "path": "::otp send status is 200",
+          "id": "933fe449a52fd5226ea036ebb432899e",
+          "passes": 23,
+          "fails": 0
+        },
+        "success message returned": {
+          "name": "success message returned",
+          "path": "::success message returned",
+          "id": "7fe6086746855051b83d8295983389ea",
+          "passes": 23,
+          "fails": 0
+        },
+        "bad email returns 400": {
+          "name": "bad email returns 400",
+          "path": "::bad email returns 400",
+          "id": "32e001ed26bb993d8ca599d01dfdda23",
+          "passes": 10,
+          "fails": 0
+        }
+      }
+    }
+  },
+  "resources": {
+    "sampleCount": 12,
+    "durationSeconds": 24,
+    "containers": {
+      "lcarena-gateway-1": {
+        "avgCpuPercent": 4.7,
+        "peakCpuPercent": 26.97,
+        "avgMemMb": 407.38,
+        "peakMemMb": 422.8,
+        "memGrowthMb": 17.1
+      },
+      "lcarena-problem-1": {
+        "avgCpuPercent": 2.09,
+        "peakCpuPercent": 10.02,
+        "avgMemMb": 220.83,
+        "peakMemMb": 221.7,
+        "memGrowthMb": 1
+      },
+      "lcarena-execution-1": {
+        "avgCpuPercent": 0.38,
+        "peakCpuPercent": 2.09,
+        "avgMemMb": 118.4,
+        "peakMemMb": 118.4,
+        "memGrowthMb": 0
+      },
+      "lcarena-minio-init-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0.01,
+        "avgMemMb": 2.67,
+        "peakMemMb": 2.67,
+        "memGrowthMb": 0
+      },
+      "lcarena-submission-1": {
+        "avgCpuPercent": 0.26,
+        "peakCpuPercent": 0.53,
+        "avgMemMb": 114.3,
+        "peakMemMb": 114.3,
+        "memGrowthMb": 0
+      },
+      "lcarena-ai-suggestion-1": {
+        "avgCpuPercent": 1.63,
+        "peakCpuPercent": 9.54,
+        "avgMemMb": 118.9,
+        "peakMemMb": 118.9,
+        "memGrowthMb": 0
+      },
+      "lcarena-mail-1": {
+        "avgCpuPercent": 8.56,
+        "peakCpuPercent": 34.36,
+        "avgMemMb": 124.66,
+        "peakMemMb": 125.8,
+        "memGrowthMb": 6.4
+      },
+      "lcarena-redis-1": {
+        "avgCpuPercent": 1.19,
+        "peakCpuPercent": 4.2,
+        "avgMemMb": 7.49,
+        "peakMemMb": 7.69,
+        "memGrowthMb": 0.26
+      },
+      "lcarena-rabbitmq-1": {
+        "avgCpuPercent": 27.66,
+        "peakCpuPercent": 170.23,
+        "avgMemMb": 136.17,
+        "peakMemMb": 136.2,
+        "memGrowthMb": 0.1
+      },
+      "lcarena-minio-1": {
+        "avgCpuPercent": 0.52,
+        "peakCpuPercent": 4.71,
+        "avgMemMb": 134.7,
+        "peakMemMb": 134.8,
+        "memGrowthMb": 0.2
+      },
+      "lcarena-mongo-1": {
+        "avgCpuPercent": 6.81,
+        "peakCpuPercent": 71.87,
+        "avgMemMb": 208.67,
+        "peakMemMb": 209,
+        "memGrowthMb": 0.5
+      },
+      "vigilant_wilbur": {
+        "avgCpuPercent": 1.55,
+        "peakCpuPercent": 2.39,
+        "avgMemMb": 13.63,
+        "peakMemMb": 14.05,
+        "memGrowthMb": 0.91
+      }
+    }
+  }
+}

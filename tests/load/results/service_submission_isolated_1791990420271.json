@@ -1,0 +1,320 @@
+{
+  "testName": "service_submission_isolated",
+  "scriptPath": "k6/services/submission-isolated.js",
+  "timestamp": "2026-10-14T15:07:21.978Z",
+  "durationSeconds": 19,
+  "exitCode": 99,
+  "success": false,
+  "envVars": {
+    "VUS": 40,
+    "DURATION": "15s"
+  },
+  "k6Metrics": {
+    "totalRequests": 5171,
+    "successRequests": 5171,
+    "failedRequests": 0,
+    "rps": 342.28,
+    "errorRatePercent": 0,
+    "p50_ms": 108.17,
+    "p90_ms": 182.01,
+    "p95_ms": 208.34,
+    "p99_ms": 256.46,
+    "min_ms": 13.01,
+    "max_ms": 715.91,
+    "avg_ms": 116.01,
+    "vusMax": 40
+  },
+  "rawK6Metrics": {
+    "root_group": {
+      "checks": {
+        "status is 201": {
+          "name": "status is 201",
+          "path": "::status is 201",
+          "id": "ec8c9afd59577ad0eb26fbf150ecf791",
+          "passes": 5171,
+          "fails": 0
+        },
+        "has submission id": {
+          "name": "has submission id",
+          "path": "::has submission id",
+          "id": "0a2eb59728865210905498343f6759fc",
+          "passes": 5171,
+          "fails": 0
+        }
+      },
+      "name": "",
+      "path": "",
+      "id": "d41d8cd98f00b204e9800998ecf8427e",
+      "groups": {}
+    },
+    "metrics": {
+      "vus_max": {
+        "value": 40,
+        "min": 40,
+        "max": 40
+      },
+      "http_req_blocked": {
+        "p(95)": 0.0133115,
+        "p(99)": 0.12297430000000133,
+        "avg": 0.02121895977567202,
+        "min": 0.001561,
+        "med": 0.007019,
+        "max": 5.909969,
+        "p(50)": 0.007019,
+        "p(90)": 0.010721
+      },
+      "http_req_waiting": {
+        "p(99)": 256.125652,
+        "avg": 115.78192116747245,
+        "min": 12.761288,
+        "med": 107.981261,
+        "max": 715.762094,
+        "p(50)": 107.981261,
+        "p(90)": 181.614188,
+        "p(95)": 207.983389
+      },
+      "vus": {
+        "value": 40,
+        "min": 40,
+        "max": 40
+      },
+      "http_reqs": {
+        "count": 5171,
+        "rate": 342.2834250686737
+      },
+      "http_req_duration": {
+        "p(90)": 182.010198,
+        "p(95)": 208.34218700000002,
+        "p(99)": 256.4579787000001,
+        "avg": 116.00945262367014,
+        "min": 13.013513,
+        "med": 108.165539,
+        "max": 715.910958,
+        "p(50)": 108.165539,
+        "thresholds": {
+          "p(50)<100": true,
+          "p(90)<250": false,
+          "p(95)<400": false,
+          "p(99)<800": false
+        }
+      },
+      "http_req_duration{expected_response:true}": {
+        "p(95)": 208.34218700000002,
+        "p(99)": 256.4579787000001,
+        "avg": 116.00945262367014,
+        "min": 13.013513,
+        "med": 108.165539,
+        "max": 715.910958,
+        "p(50)": 108.165539,
+        "p(90)": 182.010198
+      },
+      "data_sent": {
+        "count": 1468564,
+        "rate": 97208.49271950332
+      },
+      "iterations": {
+        "count": 5171,
+        "rate": 342.2834250686737
+      },
+      "http_req_tls_handshaking": {
+        "avg": 0,
+        "min": 0,
+        "med": 0,
+        "max": 0,
+        "p(50)": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 0
+      },
+      "iteration_duration": {
+        "p(50)": 108.559314,
+        "p(90)": 182.884827,
+        "p(95)": 208.9947275,
+        "p(99)": 257.31777950000003,
+        "avg": 116.43841820653628,
+        "min": 13.588646,
+        "med": 108.559314,
+        "max": 717.83485
+      },
+      "http_req_connecting": {
+        "p(95)": 0,
+        "p(99)": 0,
+        "avg": 0.006076819570682654,
+        "min": 0,
+        "med": 0,
+        "max": 4.262387,
+        "p(50)": 0,
+        "p(90)": 0
+      },
+      "data_received": {
+        "count": 3324953,
+        "rate": 220088.24231915717
+      },
+      "http_req_failed": {
+        "passes": 0,
+        "fails": 5171,
+        "thresholds": {
+          "rate<0.01": false
+        },
+        "value": 0
+      },
+      "http_req_receiving": {
+        "med": 0.118444,
+        "max": 38.199528,
+        "p(50)": 0.118444,
+        "p(90)": 0.240649,
+        "p(95)": 0.315546,
+        "p(99)": 0.9505326000000011,
+        "avg": 0.17497527712241379,
+        "min": 0.01843
+      },
+      "http_req_sending": {
+        "p(90)": 0.086517,
+        "p(95)": 0.1124835,
+        "p(99)": 0.2637781000000003,
+        "avg": 0.05255617907561374,
+        "min": 0.005307,
+        "med": 0.0285,
+        "max": 12.761182,
+        "p(50)": 0.0285
+      },
+      "checks": {
+        "passes": 10342,
+        "fails": 0,
+        "value": 1
+      }
+    }
+  },
+  "resources": {
+    "sampleCount": 8,
+    "durationSeconds": 19,
+    "containers": {
+      "lcarena-gateway-1": {
+        "avgCpuPercent": 2.46,
+        "peakCpuPercent": 18.13,
+        "avgMemMb": 316.9,
+        "peakMemMb": 316.9,
+        "memGrowthMb": 0
+      },
+      "lcarena-problem-1": {
+        "avgCpuPercent": 2.72,
+        "peakCpuPercent": 19.65,
+        "avgMemMb": 338.2,
+        "peakMemMb": 338.2,
+        "memGrowthMb": 0
+      },
+      "lcarena-execution-1": {
+        "avgCpuPercent": 7.51,
+        "peakCpuPercent": 12.77,
+        "avgMemMb": 105.24,
+        "peakMemMb": 105.5,
+        "memGrowthMb": 0.3
+      },
+      "lcarena-minio-init-1": {
+        "avgCpuPercent": 0.01,
+        "peakCpuPercent": 0.01,
+        "avgMemMb": 1.61,
+        "peakMemMb": 1.61,
+        "memGrowthMb": 0
+      },
+      "lcarena-submission-1": {
+        "avgCpuPercent": 82.51,
+        "peakCpuPercent": 132.14,
+        "avgMemMb": 171.08,
+        "peakMemMb": 195.1,
+        "memGrowthMb": 42.7
+      },
+      "lcarena-ai-suggestion-1": {
+        "avgCpuPercent": 5.34,
+        "peakCpuPercent": 22.13,
+        "avgMemMb": 122.79,
+        "peakMemMb": 131.4,
+        "memGrowthMb": 9.9
+      },
+      "lcarena-mail-1": {
+        "avgCpuPercent": 2.65,
+        "peakCpuPercent": 20.09,
+        "avgMemMb": 121.33,
+        "peakMemMb": 122.9,
+        "memGrowthMb": 1.8
+      },
+      "lcarena-redis-1": {
+        "avgCpuPercent": 0.78,
+        "peakCpuPercent": 0.99,
+        "avgMemMb": 6.57,
+        "peakMemMb": 6.57,
+        "memGrowthMb": 0.01
+      },
+      "lcarena-rabbitmq-1": {
+        "avgCpuPercent": 28.23,
+        "peakCpuPercent": 190.27,
+        "avgMemMb": 131.5,
+        "peakMemMb": 182,
+        "memGrowthMb": 66.7
+      },
+      "lcarena-minio-1": {
+        "avgCpuPercent": 6.57,
+        "peakCpuPercent": 15.89,
+        "avgMemMb": 149.73,
+        "peakMemMb": 149.8,
+        "memGrowthMb": 0.1
+      },
+      "lcarena-mongo-1": {
+        "avgCpuPercent": 53.71,
+        "peakCpuPercent": 137.23,
+        "avgMemMb": 196.28,
+        "peakMemMb": 321.9,
+        "memGrowthMb": 145.7
+      },
+      "hungry_carson": {
+        "avgCpuPercent": 71.84,
+        "peakCpuPercent": 71.84,
+        "avgMemMb": 0.81,
+        "peakMemMb": 0.81,
+        "memGrowthMb": 0
+      },
+      "loving_jepsen": {
+        "avgCpuPercent": 38.52,
+        "peakCpuPercent": 44.73,
+        "avgMemMb": 25.62,
+        "peakMemMb": 26.36,
+        "memGrowthMb": 2.67
+      },
+      "wonderful_dewdney": {
+        "avgCpuPercent": 83.84,
+        "peakCpuPercent": 83.84,
+        "avgMemMb": 0.81,
+        "peakMemMb": 0.81,
+        "memGrowthMb": 0
+      },
+      "jolly_colden": {
+        "avgCpuPercent": 79.27,
+        "peakCpuPercent": 79.27,
+        "avgMemMb": 4.63,
+        "peakMemMb": 4.63,
+        "memGrowthMb": 0
+      },
+      "cool_mendeleev": {
+        "avgCpuPercent": 66.44,
+        "peakCpuPercent": 66.44,
+        "avgMemMb": 4.49,
+        "peakMemMb": 4.49,
+        "memGrowthMb": 0
+      },
+      "elegant_montalcini": {
+        "avgCpuPercent": 95.57,
+        "peakCpuPercent": 95.57,
+        "avgMemMb": 2.03,
+        "peakMemMb": 2.03,
+        "memGrowthMb": 0
+      },
+      "wizardly_allen": {
+        "avgCpuPercent": 58.98,
+        "peakCpuPercent": 58.98,
+        "avgMemMb": 0.82,
+        "peakMemMb": 0.82,
+        "memGrowthMb": 0
+      }
+    }
+  }
+}

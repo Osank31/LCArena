@@ -1,0 +1,352 @@
+{
+  "testName": "workflow_submission_execution",
+  "scriptPath": "k6/lifecycle/e2e-submission-lifecycle.js",
+  "timestamp": "2026-10-14T15:08:49.674Z",
+  "durationSeconds": 34,
+  "exitCode": 0,
+  "success": true,
+  "envVars": {
+    "VUS": 5,
+    "DURATION": "20s"
+  },
+  "k6Metrics": {
+    "totalRequests": 161,
+    "successRequests": 161,
+    "failedRequests": 0,
+    "rps": 5.19,
+    "errorRatePercent": 0,
+    "p50_ms": 13.61,
+    "p90_ms": 50.58,
+    "p95_ms": 65.13,
+    "p99_ms": 81.16,
+    "min_ms": 5.4,
+    "max_ms": 155.99,
+    "avg_ms": 21.59,
+    "vusMax": 5
+  },
+  "rawK6Metrics": {
+    "root_group": {
+      "checks": {
+        "submission accepted 201": {
+          "name": "submission accepted 201",
+          "path": "::submission accepted 201",
+          "id": "ee3ca4f63f5221c46f918e8b2f1833cd",
+          "passes": 10,
+          "fails": 0
+        },
+        "evaluation finished within timeout": {
+          "path": "::evaluation finished within timeout",
+          "id": "1422fdd6f2638c7d499b6764feec2497",
+          "passes": 0,
+          "fails": 10,
+          "name": "evaluation finished within timeout"
+        }
+      },
+      "name": "",
+      "path": "",
+      "id": "d41d8cd98f00b204e9800998ecf8427e",
+      "groups": {}
+    },
+    "metrics": {
+      "http_req_sending": {
+        "p(95)": 0.201904,
+        "p(99)": 1.2379352000000048,
+        "avg": 0.09664367080745342,
+        "min": 0.007048,
+        "med": 0.052605,
+        "max": 2.406772,
+        "p(50)": 0.052605,
+        "p(90)": 0.118839
+      },
+      "data_sent": {
+        "count": 76963,
+        "rate": 2482.273646317661
+      },
+      "http_req_waiting": {
+        "p(50)": 13.323096,
+        "p(90)": 50.393916,
+        "p(95)": 62.686893,
+        "p(99)": 79.72838720000006,
+        "avg": 21.217927211180136,
+        "min": 5.241647,
+        "med": 13.323096,
+        "max": 155.835799
+      },
+      "http_reqs": {
+        "count": 161,
+        "rate": 5.1927037285077695
+      },
+      "http_req_duration{expected_response:true}": {
+        "p(95)": 65.127461,
+        "p(99)": 81.15909180000004,
+        "avg": 21.589827298136644,
+        "min": 5.399628,
+        "med": 13.613227,
+        "max": 155.985538,
+        "p(50)": 13.613227,
+        "p(90)": 50.582363
+      },
+      "vus_max": {
+        "value": 5,
+        "min": 5,
+        "max": 5
+      },
+      "checks": {
+        "passes": 10,
+        "fails": 10,
+        "value": 0.5
+      },
+      "http_req_failed": {
+        "passes": 0,
+        "fails": 161,
+        "thresholds": {
+          "rate<0.05": false
+        },
+        "value": 0
+      },
+      "http_req_blocked": {
+        "p(95)": 0.125073,
+        "p(99)": 2.0899236000000014,
+        "avg": 0.08103452795031055,
+        "min": 0.003133,
+        "med": 0.011982,
+        "max": 2.306596,
+        "p(50)": 0.011982,
+        "p(90)": 0.06019
+      },
+      "iteration_duration": {
+        "med": 15366.7649975,
+        "max": 15510.537391,
+        "p(50)": 15366.7649975,
+        "p(90)": 15504.7021195,
+        "p(95)": 15507.61975525,
+        "p(99)": 15509.95386385,
+        "avg": 15364.196886900001,
+        "min": 15208.30378
+      },
+      "data_received": {
+        "rate": 3895.463128108322,
+        "count": 120779
+      },
+      "iterations": {
+        "count": 10,
+        "rate": 0.3225281818948925
+      },
+      "http_req_tls_handshaking": {
+        "p(50)": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 0,
+        "avg": 0,
+        "min": 0,
+        "med": 0,
+        "max": 0
+      },
+      "submissions_poll_timeout_total": {
+        "rate": 0.3225281818948925,
+        "count": 10
+      },
+      "http_req_connecting": {
+        "p(50)": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "p(99)": 1.9999878000000013,
+        "avg": 0.04749680745341615,
+        "min": 0,
+        "med": 0,
+        "max": 2.23112
+      },
+      "http_req_receiving": {
+        "avg": 0.27525641614906826,
+        "min": 0.061891,
+        "med": 0.175022,
+        "max": 5.335542,
+        "p(50)": 0.175022,
+        "p(90)": 0.420446,
+        "p(95)": 0.617123,
+        "p(99)": 2.0868182
+      },
+      "vus": {
+        "value": 1,
+        "min": 1,
+        "max": 5
+      },
+      "http_req_duration": {
+        "avg": 21.589827298136644,
+        "min": 5.399628,
+        "med": 13.613227,
+        "max": 155.985538,
+        "p(50)": 13.613227,
+        "p(90)": 50.582363,
+        "p(95)": 65.127461,
+        "p(99)": 81.15909180000004,
+        "thresholds": {
+          "p(95)<5000": false
+        }
+      }
+    },
+    "setup_data": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWNiM2RiODc4ZGU3M2VhMGI3NDJmZmMiLCJlbWFpbCI6InJlZ3VsYXJAbGNhcmVuYS50ZXN0IiwibmFtZSI6IlJlZ3VsYXIgVXNlciIsInVzZXJSb2xlIjoiUmVndWxhciIsImp0aSI6ImZmMzlhZjE0LTM4NjYtNDg2Zi04ZTEwLWZiMTRkZmE5M2UxOCIsImlhdCI6MTc5MTk5MDQ5NSwiZXhwIjoxNzkxOTkxMzk1fQ.BueiReTezqbwtOlY89dM6jsUI7QFOmKycAc2FYu2G6s"
+    }
+  },
+  "resources": {
+    "sampleCount": 12,
+    "durationSeconds": 34,
+    "containers": {
+      "lcarena-gateway-1": {
+        "avgCpuPercent": 8.44,
+        "peakCpuPercent": 26.93,
+        "avgMemMb": 321.7,
+        "peakMemMb": 321.7,
+        "memGrowthMb": 0
+      },
+      "lcarena-problem-1": {
+        "avgCpuPercent": 2.97,
+        "peakCpuPercent": 22.07,
+        "avgMemMb": 336.3,
+        "peakMemMb": 336.3,
+        "memGrowthMb": 0
+      },
+      "lcarena-execution-1": {
+        "avgCpuPercent": 7.26,
+        "peakCpuPercent": 27.37,
+        "avgMemMb": 104.38,
+        "peakMemMb": 104.5,
+        "memGrowthMb": 0.2
+      },
+      "lcarena-minio-init-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0.01,
+        "avgMemMb": 1.5,
+        "peakMemMb": 1.5,
+        "memGrowthMb": 0
+      },
+      "lcarena-submission-1": {
+        "avgCpuPercent": 5.64,
+        "peakCpuPercent": 37.34,
+        "avgMemMb": 184.67,
+        "peakMemMb": 193.1,
+        "memGrowthMb": 9.2
+      },
+      "lcarena-ai-suggestion-1": {
+        "avgCpuPercent": 5.43,
+        "peakCpuPercent": 25.96,
+        "avgMemMb": 121.28,
+        "peakMemMb": 121.6,
+        "memGrowthMb": 1.4
+      },
+      "lcarena-mail-1": {
+        "avgCpuPercent": 2.89,
+        "peakCpuPercent": 19.32,
+        "avgMemMb": 121.95,
+        "peakMemMb": 124.1,
+        "memGrowthMb": 3.8
+      },
+      "lcarena-redis-1": {
+        "avgCpuPercent": 1.71,
+        "peakCpuPercent": 10.48,
+        "avgMemMb": 6.59,
+        "peakMemMb": 6.81,
+        "memGrowthMb": 0.25
+      },
+      "lcarena-rabbitmq-1": {
+        "avgCpuPercent": 49.33,
+        "peakCpuPercent": 223.59,
+        "avgMemMb": 129.04,
+        "peakMemMb": 172.4,
+        "memGrowthMb": 58.4
+      },
+      "lcarena-minio-1": {
+        "avgCpuPercent": 1.57,
+        "peakCpuPercent": 6.26,
+        "avgMemMb": 154.69,
+        "peakMemMb": 155.2,
+        "memGrowthMb": 2.2
+      },
+      "lcarena-mongo-1": {
+        "avgCpuPercent": 21.79,
+        "peakCpuPercent": 124.42,
+        "avgMemMb": 205.45,
+        "peakMemMb": 343.7,
+        "memGrowthMb": 170.8
+      },
+      "happy_williamson": {
+        "avgCpuPercent": 35.13,
+        "peakCpuPercent": 35.13,
+        "avgMemMb": 1.16,
+        "peakMemMb": 1.16,
+        "memGrowthMb": 0
+      },
+      "epic_stonebraker": {
+        "avgCpuPercent": 67.58,
+        "peakCpuPercent": 83.42,
+        "avgMemMb": 0.81,
+        "peakMemMb": 0.82,
+        "memGrowthMb": 0.02
+      },
+      "quizzical_proskuriakova": {
+        "avgCpuPercent": 2.79,
+        "peakCpuPercent": 6.4,
+        "avgMemMb": 13.69,
+        "peakMemMb": 13.93,
+        "memGrowthMb": 0.67
+      },
+      "hungry_burnell": {
+        "avgCpuPercent": 45.53,
+        "peakCpuPercent": 73.59,
+        "avgMemMb": 5.15,
+        "peakMemMb": 9.49,
+        "memGrowthMb": 8.69
+      },
+      "gifted_jang": {
+        "avgCpuPercent": 37.49,
+        "peakCpuPercent": 37.49,
+        "avgMemMb": 0.8,
+        "peakMemMb": 0.8,
+        "memGrowthMb": 0
+      },
+      "stoic_brown": {
+        "avgCpuPercent": 34.4,
+        "peakCpuPercent": 34.4,
+        "avgMemMb": 0.8,
+        "peakMemMb": 0.8,
+        "memGrowthMb": 0
+      },
+      "angry_burnell": {
+        "avgCpuPercent": 44.85,
+        "peakCpuPercent": 44.85,
+        "avgMemMb": 0.81,
+        "peakMemMb": 0.81,
+        "memGrowthMb": 0
+      },
+      "ecstatic_villani": {
+        "avgCpuPercent": 95.22,
+        "peakCpuPercent": 95.22,
+        "avgMemMb": 0.79,
+        "peakMemMb": 0.79,
+        "memGrowthMb": 0
+      },
+      "elated_gates": {
+        "avgCpuPercent": 44.3,
+        "peakCpuPercent": 44.3,
+        "avgMemMb": 0.8,
+        "peakMemMb": 0.8,
+        "memGrowthMb": 0
+      },
+      "nifty_panini": {
+        "avgCpuPercent": 41.02,
+        "peakCpuPercent": 41.02,
+        "avgMemMb": 0.79,
+        "peakMemMb": 0.79,
+        "memGrowthMb": 0
+      },
+      "strange_franklin": {
+        "avgCpuPercent": 71.27,
+        "peakCpuPercent": 71.27,
+        "avgMemMb": 0.88,
+        "peakMemMb": 0.88,
+        "memGrowthMb": 0
+      }
+    }
+  }
+}

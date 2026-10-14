@@ -1,0 +1,270 @@
+{
+  "testName": "endpoint_auth_me",
+  "scriptPath": "k6/endpoints/03-auth-me.js",
+  "timestamp": "2026-10-14T14:19:25.839Z",
+  "durationSeconds": 14,
+  "exitCode": 99,
+  "success": false,
+  "envVars": {
+    "VUS": 20,
+    "DURATION": "12s"
+  },
+  "k6Metrics": {
+    "totalRequests": 9016,
+    "successRequests": 8576,
+    "failedRequests": 440,
+    "rps": 746.67,
+    "errorRatePercent": 4.88,
+    "p50_ms": 22.46,
+    "p90_ms": 46.18,
+    "p95_ms": 55.64,
+    "p99_ms": 0,
+    "min_ms": 2.93,
+    "max_ms": 114.68,
+    "avg_ms": 26.45,
+    "vusMax": 20
+  },
+  "rawK6Metrics": {
+    "root_group": {
+      "name": "",
+      "path": "",
+      "id": "d41d8cd98f00b204e9800998ecf8427e",
+      "groups": {},
+      "checks": {
+        "status is 200": {
+          "path": "::status is 200",
+          "id": "6210a8cd14cd70477eba5c5e4cb3fb5f",
+          "passes": 8575,
+          "fails": 0,
+          "name": "status is 200"
+        },
+        "profile returned": {
+          "name": "profile returned",
+          "path": "::profile returned",
+          "id": "13caf96a26e82a7d79010193f40c52bd",
+          "passes": 8575,
+          "fails": 0
+        },
+        "unauthorized returns 401": {
+          "fails": 0,
+          "name": "unauthorized returns 401",
+          "path": "::unauthorized returns 401",
+          "id": "71f470e9d316b8d09001a68df16e885a",
+          "passes": 440
+        }
+      }
+    },
+    "metrics": {
+      "http_req_duration": {
+        "avg": 26.450635892968005,
+        "min": 2.926689,
+        "med": 22.45539,
+        "max": 114.681252,
+        "p(90)": 46.175793999999996,
+        "p(95)": 55.637787,
+        "thresholds": {
+          "p(99)<800": false,
+          "p(50)<100": false,
+          "p(90)<250": false,
+          "p(95)<400": false
+        }
+      },
+      "checks": {
+        "passes": 17590,
+        "fails": 0,
+        "value": 1
+      },
+      "http_req_blocked": {
+        "p(95)": 0.007983249999999999,
+        "avg": 0.006715086845607816,
+        "min": 0.000772,
+        "med": 0.003865,
+        "max": 5.412508,
+        "p(90)": 0.006902
+      },
+      "http_req_receiving": {
+        "avg": 0.08321338054569688,
+        "min": 0.009383,
+        "med": 0.06585750000000001,
+        "max": 5.301341,
+        "p(90)": 0.15120050000000002,
+        "p(95)": 0.18658275
+      },
+      "http_req_waiting": {
+        "avg": 26.350768078637998,
+        "min": 2.795031,
+        "med": 22.345573,
+        "max": 114.340283,
+        "p(90)": 46.0488175,
+        "p(95)": 55.500409000000005
+      },
+      "data_received": {
+        "count": 5049629,
+        "rate": 418191.381449518
+      },
+      "iterations": {
+        "count": 8575,
+        "rate": 710.1494180918276
+      },
+      "vus_max": {
+        "value": 20,
+        "min": 20,
+        "max": 20
+      },
+      "http_reqs": {
+        "rate": 746.6713881651216,
+        "count": 9016
+      },
+      "http_req_connecting": {
+        "p(95)": 0,
+        "avg": 0.0007971135758651286,
+        "min": 0,
+        "med": 0,
+        "max": 0.718592,
+        "p(90)": 0
+      },
+      "http_req_tls_handshaking": {
+        "p(95)": 0,
+        "avg": 0,
+        "min": 0,
+        "med": 0,
+        "max": 0,
+        "p(90)": 0
+      },
+      "http_req_duration{expected_response:true}": {
+        "p(95)": 56.040693250000004,
+        "avg": 27.371558311100685,
+        "min": 5.493112,
+        "med": 22.8938625,
+        "max": 114.681252,
+        "p(90)": 46.820482
+      },
+      "http_req_sending": {
+        "avg": 0.01665443378438332,
+        "min": 0.00278,
+        "med": 0.011891,
+        "max": 0.606924,
+        "p(90)": 0.0271945,
+        "p(95)": 0.05383675
+      },
+      "vus": {
+        "value": 20,
+        "min": 20,
+        "max": 20
+      },
+      "iteration_duration": {
+        "avg": 27.987196839066772,
+        "min": 9.638568,
+        "med": 23.403127,
+        "max": 114.953842,
+        "p(90)": 47.793022400000005,
+        "p(95)": 57.10929219999999
+      },
+      "http_req_failed": {
+        "passes": 440,
+        "fails": 8576,
+        "thresholds": {
+          "rate<0.01": true
+        },
+        "value": 0.048802129547471165
+      },
+      "data_sent": {
+        "count": 3754738,
+        "rate": 310953.3534445799
+      }
+    },
+    "setup_data": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWNiM2RiODc4ZGU3M2VhMGI3NDJmZmMiLCJlbWFpbCI6InJlZ3VsYXJAbGNhcmVuYS50ZXN0IiwibmFtZSI6IlJlZ3VsYXIgVXNlciIsInVzZXJSb2xlIjoiUmVndWxhciIsImp0aSI6IjkyYjE1YWFkLTQwZjQtNDFhMy1iZDMyLWVjMWI4YjA5Y2E1OSIsImlhdCI6MTc5MTk4NzU1MiwiZXhwIjoxNzkxOTg4NDUyfQ.k2ny1lLdQ-k1ljN5x2kh25de_0vTcxJiWch8sWdSilg"
+    }
+  },
+  "resources": {
+    "sampleCount": 7,
+    "durationSeconds": 14,
+    "containers": {
+      "lcarena-gateway-1": {
+        "avgCpuPercent": 79.48,
+        "peakCpuPercent": 116.79,
+        "avgMemMb": 405.96,
+        "peakMemMb": 406.8,
+        "memGrowthMb": 1.5
+      },
+      "lcarena-problem-1": {
+        "avgCpuPercent": 0.18,
+        "peakCpuPercent": 0.29,
+        "avgMemMb": 220.9,
+        "peakMemMb": 220.9,
+        "memGrowthMb": 0
+      },
+      "lcarena-execution-1": {
+        "avgCpuPercent": 2.39,
+        "peakCpuPercent": 15.72,
+        "avgMemMb": 118.4,
+        "peakMemMb": 118.4,
+        "memGrowthMb": 0
+      },
+      "lcarena-minio-init-1": {
+        "avgCpuPercent": 0,
+        "peakCpuPercent": 0.01,
+        "avgMemMb": 2.7,
+        "peakMemMb": 2.7,
+        "memGrowthMb": 0
+      },
+      "lcarena-submission-1": {
+        "avgCpuPercent": 2.63,
+        "peakCpuPercent": 16.17,
+        "avgMemMb": 114.3,
+        "peakMemMb": 114.3,
+        "memGrowthMb": 0
+      },
+      "lcarena-ai-suggestion-1": {
+        "avgCpuPercent": 0.18,
+        "peakCpuPercent": 0.22,
+        "avgMemMb": 119,
+        "peakMemMb": 119,
+        "memGrowthMb": 0
+      },
+      "lcarena-mail-1": {
+        "avgCpuPercent": 0.01,
+        "peakCpuPercent": 0.04,
+        "avgMemMb": 119.36,
+        "peakMemMb": 119.4,
+        "memGrowthMb": 0.1
+      },
+      "lcarena-redis-1": {
+        "avgCpuPercent": 1.75,
+        "peakCpuPercent": 2.24,
+        "avgMemMb": 7.49,
+        "peakMemMb": 7.49,
+        "memGrowthMb": 0.01
+      },
+      "lcarena-rabbitmq-1": {
+        "avgCpuPercent": 12.28,
+        "peakCpuPercent": 82.84,
+        "avgMemMb": 136.16,
+        "peakMemMb": 136.2,
+        "memGrowthMb": 0.1
+      },
+      "lcarena-minio-1": {
+        "avgCpuPercent": 9.46,
+        "peakCpuPercent": 49.42,
+        "avgMemMb": 135.13,
+        "peakMemMb": 135.2,
+        "memGrowthMb": 0.2
+      },
+      "lcarena-mongo-1": {
+        "avgCpuPercent": 36.85,
+        "peakCpuPercent": 55.87,
+        "avgMemMb": 210.7,
+        "peakMemMb": 210.8,
+        "memGrowthMb": 0.4
+      },
+      "awesome_rosalind": {
+        "avgCpuPercent": 43.64,
+        "peakCpuPercent": 46.73,
+        "avgMemMb": 19.44,
+        "peakMemMb": 20.37,
+        "memGrowthMb": 1.9
+      }
+    }
+  }
+}

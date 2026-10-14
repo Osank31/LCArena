@@ -60,7 +60,18 @@ export async function executeK6Test({
         dockerArgs.push('-e', `${key}=${val}`);
     }
 
-    dockerArgs.push('grafana/k6', 'run', '--summary-export', containerResultFile, containerScript);
+    dockerArgs.push(
+        'grafana/k6',
+        'run',
+        // Emit the percentiles the SLA thresholds are written against. Without this
+        // k6 exports only avg/min/med/max, so p(50) and p(99) came back missing and
+        // were reported as 0 ms.
+        '--summary-trend-stats',
+        'avg,min,med,max,p(50),p(90),p(95),p(99)',
+        '--summary-export',
+        containerResultFile,
+        containerScript
+    );
 
     const startTime = Date.now();
     let stdoutBuffer = '';
@@ -138,19 +149,26 @@ function extractKeyMetrics(data) {
     const failedRequests = failed.passes || 0;
     const errorRate = totalRequests > 0 ? Math.round((failedRequests / totalRequests) * 10000) / 100 : 0;
 
+    // A percentile the run never exported is reported as null, never as 0 ms -
+    // a fabricated zero is indistinguishable from an instant response.
+    const roundOrNull = (value) =>
+        typeof value === 'number' && Number.isFinite(value)
+            ? Math.round(value * 100) / 100
+            : null;
+
     return {
         totalRequests,
         successRequests: totalRequests - failedRequests,
         failedRequests,
         rps,
         errorRatePercent: errorRate,
-        p50_ms: duration['p(50)'] ? Math.round(duration['p(50)'] * 100) / 100 : (duration.med ? Math.round(duration.med * 100) / 100 : 0),
-        p90_ms: duration['p(90)'] ? Math.round(duration['p(90)'] * 100) / 100 : 0,
-        p95_ms: duration['p(95)'] ? Math.round(duration['p(95)'] * 100) / 100 : 0,
-        p99_ms: duration['p(99)'] ? Math.round(duration['p(99)'] * 100) / 100 : 0,
-        min_ms: duration.min ? Math.round(duration.min * 100) / 100 : 0,
-        max_ms: duration.max ? Math.round(duration.max * 100) / 100 : 0,
-        avg_ms: duration.avg ? Math.round(duration.avg * 100) / 100 : 0,
+        p50_ms: roundOrNull(duration['p(50)'] ?? duration.med),
+        p90_ms: roundOrNull(duration['p(90)']),
+        p95_ms: roundOrNull(duration['p(95)']),
+        p99_ms: roundOrNull(duration['p(99)']),
+        min_ms: roundOrNull(duration.min),
+        max_ms: roundOrNull(duration.max),
+        avg_ms: roundOrNull(duration.avg),
         vusMax: vus.max || (vus.value || 0),
     };
 }
