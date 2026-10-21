@@ -7,6 +7,11 @@ import express, {
 import { appErrorHandler } from "@LCArena/middlewares";
 import { UnauthorizedError } from "@LCArena/utils";
 import { createOtpController } from "./controller";
+import {
+    createDispatcher,
+    type DispatcherOptions,
+    type MailDispatcher,
+} from "./dispatcher";
 import { type Mailer } from "./mailer";
 
 export interface AppOptions {
@@ -16,6 +21,13 @@ export interface AppOptions {
      * the service.
      */
     token?: string;
+    /**
+     * Background delivery queue. Injected by `index.ts` so the process can drain
+     * it on shutdown; omitting it builds one around the supplied mailer.
+     */
+    dispatcher?: MailDispatcher;
+    /** Only used when `dispatcher` is omitted. */
+    dispatcherOptions?: DispatcherOptions;
 }
 
 const requireToken =
@@ -35,19 +47,28 @@ const requireToken =
  */
 export const createApp = (mailer: Mailer, options: AppOptions = {}): Express => {
     const app = express();
+    const dispatcher =
+        options.dispatcher ??
+        createDispatcher(mailer, options.dispatcherOptions);
 
     app.disable("x-powered-by");
     app.use(express.json());
 
-    // Liveness stays open so orchestrators can probe the pod.
+    // Liveness stays open so orchestrators can probe the pod. Queue depth is
+    // included because delivery now happens after the response is sent: a
+    // growing backlog is the first sign a relay is unhealthy.
     app.get("/health", (_req, res) => {
-        res.status(200).json({ message: "Mail Service Healthy" });
+        res.status(200).json({
+            message: "Mail Service Healthy",
+            queued: dispatcher.queued,
+            inFlight: dispatcher.inFlight,
+        });
     });
 
     if (options.token) {
-        app.post("/otp", requireToken(options.token), createOtpController(mailer));
+        app.post("/otp", requireToken(options.token), createOtpController(dispatcher));
     } else {
-        app.post("/otp", createOtpController(mailer));
+        app.post("/otp", createOtpController(dispatcher));
     }
 
     app.use(appErrorHandler);

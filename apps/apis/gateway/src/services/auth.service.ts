@@ -66,11 +66,12 @@ const issueTokens = async (user: UserDocument) => {
 export const sendOtp = async (email: string): Promise<void> => {
     const otp = await otpService.generateAndSaveOtp(email)
 
-    // Persist first, then deliver. Delivery is best-effort: a mail-provider
-    // outage is logged but does not fail the request, so `/auth/send-otp`
-    // cannot be used as an oracle for which accounts exist or for provider
-    // health. The user can simply request a new code.
-    await mailClient.notifyOtp({ email, otp })
+    // Persist first, then hand off delivery. This is deliberately *not*
+    // awaited: the code is already in Redis, so the request returns as soon as
+    // it can be used instead of waiting on the mail service and its SMTP relay.
+    // Delivery stays best-effort and logged-only, so `/auth/send-otp` is still
+    // not an oracle for which accounts exist or for provider health.
+    mailClient.dispatchOtp({ email, otp })
 }
 
 export const registerWithOtp = async (data: RegisterWithOtpInput) => {

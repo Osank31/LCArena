@@ -28,7 +28,36 @@ export const MAIL_FROM =
 export const MAIL_SERVICE_TOKEN =
     getEnvVariable("MAIL_SERVICE_TOKEN", false) || undefined;
 
-// Bound how long an HTTP request to this service can hang waiting on the relay.
+// Bound how long a single delivery attempt can hang waiting on the relay. This
+// is no longer an HTTP request budget: sending happens in the background.
 export const SMTP_CONNECTION_TIMEOUT_MS = Number(
     getEnvVariable("MAIL_CONNECTION_TIMEOUT_MS", false) || 10_000
+);
+
+// Background delivery queue. `POST /otp` only enqueues (202), so these bound how
+// much work a slow relay can accumulate in memory before backpressure kicks in.
+export const MAIL_QUEUE_CONCURRENCY = Math.max(
+    1,
+    Number(getEnvVariable("MAIL_QUEUE_CONCURRENCY", false) || 2)
+);
+
+export const MAIL_QUEUE_MAX_SIZE = Math.max(
+    1,
+    Number(getEnvVariable("MAIL_QUEUE_MAX_SIZE", false) || 500)
+);
+
+export const MAIL_MAX_ATTEMPTS = Math.max(
+    1,
+    Number(getEnvVariable("MAIL_MAX_ATTEMPTS", false) || 3)
+);
+
+export const MAIL_RETRY_DELAY_MS = Math.max(
+    0,
+    Number(getEnvVariable("MAIL_RETRY_DELAY_MS", false) || 500)
+);
+
+// How long SIGTERM waits for queued mail before the process exits anyway.
+export const MAIL_DRAIN_TIMEOUT_MS = Math.max(
+    0,
+    Number(getEnvVariable("MAIL_DRAIN_TIMEOUT_MS", false) || 10_000)
 );

@@ -39,7 +39,7 @@ flowchart TD
         ProblemSvc["Problem Service (Port 3001)\n@LCArena/problem\n• Problem CRUD & Metadata"]
         SubmissionSvc["Submission Service (Port 3002)\n@LCArena/submission\n• Submission Intake & Query"]
         SocketSvc["Sockets Service (Port 3007)\n@LCArena/socket\n• WebSocket Real-time Push"]
-        MailSvc["Mail Service (Port 3003)\n@LCArena/mail\n• Nodemailer Notifications"]
+        MailSvc["Mail Service (Port 3003)\n@LCArena/mail\n• Nodemailer Notifications\n• POST /otp queues (202), delivers in background"]
     end
 
     subgraph EventMesh["Event & State Infrastructure"]

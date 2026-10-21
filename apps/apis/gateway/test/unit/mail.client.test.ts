@@ -114,4 +114,44 @@ describe("createMailClient", () => {
         assert.equal(calls.length, 1);
         assert.equal(calls[0].url, "http://mail:3003/otp");
     });
+
+    it("returns from dispatchOtp without waiting for the mail service", async () => {
+        const calls: RecordedCall[] = [];
+        let release: (() => void) | undefined;
+
+        const client = createMailClient({
+            baseUrl: "http://mail:3003",
+            request: (url, body, config) => {
+                calls.push({ url, body, config });
+
+                // A slow mail service: the promise only settles when released.
+                return new Promise((resolve) => {
+                    release = () => resolve({ status: 202 });
+                });
+            },
+        });
+
+        // Synchronous return: this is what keeps /auth/send-otp fast.
+        assert.equal(client.dispatchOtp({ email: "user@example.com", otp: "123456" }), undefined);
+        assert.equal(calls.length, 1);
+        assert.equal(typeof release, "function");
+
+        release?.();
+    });
+
+    it("never rejects from dispatchOtp when the mail service is unreachable", async () => {
+        const client = createMailClient({
+            baseUrl: "http://mail:3003",
+            request: async () => {
+                throw new Error("connection refused");
+            },
+        });
+
+        // An un-awaited call must not become an unhandled rejection.
+        assert.doesNotThrow(() =>
+            client.dispatchOtp({ email: "user@example.com", otp: "123456" })
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, 10));
+    });
 });

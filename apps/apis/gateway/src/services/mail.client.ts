@@ -37,6 +37,13 @@ export interface MailClient {
      * health or account existence.
      */
     notifyOtp(payload: OtpMailPayload): Promise<void>
+    /**
+     * Hands the OTP to the mail service without waiting for it. Used by
+     * `/auth/send-otp`: the code is already persisted in Redis, so the response
+     * must not be stretched by the mail service (or a slow SMTP relay). The
+     * returned promise never rejects, so it is safe to call un-awaited.
+     */
+    dispatchOtp(payload: OtpMailPayload): void
 }
 
 const DEFAULT_TIMEOUT_MS = 10_000
@@ -63,5 +70,11 @@ export const createMailClient = (options: MailClientOptions): MailClient => {
         }
     }
 
-    return { sendOtpEmail, notifyOtp }
+    const dispatchOtp = (payload: OtpMailPayload): void => {
+        // Deliberately not awaited: `notifyOtp` already swallows failures, so
+        // this cannot surface as an unhandled rejection.
+        void notifyOtp(payload)
+    }
+
+    return { sendOtpEmail, notifyOtp, dispatchOtp }
 }

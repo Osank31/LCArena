@@ -15,7 +15,7 @@ frontend is out of scope for every command in this document.
 | Gateway | `apps/apis/gateway` | 3000 | Public HTTP entry point: auth, sessions, RBAC, reverse proxy. |
 | Problem | `apps/apis/problem` | 3001 | Problem CRUD. |
 | Submission | `apps/apis/submission` | 3002 | Submission intake; publishes `submission.created`. |
-| Mail | `apps/apis/mail` | 3003 | SMTP delivery of OTP emails. |
+| Mail | `apps/apis/mail` | 3003 | SMTP delivery of OTP emails; `POST /otp` queues and answers `202`, delivery runs in the background. |
 | Execution worker | `apps/apis/execution` | 3004 (`/health` only) | Consumes `submission.created`, runs code in ephemeral containers, publishes `submission.completed`. |
 | MinIO Storage | Docker container | 9000 (S3 API), 9001 (Console) | S3-compatible test-case object storage (MinIO for dev/testing, Cloudflare R2 compatible). |
 | Sockets | — | — | **Not implemented in this repository.** The AGENTS.md/README references are aspirational; there is no `apps/apis/sockets` workspace. |

@@ -139,7 +139,7 @@ LCArena is a Turborepo monorepo with npm workspaces. The test-relevant services 
 | API Gateway | `apps/apis/gateway` | 3000 | Auth, sessions, OTP, RBAC, reverse proxy |
 | Problem service | `apps/apis/problem` | 3001 | Problem CRUD and test-case upload |
 | Submission service | `apps/apis/submission` | 3002 | Submission intake and queue publish |
-| Mail service | `apps/apis/mail` | 3003 | OTP email delivery |
+| Mail service | `apps/apis/mail` | 3003 | OTP email delivery (queued; `POST /otp` answers `202` before SMTP runs) |
 | Execution worker | `apps/apis/execution` | 3004 (`/health`) | RabbitMQ consumer + Docker sandbox orchestration |
 | AI suggestion service | `apps/apis/ai-suggestion-service` | 8000 | Python/FastAPI code completion |
 | Frontend | `apps/frontend` | 5173 | React/Vite SPA |
@@ -173,7 +173,7 @@ LCArena is a Turborepo monorepo with npm workspaces. The test-relevant services 
 | Gateway → Submission service | Gateway submission routing tests | **Tested** |
 | Gateway → Redis (sessions, JTI, OTP) | Gateway auth/refresh/logout/OTP tests | **Tested** |
 | Gateway → MongoDB (users) | Gateway login/role/delete tests | **Tested** |
-| Gateway → Mail service | Unit tests with recording client; integration sets mail URL to a dead port to prove best-effort behaviour | **Partially tested** |
+| Gateway → Mail service | Unit tests with recording client (including the un-awaited `dispatchOtp`); integration sets mail URL to a dead port to prove best-effort behaviour | **Partially tested** |
 | Problem service → MongoDB | Integration tests read back with the MongoDB driver | **Tested** |
 | Problem service → MinIO/S3 | `full-flow.e2e.ts` verifies key hierarchy and contents | **Tested (E2E)** |
 | Submission service → MongoDB | Integration tests read back directly | **Tested** |
@@ -551,8 +551,8 @@ They catch logic and contract regressions immediately, without needing MongoDB, 
 | `@LCArena/config` | 11 | Redis accessor failure mode, queue names/topology, storage key formatting, S3/MinIO/R2 config resolution |
 | `@LCArena/evaluator` (`apps/apis/execution`) | 41 | RabbitMQ consumer, executor factory, S3 test-case acquisition, submission service logic, test-case validation, message schema |
 | `@LCArena/execution` (`packages/backend/execution`) | 32 | Base `Executor` runner-script generation, tar packaging, path safety, output comparison policy |
-| `@LCArena/gateway` | 5 | Mail client request shape, timeout, token header, failure propagation/best-effort notify |
-| `@LCArena/mail` | 12 | Express app routes, OTP templates, validation, real local SMTP delivery |
+| `@LCArena/gateway` | 7 | Mail client request shape, timeout, token header, failure propagation/best-effort notify, fire-and-forget dispatch |
+| `@LCArena/mail` | 20 | Express app routes (202/503 contract), background dispatcher, OTP templates, validation, real local SMTP delivery |
 | `@LCArena/middlewares` | 18 | `appErrorHandler` mappings, `roleValidation`, `userValidation` |
 | `@LCArena/models` | 20 | User/Problem/Submission schema validation, defaults, enums, indexes, password compare |
 | `@LCArena/problem` | 30 | Problem Zod schemas, id guards, controller error forwarding |
@@ -671,6 +671,7 @@ cd packages/backend/utils && npm run test:unit
   - [`userValidation.test.ts`](packages/backend/middlewares/test/unit/userValidation.test.ts)
   - [`user.model.test.ts`](packages/backend/models/test/unit/user.model.test.ts)
   - [`mailer.test.ts`](apps/apis/mail/test/unit/mailer.test.ts)
+  - [`dispatcher.test.ts`](apps/apis/mail/test/unit/dispatcher.test.ts)
   - [`service.test.ts`](apps/apis/problem/test/unit/service.test.ts)
   - [`validation.test.ts`](apps/apis/submission/test/unit/validation.test.ts)
 

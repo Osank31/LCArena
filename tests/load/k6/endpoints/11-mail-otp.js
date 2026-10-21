@@ -22,11 +22,18 @@ export default function () {
         tags: { endpoint: 'mail_otp' },
     });
 
+    // /otp queues the message and answers 202 before SMTP runs. A 503 is the
+    // documented backpressure response when the delivery queue is saturated,
+    // so it is an expected outcome for a flood test, not a failure.
     check(res, {
-        'status is 200': (r) => r.status === 200,
-        'success message returned': (r) => {
+        'queued (202) or backpressure (503)': (r) =>
+            r.status === 202 || r.status === 503,
+        'acknowledgement message returned': (r) => {
             try {
-                return JSON.parse(r.body).message === 'OTP email sent successfully';
+                const body = JSON.parse(r.body);
+                return r.status === 202
+                    ? body.message === 'OTP email queued for delivery'
+                    : body.success === false;
             } catch {
                 return false;
             }

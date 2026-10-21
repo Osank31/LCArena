@@ -112,9 +112,12 @@ apps/apis/gateway/
 1. `POST /auth/send-otp` → `generateAndSaveOtp(email)` stores a
    `crypto.randomInt(100000, 1000000)` 6-digit code in Redis at
    `otp:<normalized_email>` with `EX 300`.
-2. The OTP is **never logged**, and delivery is **best-effort**: `notifyOtp`
-   swallows transport failures so `/auth/send-otp` cannot be used as an oracle
-   for provider health or account existence.
+2. The OTP is **never logged**, and delivery is **best-effort and
+   off the request path**: `sendOtp` calls `dispatchOtp`, which fires `notifyOtp`
+   without awaiting it. Failures are logged (never thrown), so `/auth/send-otp`
+   cannot be used as an oracle for provider health or account existence, and the
+   response is not stretched by the mail service or its SMTP relay. The trade-off
+   is that a delivery failure is invisible to the caller — only the logs show it.
 3. `POST /auth/register` verifies + deletes the OTP (single-use), rejects an
    existing email, creates the user, then issues tokens.
 4. `POST /auth/login-otp` verifies the OTP and issues tokens for an existing user.
@@ -162,7 +165,7 @@ All responses use the shared envelope from `@LCArena/utils`:
 
 | Method | Path | Auth | Body | Success |
 | :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/auth/send-otp` | none | `{ email }` | 200, `data: null` |
+| `POST` | `/auth/send-otp` | none | `{ email }` | 200, `data: null` (mail delivery is queued in the background) |
 | `POST` | `/auth/register` | none | `{ email, password(≥6), name, otp(6 digits) }` | 201, `data: { user, accessToken }` + refresh cookie |
 | `POST` | `/auth/login-otp` | none | `{ email, otp(6 digits) }` | 200, `data: { user, accessToken }` + refresh cookie |
 | `POST` | `/auth/login` | none | `{ email, password }` | 200, `data: { user, accessToken }` + refresh cookie |
@@ -193,8 +196,10 @@ Admin.
 ## Inter-service communication
 
 - **HTTP out:** `POST {MAIL_SERVICE_URL}/otp` with `{ email, otp }` and, when
-  configured, the `x-mail-service-token` header. Timeout 10s; failures are logged
-  and swallowed by `notifyOtp`.
+  configured, the `x-mail-service-token` header. The mail service answers `202`
+  and delivers in the background; the gateway does not await the call
+  (`dispatchOtp`), so `/auth/send-otp` only waits for the Redis write. Timeout
+  10s; failures are logged and swallowed.
 - **HTTP in (proxied):** `PROBLEM_SERVICE_URL`, `SUBMISSION_SERVICE_URL`. On each
   proxied request the factory:
   - removes client-supplied `x-user-id` and `authorization`
@@ -246,7 +251,8 @@ them through the deployment's secret store; `.env.example` documents the names.
   reachable for the gateway to be useful. `dbConnect` exits the process on
   failure; `redisConnect` must succeed before auth works.
 - The Mail service is required in practice: `/auth/send-otp` returns 200 even if
-  mail delivery fails, but no code reaches the user.
+  mail delivery fails, but no code reaches the user. Because delivery is
+  asynchronous, the response time no longer reflects relay health at all.
 - `@LCArena/*` workspace packages must be built (`npm run build:backend`) before
   running the gateway outside Turborepo.
 
@@ -302,7 +308,8 @@ contract and needs MongoDB, Redis and the services running.
 | 401 after a successful login | Access token expired → refresh; or `jti` blacklisted by a logout |
 | 401 on every request after a role change | Unexpected: `authenticate` re-reads the user, so verify MongoDB connectivity |
 | 502/504 on `/api/problems` | Problem service unhealthy / slow (check `PROXY_TIMEOUT_MS`) |
-| OTP never arrives | Mail service unreachable or SMTP misconfigured; the gateway intentionally logs and swallows this |
+| OTP never arrives | Mail service unreachable or SMTP misconfigured; the gateway intentionally logs and swallows this (`Failed to deliver OTP email`) |
+| `/auth/send-otp` is slow | Should be ~ms: it only writes Redis. A slow response means Redis, not mail — delivery was decoupled from the request |
 | Refresh cookie "disappears" | Cookie is scoped to `path=/auth`; it is not sent with `/api/*` calls by design |
 
 ## Related services
