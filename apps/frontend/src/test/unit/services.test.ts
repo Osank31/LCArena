@@ -3,6 +3,7 @@ import { authService } from "../../services/authService";
 import { problemService } from "../../services/problemService";
 import { submissionService } from "../../services/submissionService";
 import { apiClient, getStoredToken, setStoredToken } from "../../services/apiClient";
+import { backendStatus } from "../../services/backendStatus";
 import { IProblem } from "../../types/problem.types";
 import { ISubmission } from "../../types/submission.types";
 
@@ -162,6 +163,8 @@ describe("authService", () => {
 describe("problemService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // These cases describe the offline fallback; remote fetchers are tested below.
+    backendStatus.markOffline();
   });
 
   const mockProblem: IProblem = {

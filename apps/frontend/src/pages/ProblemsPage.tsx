@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Alert } from "../components/common/Alert";
 import { Button } from "../components/common/Button";
@@ -9,6 +9,7 @@ import { ProblemRow } from "../components/problem/ProblemRow";
 import { DeveloperApologyBanner } from "../components/common/DeveloperApologyBanner";
 import { useReveal } from "../animations";
 import { useAuth } from "../context/AuthContext";
+import { useBackendStatus } from "../hooks/useBackendStatus";
 import { problemService } from "../services/problemService";
 import { submissionService } from "../services/submissionService";
 import { ParsedProblem, ProblemFilterState } from "../types/problem.types";
@@ -25,6 +26,7 @@ const INITIAL_FILTERS: ProblemFilterState = {
 
 export const ProblemsPage: React.FC = () => {
   const { user } = useAuth();
+  const { isOnline, isOffline } = useBackendStatus();
   const [problems, setProblems] = useState<ParsedProblem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +67,17 @@ export const ProblemsPage: React.FC = () => {
   useEffect(() => {
     fetchProblems();
   }, []);
+
+  // Refetch when the backend becomes reachable so the sample-problem fallback
+  // is replaced by the live catalog without a manual reload.
+  const wasOnlineRef = useRef(isOnline);
+  useEffect(() => {
+    const wasOnline = wasOnlineRef.current;
+    wasOnlineRef.current = isOnline;
+    if (isOnline && !wasOnline) {
+      fetchProblems();
+    }
+  }, [isOnline]);
 
   // Compute set of solved problem IDs
   const solvedProblemIds = useMemo(() => {
@@ -186,8 +199,8 @@ export const ProblemsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Developer Apology / Demo Mode Notice */}
-      <DeveloperApologyBanner />
+      {/* Developer Apology / Demo Mode Notice — only while the backend is unreachable */}
+      {isOffline && <DeveloperApologyBanner />}
 
       {/* Filter Controls */}
       <div data-reveal>

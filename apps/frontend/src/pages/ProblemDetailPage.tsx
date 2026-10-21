@@ -24,6 +24,9 @@ import { SubmissionHistoryTab } from "../components/problem/SubmissionHistoryTab
 import { WorkspaceHeader } from "../components/problem/WorkspaceHeader";
 import Resizable from "../components/Resizable";
 import { useAuth } from "../context/AuthContext";
+import { useBackendStatus } from "../hooks/useBackendStatus";
+import { getErrorMessage } from "../services/apiClient";
+import { backendStatus, isConnectivityError } from "../services/backendStatus";
 import { problemService } from "../services/problemService";
 import { submissionService } from "../services/submissionService";
 import { ParsedProblem } from "../types/problem.types";
@@ -33,12 +36,13 @@ import {
   SupportedLanguage,
 } from "../types/submission.types";
 import { DEFAULT_STARTER_CODE } from "../utils/starterCode";
-import { formatDemoRunNotice, runCode } from "../utils/codeRunner";
+import { formatDemoRunNotice, formatOnlineRunNotice } from "../utils/codeRunner";
 
 export const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { isOnline, isOffline } = useBackendStatus();
 
   const [problem, setProblem] = useState<ParsedProblem | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -167,10 +171,12 @@ export const ProblemDetailPage: React.FC = () => {
     setRunOutput(null);
     setExecutionResult(null);
 
-    // Provide friendly notice explaining that live execution is unavailable in demo
-    // while displaying problem sample test cases for inspection
+    // Show the sample cases. When the backend is reachable, point the user to
+    // Submit (server-side judging); otherwise explain the demo limitation.
     setTimeout(() => {
-      setRunOutput(formatDemoRunNotice(problem));
+      setRunOutput(
+        isOnline ? formatOnlineRunNotice(problem) : formatDemoRunNotice(problem)
+      );
       setIsEvaluating(false);
       setMobileTab("console");
     }, 250);
@@ -216,15 +222,26 @@ export const ProblemDetailPage: React.FC = () => {
       ]);
     } catch (err: any) {
       setExecutionResult(null);
-      setRunOutput(
-        `[Online Demo Notice — Submissions Unavailable]\n\n` +
-          `Submitting code for sandboxed grading requires the LCArena backend execution worker and Docker engine.\n` +
-          `Because LCArena is currently hosted as a frontend demo to save infrastructure costs, remote submission grading is disabled.\n\n` +
-          `To evaluate code submissions against the full test suite, please clone and run the backend locally:\n\n` +
-          `  git clone https://github.com/Osank31/LCArena.git && docker compose up\n` +
-          `  Repository: https://github.com/Osank31/LCArena`
-      );
-      setShowDemoNoticeModal(true);
+
+      // Only the hosted demo (backend unreachable) gets the apology treatment.
+      // A live backend returning a real error should surface that error instead.
+      if (isConnectivityError(err)) {
+        backendStatus.markOffline();
+      }
+
+      if (backendStatus.isOffline()) {
+        setRunOutput(
+          `[Online Demo Notice — Submissions Unavailable]\n\n` +
+            `Submitting code for sandboxed grading requires the LCArena backend execution worker and Docker engine.\n` +
+            `Because LCArena is currently hosted as a frontend demo to save infrastructure costs, remote submission grading is disabled.\n\n` +
+            `To evaluate code submissions against the full test suite, please clone and run the backend locally:\n\n` +
+            `  git clone https://github.com/Osank31/LCArena.git && docker compose up\n` +
+            `  Repository: https://github.com/Osank31/LCArena`
+        );
+        setShowDemoNoticeModal(true);
+      } else {
+        setRunOutput(`[Submission Failed]\n\n${getErrorMessage(err)}`);
+      }
     } finally {
       setIsEvaluating(false);
     }
@@ -444,13 +461,15 @@ export const ProblemDetailPage: React.FC = () => {
         description="To run submissions against the sandboxed Docker judge and record verdicts, please sign in or register."
       >
         <div className="space-y-4">
-          <div className="p-3 bg-paper-2 border border-rule-2 rounded-sm text-xs text-ink-2 space-y-1">
-            <span className="font-semibold text-ink">Online Demo Notice:</span>
-            <p>
-              Please note that in this free online demo, backend execution servers are not hosted.
-              Run LCArena locally with Docker Compose to evaluate submissions.
-            </p>
-          </div>
+          {isOffline && (
+            <div className="p-3 bg-paper-2 border border-rule-2 rounded-sm text-xs text-ink-2 space-y-1">
+              <span className="font-semibold text-ink">Online Demo Notice:</span>
+              <p>
+                Please note that in this free online demo, backend execution servers are not hosted.
+                Run LCArena locally with Docker Compose to evaluate submissions.
+              </p>
+            </div>
+          )}
           <div className="flex justify-end gap-3 mt-2">
             <Button variant="ghost" size="sm" onClick={() => setShowAuthModal(false)}>
               Cancel

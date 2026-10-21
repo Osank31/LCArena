@@ -12,31 +12,33 @@ submission history.
 
 ---
 
-## ⚠️ Read this first: the deployed frontend runs in demo mode
+## ⚠️ Read this first: live backend vs. hosted demo
 
-The current frontend source is a **hosted demo**, not a full judge client. Two
-behaviours in the code are easy to misread from the UI:
+The same build serves two deployments, and it decides which one it is talking to
+at runtime by probing the gateway health endpoint:
 
-1. **Problems are local, static fixtures.** `services/problemService.ts`
-   `getAllProblems()` / `getProblemById()` read
-   [`src/data/sampleProblems.ts`](src/data/sampleProblems.ts) and never issue an
-   HTTP request. The ids are **slugs** (`"two-sum"`, `"reverse-a-string"`,
-   `"valid-parentheses"`, `"maximum-subarray-sum"`), not Mongo ObjectIds.
-   Preserved-but-unused remote fetchers exist as
-   `fetchRemoteProblems()` / `fetchRemoteProblemById()`.
-2. **The "Run" button does not execute code.** `handleRun()` in
-   `ProblemDetailPage.tsx` waits 250 ms and calls `formatDemoRunNotice(problem)`,
-   which prints the sample cases and explains that execution requires running the
-   backend locally. The real in-browser judge in `utils/codeRunner.ts`
-   (`runCode`, `executeJavaScript`, `evaluateStaticCode`) exists and is unit
-   tested, but is **not wired to the Run button**.
-
-Consequently `handleSubmit()` posts to `POST /api/submissions` with a slug
-`problemId`, and the real Submission service rejects it with
-`400 "Invalid problem id"`. The error is caught and replaced by a
-"Code Execution Unavailable in Online Demo" modal. **Submission grading from this
-frontend only works against a backend after the problem ids are real ObjectIds**
-— see [Gaps](#gaps-at-the-frontendbackend-boundary).
+1. **Backend detection.** `services/backendStatus.ts` owns a single
+   `"checking" | "online" | "offline"` status. `App` starts `backendStatus.watch()`
+   on mount, which probes `GET /health`, flips offline the moment `apiClient`
+   reports a network-level failure (`lcarena:server-connection-error`), re-probes
+   on `window.online` / tab visibility, and polls every 15 s while offline so a
+   backend started later is picked up without a reload. Components subscribe via
+   `hooks/useBackendStatus`.
+2. **Problems follow that status.** `services/problemService.ts`
+   `getAllProblems()` / `getProblemById()` fetch `/api/problems` when the backend
+   is reachable and fall back to [`src/data/sampleProblems.ts`](src/data/sampleProblems.ts)
+   only when it is not. Sample ids are **slugs** (`"two-sum"`,
+   `"reverse-a-string"`, …); live ids are Mongo ObjectIds, so submission grading
+   works against the live catalog.
+3. **Demo UI is offline-only.** The `DeveloperApologyBanner` on the catalogue,
+   the `Demo Mode` navbar/workspace badges, the sign-in demo note and the
+   "Code Execution Unavailable in Online Demo" modal render only while the
+   backend is detected offline; online shows a `Live` indicator and real errors.
+4. **The "Run" button does not execute code.** `handleRun()` waits 250 ms and
+   prints the sample cases: `formatOnlineRunNotice()` when the backend is live
+   (points at Submit for grading) or `formatDemoRunNotice()` when offline. The
+   in-browser judge in `utils/codeRunner.ts` (`runCode`, `executeJavaScript`,
+   `evaluateStaticCode`) exists and is unit tested, but is **not wired to Run**.
 
 ## Overview
 
@@ -56,7 +58,8 @@ frontend only works against a backend after the problem ids are real ObjectIds**
 flowchart LR
     subgraph SPA["React SPA :5173"]
         Auth["AuthContext"] --> AC["apiClient (axios)"]
-        PP["ProblemsPage / ProblemDetailPage"] --> PS["problemService\n(local sample data)"]
+        PP["ProblemsPage / ProblemDetailPage"] --> PS["problemService\n(live API + offline samples)"]
+        BS["backendStatus (+ useBackendStatus)"] --> AC
         WS["Workspace"] --> SS["submissionService"]
         CE["CodeEditorPane"] --> AI["POST /suggestions"]
     end
@@ -65,8 +68,9 @@ flowchart LR
     SS -->|"localStorage history"| LS[("localStorage")]
 ```
 
-Only `apiClient`, `authService` and `submissionService` make network calls.
-Problem browsing and submission history are client-side.
+`apiClient`, `authService`, `problemService` (when online) and
+`submissionService` make network calls. Submission history is client-side
+(`localStorage`).
 
 ## Technology stack
 
@@ -90,10 +94,12 @@ apps/frontend/
 ├── src/
 │   ├── main.tsx, App.tsx, index.css
 │   ├── context/AuthContext.tsx     # login/logout/refresh, hydrates from /auth/me
+│   ├── hooks/useBackendStatus.ts   # subscribes components to backendStatus
 │   ├── services/
 │   │   ├── apiClient.ts            # axios instance, token storage, 401 refresh queue
 │   │   ├── authService.ts
-│   │   ├── problemService.ts       # local sample problems (+ unused remote fetchers)
+│   │   ├── backendStatus.ts        # /health probe, offline polling, status store
+│   │   ├── problemService.ts       # live API catalog, sample fallback when offline
 │   │   └── submissionService.ts    # create / get / pollVerdict / localStorage history
 │   ├── pages/                      # LoginPage, RegisterPage, ProblemsPage,
 │   │                               # ProblemDetailPage, SubmissionsPage, ProfilePage, NotFoundPage
@@ -107,7 +113,7 @@ apps/frontend/
 │   │   ├── problemParser.ts        # raw Problem -> ParsedProblem
 │   │   └── starterCode.ts          # per-language templates
 │   ├── types/{auth,problem,submission}.types.ts
-│   ├── data/sampleProblems.ts      # the 4 demo problems
+│   ├── data/sampleProblems.ts      # offline fallback problems
 │   └── test/                       # vitest suites (components, pages, routing, unit)
 └── public/{favicon.svg,icons.svg}
 ```
@@ -198,9 +204,10 @@ Per-problem code is persisted in `localStorage` at
 
 ### "Run" vs "Submit"
 
-- **Run** → `handleRun()` → 250 ms later `formatDemoRunNotice()`: a notice plus
-  the sample cases, explicitly labelled "Reference Only". No code leaves the
-  browser.
+- **Run** → `handleRun()` → 250 ms later a notice plus the sample cases, labelled
+  "Sample Preview". Online (`formatOnlineRunNotice`) it points at Submit for real
+  judging; offline (`formatDemoRunNotice`) it explains the demo limitation. No
+  code leaves the browser either way.
 - **Submit** → the real pipeline, described above. Requires authentication; an
   unauthenticated click opens a sign-in modal.
 
@@ -313,17 +320,19 @@ Suites: `test/unit/` (`apiClient.test.ts` — including the refresh queue,
 `AuthContext.test.tsx`, `Animations.test.tsx`), `test/components/`,
 `test/pages/`, `test/routing/`.
 
-Note that the tests validate the demo behaviour as-is (e.g. `ProblemDetailPage`
-tests assert `recordLocalSubmission`), so they will need updating when the
-catalogue is switched to remote problems.
+`test/pages/FrontendDemo.test.tsx` pins the offline experience (it sets
+`backendStatus.markOffline()` in `beforeEach`), while `test/pages/OnlineBackend.test.tsx`
+covers the live path: remote catalog, `Live` indicator, online Run notice and
+real submit errors. `test/unit/backendStatus.test.ts` covers the probe, polling
+and connectivity-error classification.
 
 ## Error handling and troubleshooting
 
 | Symptom | Cause / handling |
 | :--- | :--- |
-| Catalogue shows only 4 problems | Expected: local `sampleProblems.ts`, no API call |
-| `400 Invalid problem id` after Submit | The slug problem id is not a Mongo ObjectId — see [Gaps](#gaps-at-the-frontendbackend-boundary) |
-| "Code Execution Unavailable in Online Demo" modal | Any error from `createSubmission` is replaced by this modal; check the network tab first |
+| Catalogue shows only 4 problems | Backend detected offline, so the local `sampleProblems.ts` fallback is used — check `GET /health` through the Vite proxy |
+| `400 Invalid problem id` after Submit | A sample slug was submitted instead of a live ObjectId (backend went offline after the catalogue loaded) |
+| "Code Execution Unavailable in Online Demo" modal | Only shown when the backend is unreachable; a reachable backend surfaces the real error in the console instead |
 | Submit button requires sign-in | `handleSubmit` opens the auth modal when `!isAuthenticated` |
 | Every `401` then a redirect to login | Refresh token missing/expired; `apiClient` falls through and clears tokens |
 | Requests fail with a CORS error | Frontend and gateway on different origins without `CORS_ORIGIN` allowing the frontend |
@@ -333,12 +342,12 @@ catalogue is switched to remote problems.
 
 ## Gaps at the frontend/backend boundary
 
-Documented rather than fixed (documentation-only task):
+Documented rather than fixed:
 
-1. **Problem ids are slugs, not ObjectIds.** `POST /api/submissions` therefore
-   fails against the real backend. Bridging this means either pointing the
-   catalogue at `fetchRemoteProblems()` (and seeding problems) or mapping slugs
-   to server ids.
+1. **Sample-fallback ids are slugs, not ObjectIds.** While the backend is
+   unreachable the catalogue shows sample problems; submitting one of those after
+   the backend comes back would post a slug. Live problems use real ObjectIds and
+   grade normally.
 2. **No push notification path.** The worker publishes `submission.completed`
    into a queue that nothing consumes; the SPA polls instead. Any real-time
    feature requires a new consumer plus a client channel — see

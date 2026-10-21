@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import { backendStatus } from '../services/backendStatus';
 
 // Cleanup after each test
 afterEach(() => {
@@ -8,6 +9,8 @@ afterEach(() => {
   localStorage.clear();
   sessionStorage.clear();
   vi.clearAllMocks();
+  // Backend detection is module-level state: never leak it between tests.
+  backendStatus.reset();
 });
 
 // Mock window.matchMedia

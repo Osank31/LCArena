@@ -504,3 +504,46 @@ export function formatDemoRunNotice(problem: ParsedProblem): string {
   return lines.join("\n");
 }
 
+/**
+ * Formats the notice shown when the backend is reachable. "Run" only previews
+ * the bundled sample cases, so the real evaluation path is Submit, which sends
+ * the code to the Docker judge and grades every hidden test case.
+ */
+export function formatOnlineRunNotice(problem: ParsedProblem): string {
+  const lines: string[] = [];
+  lines.push("[Sample Preview - Live Backend Connected]");
+  lines.push("");
+  lines.push("Run previews the sample cases below. To compile and grade your");
+  lines.push("solution against the complete test suite in the sandboxed judge,");
+  lines.push("press Submit.");
+  lines.push("");
+
+  const examples =
+    problem.examples && problem.examples.length > 0
+      ? problem.examples
+      : [
+          {
+            input: "Sample Input",
+            output: "Expected Output",
+          },
+        ];
+
+  lines.push("----------------------------------------");
+  lines.push("Tested against sample input:");
+
+  examples.forEach((tc, idx) => {
+    lines.push(`----------------------------------------`);
+    lines.push(`Test Case ${idx + 1}:`);
+    lines.push(`Input:    ${tc.input}`);
+    lines.push(`Expected: ${tc.output}`);
+    lines.push(`Status:   Sample Preview (Submit to execute)`);
+    if (tc.explanation) {
+      lines.push(`Note:     ${tc.explanation}`);
+    }
+  });
+
+  lines.push(`----------------------------------------`);
+
+  return lines.join("\n");
+}
+

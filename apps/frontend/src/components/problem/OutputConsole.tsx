@@ -20,6 +20,55 @@ interface OutputConsoleProps {
   runOutput?: string | null;
 }
 
+interface RunOutputMeta {
+  icon: React.ReactNode;
+  label: string;
+}
+
+/** Headline shown above the raw run output, derived from the notice it contains. */
+function getRunOutputMeta(output: string): RunOutputMeta {
+  if (output.includes("Online Demo") || output.includes("Code Execution Unavailable")) {
+    return {
+      icon: <Terminal className="w-4 h-4 text-ink" />,
+      label: "Notice: Execution Unavailable in Online Demo",
+    };
+  }
+  if (output.includes("Sample Preview")) {
+    return {
+      icon: <Terminal className="w-4 h-4 text-ink" />,
+      label: "Sample Cases (Preview Only)",
+    };
+  }
+  if (output.includes("Submission Failed")) {
+    return {
+      icon: <XCircle className="w-4 h-4" />,
+      label: "Submission Failed",
+    };
+  }
+  if (output.includes("Compilation Error")) {
+    return {
+      icon: <XCircle className="w-4 h-4" />,
+      label: "Run Finished (Compilation Error)",
+    };
+  }
+  if (output.includes("Runtime Error")) {
+    return {
+      icon: <XCircle className="w-4 h-4" />,
+      label: "Run Finished (Runtime Error)",
+    };
+  }
+  if (output.includes("Wrong Answer")) {
+    return {
+      icon: <AlertCircle className="w-4 h-4" />,
+      label: "Run Finished (Wrong Answer)",
+    };
+  }
+  return {
+    icon: <CheckCircle2 className="w-4 h-4" />,
+    label: "Run Finished (All Passed)",
+  };
+}
+
 export const OutputConsole: React.FC<OutputConsoleProps> = ({
   problem,
   result,
@@ -37,6 +86,7 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
   });
 
   const verdictInfo = result ? parseVerdict(result) : null;
+  const runMeta = runOutput ? getRunOutputMeta(runOutput) : null;
 
   const tabs = [
     { id: "result", label: "Verdict & Output" },
@@ -104,31 +154,9 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
                 </p>
               </div>
             ) : runOutput ? (
-              <div data-output-reveal className="space-y-3">
-                <div className="flex items-center gap-2 font-serif font-bold text-sm text-ink">
-                  {runOutput.includes("Online Demo") ||
-                  runOutput.includes("Code Execution Unavailable") ? (
-                    <Terminal className="w-4 h-4 text-ink" />
-                  ) : runOutput.includes("Compilation Error") ||
-                  runOutput.includes("Runtime Error") ? (
-                    <XCircle className="w-4 h-4" />
-                  ) : runOutput.includes("Wrong Answer") ? (
-                    <AlertCircle className="w-4 h-4" />
-                  ) : (
-                    <CheckCircle2 className="w-4 h-4" />
-                  )}
-                  <span>
-                    {runOutput.includes("Online Demo") ||
-                    runOutput.includes("Code Execution Unavailable")
-                      ? "Notice: Execution Unavailable in Online Demo"
-                      : runOutput.includes("Compilation Error")
-                      ? "Run Finished (Compilation Error)"
-                      : runOutput.includes("Runtime Error")
-                      ? "Run Finished (Runtime Error)"
-                      : runOutput.includes("Wrong Answer")
-                      ? "Run Finished (Wrong Answer)"
-                      : "Run Finished (All Passed)"}
-                  </span>
+              <div data-output-reveal className="space-y-3">                <div className="flex items-center gap-2 font-serif font-bold text-sm text-ink">
+                  {runMeta?.icon}
+                  <span>{runMeta?.label}</span>
                 </div>
                 <pre className="bg-paper p-3 rounded-sm border border-rule text-ink overflow-x-auto whitespace-pre-wrap font-mono text-xs">
                   {runOutput}

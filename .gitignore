@@ -47,3 +47,6 @@ venv/
 .idea
 graphify-out
 .freebuff
+
+
+.codegraph

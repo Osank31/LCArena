@@ -7,6 +7,7 @@ import {
   Send,
   Sparkles,
 } from "lucide-react";
+import { useBackendStatus } from "../../hooks/useBackendStatus";
 import { ParsedProblem } from "../../types/problem.types";
 import { SupportedLanguage } from "../../types/submission.types";
 import { LANGUAGE_OPTIONS } from "../../utils/starterCode";
@@ -36,6 +37,8 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
   aiEnabled,
   onToggleAi,
 }) => {
+  const { isOnline, isOffline } = useBackendStatus();
+
   return (
     <header className="h-12 border-b border-rule bg-paper-2/70 px-3 flex items-center justify-between gap-2 shrink-0 select-none">
       {/* Left: Back & Problem Info */}
@@ -57,13 +60,24 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
           size="sm"
           className="hidden md:inline-flex shrink-0 text-[10px]"
         />
-        <button
-          onClick={() => window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"))}
-          className="hidden lg:inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-sm border border-rule-2 text-ink-3 hover:text-ink hover:border-ink-3 bg-paper transition-colors cursor-pointer"
-          title="Frontend Demo Mode — View Developer Apology Note"
-        >
-          <span>Demo 🥹</span>
-        </button>
+        {isOnline && (
+          <span
+            className="hidden lg:inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-sm border border-rule-2 text-ink-2 bg-paper"
+            title="Connected to the LCArena backend"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-ink" />
+            <span>Live</span>
+          </span>
+        )}
+        {isOffline && (
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"))}
+            className="hidden lg:inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-sm border border-rule-2 text-ink-3 hover:text-ink hover:border-ink-3 bg-paper transition-colors cursor-pointer"
+            title="Frontend Demo Mode — View Developer Apology Note"
+          >
+            <span>Demo 🥹</span>
+          </button>
+        )}
       </div>
 
       {/* Middle/Right: Controls */}

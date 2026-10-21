@@ -6,12 +6,15 @@ import { ProblemsPage } from "../../pages/ProblemsPage";
 import { ProblemDetailPage } from "../../pages/ProblemDetailPage";
 import { AuthProvider } from "../../context/AuthContext";
 import { apiClient } from "../../services/apiClient";
+import { backendStatus } from "../../services/backendStatus";
 import { GITHUB_REPO_URL, APOLOGY_TITLE } from "../../components/common/DeveloperApologyBanner";
 
 describe("Frontend Demo Mode (Backend Offline Experience)", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
+    // Hosted demo / backend down: the client must not probe the network.
+    backendStatus.markOffline();
   });
 
   it("renders developer apology banner and all 4 sample problems without any backend calls", async () => {

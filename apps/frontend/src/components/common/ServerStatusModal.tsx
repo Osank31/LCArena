@@ -6,7 +6,7 @@ import {
   RefreshCw,
   Terminal,
 } from "lucide-react";
-import { apiClient } from "../../services/apiClient";
+import { backendStatus } from "../../services/backendStatus";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
 import { GithubIcon } from "./DeveloperApologyBanner";
@@ -79,7 +79,10 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
     setIsRetrying(true);
     setRetryMessage(null);
     try {
-      await apiClient.get("/health", { timeout: 4000 });
+      // Re-probes /health and updates the shared backend status so the rest of
+      // the app (demo badges, catalog fallback) follows along.
+      const isReachable = await backendStatus.check();
+      if (!isReachable) throw new Error("Backend unreachable");
       setIsOpen(false);
       if (onDismiss) onDismiss();
     } catch {
