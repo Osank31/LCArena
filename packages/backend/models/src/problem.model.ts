@@ -8,6 +8,10 @@ export interface IProblem extends Document {
     time_limit: number;
     testCaseStoragePrefix?: string;
     testCasesCount?: number;
+    markdownProcessedAt?: Date;
+    title?: string;
+    slug?: string;
+    tags?: string[];
 }
 
 export type ProblemModel = Model<IProblem, {}>

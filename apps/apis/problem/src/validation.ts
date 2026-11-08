@@ -25,7 +25,12 @@ export const createProblemSchema = z.preprocess(
         .object({
             description: z
                 .string({ message: "Description must be at least 10 characters" })
-                .min(10, "Description must be at least 10 characters"),
+                .min(10, "Description must be at least 10 characters")
+                .max(50_000, "Description must not exceed 50,000 characters"),
+
+            title: z.string().max(200).optional(),
+            slug: z.string().max(200).optional(),
+            tags: z.array(z.string().max(50)).max(20).optional(),
 
             difficulty: z.enum(["Easy", "Medium", "Hard"]),
 
@@ -82,7 +87,11 @@ export const updateProblemSchema = z.object({
     description: z
         .string()
         .min(10, "Description must be at least 10 characters")
+        .max(50_000, "Description must not exceed 50,000 characters")
         .optional(),
+    title: z.string().max(200).optional(),
+    slug: z.string().max(200).optional(),
+    tags: z.array(z.string().max(50)).max(20).optional(),
     difficulty: z.enum(["Easy", "Medium", "Hard"]).optional(),
     sampleTestCaseUrl: z.string().optional(),
     testCasesUrl: z.string().optional(),

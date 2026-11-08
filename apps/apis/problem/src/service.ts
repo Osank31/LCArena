@@ -1,5 +1,6 @@
 import { Problem } from "@LCArena/models";
 import mongoose from "mongoose";
+import { processMarkdown } from "./markdown/processing.service";
 import {
     BadRequestError,
     InternalServerError,
@@ -79,9 +80,10 @@ export const createProblemService = async (data: createProblemType) => {
         );
 
         try {
+            const { canonical: description } = processMarkdown(data.description);
             const problem = await Problem.create({
                 _id: problemId,
-                description: data.description,
+                description,
                 difficulty: data.difficulty,
                 time_limit: data.time_limit ?? 5000,
                 sampleTestCaseUrl:
@@ -106,8 +108,11 @@ export const createProblemService = async (data: createProblemType) => {
     }
 
     // Fallback path when testCasesUrl is directly supplied
+    const { canonical: fallbackDescription } = processMarkdown(
+        data.description
+    );
     return await Problem.create({
-        description: data.description,
+        description: fallbackDescription,
         difficulty: data.difficulty,
         time_limit: data.time_limit ?? 5000,
         sampleTestCaseUrl: data.sampleTestCaseUrl || data.testCasesUrl,
@@ -169,10 +174,17 @@ export const updateProblemService = async (
         };
     }
 
-    const updatePayload = {
+    const updatePayload: Record<string, any> = {
         ...data,
         ...storageUpdate,
     };
+
+    // Process Markdown description if it is being updated.
+    if (data.description !== undefined) {
+        const { canonical } = processMarkdown(data.description);
+        updatePayload.description = canonical;
+    }
+
     // Don't persist raw testCases array directly to MongoDB problem document
     delete (updatePayload as any).testCases;
 

@@ -68,7 +68,11 @@ int main() {
 				Image: CPPExecutor.IMAGE_NAME,
 				Cmd: ["/bin/bash", "-c", "tail -f /dev/null"],
 				WorkingDir: "/workspace",
-				HostConfig: {},
+				HostConfig: {
+					NetworkMode: "none",
+					Memory: 256*1024,
+					MemorySwap: 256*1024
+				},
 			});
 
 			await container.start();

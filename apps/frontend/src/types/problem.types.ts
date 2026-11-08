@@ -36,6 +36,7 @@ export interface ParsedProblem {
   createdAt?: string;
   updatedAt?: string;
   rawDescription: string;
+  renderedHtml?: string;
 }
 
 export interface ProblemFilterState {

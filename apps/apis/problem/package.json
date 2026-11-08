@@ -18,10 +18,15 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@LCArena/utils": "*",
-    "@LCArena/models": "*",
+    "@LCArena/config": "*",
     "@LCArena/middlewares": "*",
-    "@LCArena/config": "*"
+    "@LCArena/models": "*",
+    "@LCArena/utils": "*",
+    "dompurify": "^3.4.17",
+    "highlight.js": "^11.12.0",
+    "jsdom": "^26.1.0",
+    "markdown-it": "^14.3.3",
+    "markdown-it-texmath": "^1.0.0"
   },
   "devDependencies": {
     "typescript": "^7.0.2"

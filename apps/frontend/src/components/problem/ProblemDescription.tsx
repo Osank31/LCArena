@@ -3,6 +3,7 @@ import { Clock, Hash, Tag } from "lucide-react";
 import { useReveal } from "../../animations";
 import { ParsedProblem } from "../../types/problem.types";
 import { Badge, DifficultyBadge } from "../common/Badge";
+import { MarkdownRenderer } from "../../components/markdown/MarkdownRenderer";
 
 export const ProblemDescription: React.FC<{ problem: ParsedProblem }> = ({
   problem,
@@ -48,8 +49,11 @@ export const ProblemDescription: React.FC<{ problem: ParsedProblem }> = ({
         <h2 className="font-serif text-sm font-bold uppercase tracking-[0.18em] text-ink-2">
           Problem Description
         </h2>
-        <div className="whitespace-pre-line text-ink-2 leading-loose text-[15px]">
-          {problem.statement}
+        <div className="bg-paper/40 border border-rule rounded-sm p-5">
+          <MarkdownRenderer
+            markdown={problem.rawDescription || problem.statement}
+            className="text-[15px]"
+          />
         </div>
       </section>
 
