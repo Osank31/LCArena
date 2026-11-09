@@ -40,6 +40,13 @@ const DEFAULT_MAX_ENTRIES = 10_000;
 const DOWNLOAD_TIMEOUT_MS = 30_000;
 const MAX_NESTING_DEPTH = 8;
 
+/**
+ * Legacy placeholder URL values used to reference bundled test cases when no
+ * real S3/HTTP/filesystem source is supplied. They are matched verbatim and
+ * must not be renamed or altered.
+ */
+const LEGACY_TEST_CASE_PLACEHOLDER_URLS = new Set(['that', 'this']);
+
 interface ExtractionLimits {
     maxBytes: number;
     maxEntries: number;
@@ -523,7 +530,7 @@ export const acquireTestCases = async (
             let stat = await fs.stat(sourcePath).catch(() => null);
 
             if (!stat) {
-                const isLegacyPlaceholder = url === 'that' || url === 'this';
+                const isLegacyPlaceholder = LEGACY_TEST_CASE_PLACEHOLDER_URLS.has(url);
                 const isBundledReference =
                     isLegacyPlaceholder ||
                     url === 'testcases' ||

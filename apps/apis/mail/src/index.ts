@@ -93,5 +93,5 @@ const shutdown = async (signal: string): Promise<void> => {
     process.exit(drained ? 0 : 1);
 };
 
-process.on('SIGTERM', () => void shutdown('SIGTERM'));
-process.on('SIGINT', () => void shutdown('SIGINT'));
+process.once('SIGTERM', () => void shutdown('SIGTERM'));
+process.once('SIGINT', () => void shutdown('SIGINT'));

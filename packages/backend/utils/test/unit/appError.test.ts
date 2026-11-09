@@ -19,14 +19,14 @@ interface ErrorCase {
 
 const CASES: ErrorCase[] = [
     { Ctor: BadRequestError, statusCode: 400, name: 'BadRequestError' },
-    { Ctor: UnauthorizedError, statusCode: 401, name: 'Unauthorized Error' },
+    { Ctor: UnauthorizedError, statusCode: 401, name: 'UnauthorizedError' },
     { Ctor: ForbiddenError, statusCode: 403, name: 'ForbiddenError' },
     { Ctor: NotFoundError, statusCode: 404, name: 'NotFoundError' },
     { Ctor: ConflictError, statusCode: 409, name: 'ConflictError' },
     {
         Ctor: InternalServerError,
         statusCode: 500,
-        name: 'Internal Server Error',
+        name: 'InternalServerError',
     },
     { Ctor: NotImplementedError, statusCode: 501, name: 'NotImplementedError' },
 ];

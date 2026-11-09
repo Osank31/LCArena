@@ -10,7 +10,7 @@ export class AppError extends Error {
 }
 
 export class InternalServerError extends AppError {
-    constructor(message: string, statusCode = 500, name = 'Internal Server Error') {
+    constructor(message: string, statusCode = 500, name = 'InternalServerError') {
         super(message, statusCode, name);
     }
 }
@@ -28,7 +28,7 @@ export class NotFoundError extends AppError {
 }
 
 export class UnauthorizedError extends AppError {
-    constructor(message: string, statusCode = 401, name = 'Unauthorized Error') {
+    constructor(message: string, statusCode = 401, name = 'UnauthorizedError') {
         super(message, statusCode, name);
     }
 }

@@ -10,7 +10,7 @@ export const evaluationService = async (data: CreateSubmissionInput & { userId: 
     const { problemId, code, language, userId } = data;
 
     if (!channel || !queue) {
-        throw new InternalServerError('Rabbit Mq chnnel or queue not found');
+        throw new InternalServerError('RabbitMQ channel or queue not found');
     }
 
     // The initial verdict is always minted server-side; clients cannot inject

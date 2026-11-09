@@ -8,7 +8,7 @@ const router = Router();
 const submissionProxy = createServiceProxy(servicesConfig.submission);
 
 // Any authenticated user can submit; gateway supplies verified identity
-submissionRouter: router.post('/', authenticate, submissionProxy);
+router.post('/', authenticate, submissionProxy);
 
 // Reading or updating a submission requires ownership or Admin
 router.get('/:id', authenticate, requireSubmissionOwner, submissionProxy);
