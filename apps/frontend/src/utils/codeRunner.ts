@@ -1,25 +1,24 @@
-import { ParsedProblem, ProblemExample } from "../types/problem.types";
-import { SupportedLanguage } from "../types/submission.types";
+import { ParsedProblem, ProblemExample } from '../types/problem.types';
+import { SupportedLanguage } from '../types/submission.types';
 
 export interface TestCaseRunResult {
-  index: number;
-  input: string;
-  expectedOutput: string;
-  actualOutput?: string;
-  passed: boolean;
-  logs?: string[];
-  executionTimeMs?: number;
-  error?: string;
+    index: number;
+    input: string;
+    expectedOutput: string;
+    actualOutput?: string;
+    passed: boolean;
+    logs?: string[];
+    executionTimeMs?: number;
+    error?: string;
 }
 
 export interface RunEvaluationResult {
-  status:
-    "SUCCESS" | "WRONG_ANSWER" | "COMPILE_ERROR" | "RUNTIME_ERROR" | "TIMEOUT";
-  outputMessage: string;
-  totalCases: number;
-  passedCases: number;
-  executionTimeMs: number;
-  results: TestCaseRunResult[];
+    status: 'SUCCESS' | 'WRONG_ANSWER' | 'COMPILE_ERROR' | 'RUNTIME_ERROR' | 'TIMEOUT';
+    outputMessage: string;
+    totalCases: number;
+    passedCases: number;
+    executionTimeMs: number;
+    results: TestCaseRunResult[];
 }
 
 /**
@@ -31,242 +30,237 @@ export interface RunEvaluationResult {
  * - raw JSON or primitives
  */
 export function parseExampleArguments(inputStr: string): any[] {
-  const trimmed = inputStr.trim();
-  if (!trimmed) return [];
+    const trimmed = inputStr.trim();
+    if (!trimmed) return [];
 
-  // Try parsing variable assignments: e.g. "s = 'babad'" or "nums = [2,7,11,15], target = 9"
-  try {
-    if (/[a-zA-Z_$][a-zA-Z0-9_$]*\s*=/.test(trimmed)) {
-      const parts = trimmed.split(/,(?![^\[\{\(]*[\]\}\)])/);
-      const varNames = parts
-        .map((part) => part.split("=")[0].trim())
-        .filter((v) => /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(v));
+    // Try parsing variable assignments: e.g. "s = 'babad'" or "nums = [2,7,11,15], target = 9"
+    try {
+        if (/[a-zA-Z_$][a-zA-Z0-9_$]*\s*=/.test(trimmed)) {
+            const parts = trimmed.split(/,(?![^\[\{\(]*[\]\}\)])/);
+            const varNames = parts
+                .map((part) => part.split('=')[0].trim())
+                .filter((v) => /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(v));
 
-      if (varNames.length > 0) {
-        const fn = new Function(`
+            if (varNames.length > 0) {
+                const fn = new Function(`
           "use strict";
           let ${trimmed};
-          return [${varNames.join(", ")}];
+          return [${varNames.join(', ')}];
         `);
-        const res = fn();
-        if (Array.isArray(res) && res.length > 0) {
-          return res;
+                const res = fn();
+                if (Array.isArray(res) && res.length > 0) {
+                    return res;
+                }
+            }
         }
-      }
+    } catch {
+        // If variable assignment evaluation fails, fall through
     }
-  } catch {
-    // If variable assignment evaluation fails, fall through
-  }
 
-  // Try parsing as JSON:
-  try {
-    const parsed = JSON.parse(trimmed);
-    return [parsed];
-  } catch {
-    // Fall through
-  }
+    // Try parsing as JSON:
+    try {
+        const parsed = JSON.parse(trimmed);
+        return [parsed];
+    } catch {
+        // Fall through
+    }
 
-  // Fallback: return raw string
-  return [trimmed];
+    // Fallback: return raw string
+    return [trimmed];
 }
 
 /**
  * Normalizes output values into consistent comparable string representation.
  */
 export function normalizeOutput(val: any): string {
-  if (val === undefined) return "undefined";
-  if (val === null) return "null";
-  if (typeof val === "boolean" || typeof val === "number") return String(val);
-  if (typeof val === "string") return val.trim();
-  try {
-    return JSON.stringify(val);
-  } catch {
-    return String(val);
-  }
+    if (val === undefined) return 'undefined';
+    if (val === null) return 'null';
+    if (typeof val === 'boolean' || typeof val === 'number') return String(val);
+    if (typeof val === 'string') return val.trim();
+    try {
+        return JSON.stringify(val);
+    } catch {
+        return String(val);
+    }
 }
 
 /**
  * Compares actual output with expected output, handling string trimming, quotes, and JSON structures.
  */
 export function compareOutputs(actual: any, expected: string): boolean {
-  const normActual = normalizeOutput(actual).trim();
-  const normExpected = expected.trim();
+    const normActual = normalizeOutput(actual).trim();
+    const normExpected = expected.trim();
 
-  if (normActual === normExpected) return true;
+    if (normActual === normExpected) return true;
 
-  // Unquoted string check
-  const stripQuotes = (s: string) => s.replace(/^["']|["']$/g, "").trim();
-  if (stripQuotes(normActual) === stripQuotes(normExpected)) return true;
+    // Unquoted string check
+    const stripQuotes = (s: string) => s.replace(/^["']|["']$/g, '').trim();
+    if (stripQuotes(normActual) === stripQuotes(normExpected)) return true;
 
-  // Check JSON structural equality
-  try {
-    const jsonActual =
-      typeof actual === "object" && actual !== null
-        ? actual
-        : JSON.parse(normActual);
-    const jsonExpected = JSON.parse(normExpected);
-    return JSON.stringify(jsonActual) === JSON.stringify(jsonExpected);
-  } catch {
-    // Not JSON
-  }
+    // Check JSON structural equality
+    try {
+        const jsonActual =
+            typeof actual === 'object' && actual !== null ? actual : JSON.parse(normActual);
+        const jsonExpected = JSON.parse(normExpected);
+        return JSON.stringify(jsonActual) === JSON.stringify(jsonExpected);
+    } catch {
+        // Not JSON
+    }
 
-  return false;
+    return false;
 }
 
 /**
  * Checks bracket balance and structural sanity for non-JS languages.
  */
 export function checkSyntaxBalance(
-  code: string,
-  language: SupportedLanguage,
+    code: string,
+    language: SupportedLanguage,
 ): { valid: boolean; error?: string } {
-  const stack: { char: string; line: number; col: number }[] = [];
-  const lines = code.split("\n");
+    const stack: { char: string; line: number; col: number }[] = [];
+    const lines = code.split('\n');
 
-  let inBlockComment = false;
-  let inString: string | null = null;
+    let inBlockComment = false;
+    let inString: string | null = null;
 
-  for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-    const line = lines[lineIdx];
+    for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        const line = lines[lineIdx];
 
-    for (let colIdx = 0; colIdx < line.length; colIdx++) {
-      const char = line[colIdx];
-      const nextChar = line[colIdx + 1];
+        for (let colIdx = 0; colIdx < line.length; colIdx++) {
+            const char = line[colIdx];
+            const nextChar = line[colIdx + 1];
 
-      // Handle comments
-      if (!inString) {
-        if (!inBlockComment && char === "#" && language === "py") {
-          break; // Python comment to end of line
+            // Handle comments
+            if (!inString) {
+                if (!inBlockComment && char === '#' && language === 'py') {
+                    break; // Python comment to end of line
+                }
+                if (!inBlockComment && char === '/' && nextChar === '/') {
+                    break; // Line comment to end of line
+                }
+                if (!inBlockComment && char === '/' && nextChar === '*') {
+                    inBlockComment = true;
+                    colIdx++;
+                    continue;
+                }
+                if (inBlockComment && char === '*' && nextChar === '/') {
+                    inBlockComment = false;
+                    colIdx++;
+                    continue;
+                }
+            }
+
+            if (inBlockComment) continue;
+
+            // Handle strings
+            if (char === '"' || char === "'" || char === '`') {
+                if (!inString) {
+                    inString = char;
+                } else if (inString === char && line[colIdx - 1] !== '\\') {
+                    inString = null;
+                }
+                continue;
+            }
+
+            if (inString) continue;
+
+            // Handle brackets
+            if (char === '(' || char === '{' || char === '[') {
+                stack.push({ char, line: lineIdx + 1, col: colIdx + 1 });
+            } else if (char === ')' || char === '}' || char === ']') {
+                const last = stack.pop();
+                if (!last) {
+                    return {
+                        valid: false,
+                        error: `Syntax Error: Unmatched closing bracket '${char}' at line ${lineIdx + 1}, column ${colIdx + 1}`,
+                    };
+                }
+                const pairs: Record<string, string> = { '(': ')', '{': '}', '[': ']' };
+                if (pairs[last.char] !== char) {
+                    return {
+                        valid: false,
+                        error: `Syntax Error: Mismatched bracket: expected '${pairs[last.char]}' for '${last.char}' from line ${last.line}, but found '${char}' at line ${lineIdx + 1}`,
+                    };
+                }
+            }
         }
-        if (!inBlockComment && char === "/" && nextChar === "/") {
-          break; // Line comment to end of line
-        }
-        if (!inBlockComment && char === "/" && nextChar === "*") {
-          inBlockComment = true;
-          colIdx++;
-          continue;
-        }
-        if (inBlockComment && char === "*" && nextChar === "/") {
-          inBlockComment = false;
-          colIdx++;
-          continue;
-        }
-      }
+    }
 
-      if (inBlockComment) continue;
-
-      // Handle strings
-      if (char === '"' || char === "'" || char === "`") {
-        if (!inString) {
-          inString = char;
-        } else if (inString === char && line[colIdx - 1] !== "\\") {
-          inString = null;
-        }
-        continue;
-      }
-
-      if (inString) continue;
-
-      // Handle brackets
-      if (char === "(" || char === "{" || char === "[") {
-        stack.push({ char, line: lineIdx + 1, col: colIdx + 1 });
-      } else if (char === ")" || char === "}" || char === "]") {
-        const last = stack.pop();
-        if (!last) {
-          return {
+    if (stack.length > 0) {
+        const unclosed = stack[stack.length - 1];
+        return {
             valid: false,
-            error: `Syntax Error: Unmatched closing bracket '${char}' at line ${lineIdx + 1}, column ${colIdx + 1}`,
-          };
+            error: `Syntax Error: Unclosed '${unclosed.char}' opened at line ${unclosed.line}, column ${unclosed.col}`,
+        };
+    }
+
+    // Structural sanity checks
+    if (language === 'cpp' || language === 'java') {
+        if (!code.includes('class Solution') && !code.includes('solve(')) {
+            return {
+                valid: false,
+                error: `Compilation Error: Missing 'class Solution' or solve member function`,
+            };
         }
-        const pairs: Record<string, string> = { "(": ")", "{": "}", "[": "]" };
-        if (pairs[last.char] !== char) {
-          return {
-            valid: false,
-            error: `Syntax Error: Mismatched bracket: expected '${pairs[last.char]}' for '${last.char}' from line ${last.line}, but found '${char}' at line ${lineIdx + 1}`,
-          };
+    }
+
+    if (language === 'py') {
+        if (!code.includes('class Solution') && !code.includes('def solve')) {
+            return {
+                valid: false,
+                error: `Compilation Error: Missing 'class Solution' or 'def solve'`,
+            };
         }
-      }
     }
-  }
 
-  if (stack.length > 0) {
-    const unclosed = stack[stack.length - 1];
-    return {
-      valid: false,
-      error: `Syntax Error: Unclosed '${unclosed.char}' opened at line ${unclosed.line}, column ${unclosed.col}`,
-    };
-  }
-
-  // Structural sanity checks
-  if (language === "cpp" || language === "java") {
-    if (!code.includes("class Solution") && !code.includes("solve(")) {
-      return {
-        valid: false,
-        error: `Compilation Error: Missing 'class Solution' or solve member function`,
-      };
-    }
-  }
-
-  if (language === "py") {
-    if (!code.includes("class Solution") && !code.includes("def solve")) {
-      return {
-        valid: false,
-        error: `Compilation Error: Missing 'class Solution' or 'def solve'`,
-      };
-    }
-  }
-
-  return { valid: true };
+    return { valid: true };
 }
 
 /**
  * Evaluates JavaScript code against sample test cases in browser.
  */
-export function executeJavaScript(
-  code: string,
-  examples: ProblemExample[],
-): TestCaseRunResult[] {
-  // 1. Syntax check
-  try {
-    new Function(code);
-  } catch (err: any) {
-    return [
-      {
-        index: 1,
-        input: examples[0]?.input || "",
-        expectedOutput: examples[0]?.output || "",
-        passed: false,
-        error: `SyntaxError: ${err.message}`,
-      },
-    ];
-  }
-
-  const results: TestCaseRunResult[] = [];
-
-  for (let i = 0; i < examples.length; i++) {
-    const ex = examples[i];
-    const args = parseExampleArguments(ex.input);
-    const logs: string[] = [];
-
-    const mockConsole = {
-      log: (...a: any[]) =>
-        logs.push(
-          a
-            .map((item) =>
-              typeof item === "object" ? JSON.stringify(item) : String(item),
-            )
-            .join(" "),
-        ),
-      warn: (...a: any[]) => logs.push("[warn] " + a.join(" ")),
-      error: (...a: any[]) => logs.push("[error] " + a.join(" ")),
-    };
-
-    const startTime = performance.now();
+export function executeJavaScript(code: string, examples: ProblemExample[]): TestCaseRunResult[] {
+    // 1. Syntax check
     try {
-      const runner = new Function(
-        "console",
-        "args",
-        `
+        new Function(code);
+    } catch (err: any) {
+        return [
+            {
+                index: 1,
+                input: examples[0]?.input || '',
+                expectedOutput: examples[0]?.output || '',
+                passed: false,
+                error: `SyntaxError: ${err.message}`,
+            },
+        ];
+    }
+
+    const results: TestCaseRunResult[] = [];
+
+    for (let i = 0; i < examples.length; i++) {
+        const ex = examples[i];
+        const args = parseExampleArguments(ex.input);
+        const logs: string[] = [];
+
+        const mockConsole = {
+            log: (...a: any[]) =>
+                logs.push(
+                    a
+                        .map((item) =>
+                            typeof item === 'object' ? JSON.stringify(item) : String(item),
+                        )
+                        .join(' '),
+                ),
+            warn: (...a: any[]) => logs.push('[warn] ' + a.join(' ')),
+            error: (...a: any[]) => logs.push('[error] ' + a.join(' ')),
+        };
+
+        const startTime = performance.now();
+        try {
+            const runner = new Function(
+                'console',
+                'args',
+                `
         const module = { exports: {} };
         const exports = module.exports;
         ${code}
@@ -293,170 +287,170 @@ export function executeJavaScript(
 
         return fn(...args);
       `,
-      );
+            );
 
-      const actual = runner(mockConsole, args);
-      const executionTimeMs = Math.round(performance.now() - startTime);
-      const actualStr = normalizeOutput(actual);
-      const passed = compareOutputs(actual, ex.output);
+            const actual = runner(mockConsole, args);
+            const executionTimeMs = Math.round(performance.now() - startTime);
+            const actualStr = normalizeOutput(actual);
+            const passed = compareOutputs(actual, ex.output);
 
-      results.push({
-        index: i + 1,
-        input: ex.input,
-        expectedOutput: ex.output,
-        actualOutput: actualStr,
-        passed,
-        logs: logs.length > 0 ? logs : undefined,
-        executionTimeMs,
-      });
-    } catch (err: any) {
-      const executionTimeMs = Math.round(performance.now() - startTime);
-      results.push({
-        index: i + 1,
-        input: ex.input,
-        expectedOutput: ex.output,
-        passed: false,
-        error: `Runtime Error: ${err.message}`,
-        logs: logs.length > 0 ? logs : undefined,
-        executionTimeMs,
-      });
+            results.push({
+                index: i + 1,
+                input: ex.input,
+                expectedOutput: ex.output,
+                actualOutput: actualStr,
+                passed,
+                logs: logs.length > 0 ? logs : undefined,
+                executionTimeMs,
+            });
+        } catch (err: any) {
+            const executionTimeMs = Math.round(performance.now() - startTime);
+            results.push({
+                index: i + 1,
+                input: ex.input,
+                expectedOutput: ex.output,
+                passed: false,
+                error: `Runtime Error: ${err.message}`,
+                logs: logs.length > 0 ? logs : undefined,
+                executionTimeMs,
+            });
+        }
     }
-  }
 
-  return results;
+    return results;
 }
 
 /**
  * Validates and evaluates static language code (C++, Java, Python) against sample test cases.
  */
 export function evaluateStaticCode(
-  code: string,
-  language: SupportedLanguage,
-  examples: ProblemExample[],
+    code: string,
+    language: SupportedLanguage,
+    examples: ProblemExample[],
 ): TestCaseRunResult[] {
-  const syntaxCheck = checkSyntaxBalance(code, language);
-  if (!syntaxCheck.valid) {
-    return [
-      {
-        index: 1,
-        input: examples[0]?.input || "",
-        expectedOutput: examples[0]?.output || "",
-        passed: false,
-        error: syntaxCheck.error || "Syntax check failed",
-      },
-    ];
-  }
+    const syntaxCheck = checkSyntaxBalance(code, language);
+    if (!syntaxCheck.valid) {
+        return [
+            {
+                index: 1,
+                input: examples[0]?.input || '',
+                expectedOutput: examples[0]?.output || '',
+                passed: false,
+                error: syntaxCheck.error || 'Syntax check failed',
+            },
+        ];
+    }
 
-  const results: TestCaseRunResult[] = [];
-  for (let i = 0; i < examples.length; i++) {
-    const ex = examples[i];
+    const results: TestCaseRunResult[] = [];
+    for (let i = 0; i < examples.length; i++) {
+        const ex = examples[i];
 
-    // Inspect return statement in code
-    const returnMatch = code.match(/return\s+([^;}\n]+)/);
-    const estimatedOutput = returnMatch ? returnMatch[1].trim() : "0";
+        // Inspect return statement in code
+        const returnMatch = code.match(/return\s+([^;}\n]+)/);
+        const estimatedOutput = returnMatch ? returnMatch[1].trim() : '0';
 
-    const passed = compareOutputs(estimatedOutput, ex.output);
-    results.push({
-      index: i + 1,
-      input: ex.input,
-      expectedOutput: ex.output,
-      actualOutput: estimatedOutput,
-      passed,
-      executionTimeMs: 12 + i * 4,
-    });
-  }
+        const passed = compareOutputs(estimatedOutput, ex.output);
+        results.push({
+            index: i + 1,
+            input: ex.input,
+            expectedOutput: ex.output,
+            actualOutput: estimatedOutput,
+            passed,
+            executionTimeMs: 12 + i * 4,
+        });
+    }
 
-  return results;
+    return results;
 }
 
 /**
  * Main code runner function for the Run button.
  */
 export function runCode(
-  code: string,
-  language: SupportedLanguage,
-  problem: ParsedProblem,
+    code: string,
+    language: SupportedLanguage,
+    problem: ParsedProblem,
 ): RunEvaluationResult {
-  const examples =
-    problem.examples && problem.examples.length > 0
-      ? problem.examples
-      : [
-          {
-            input: "Sample Input",
-            output: "Expected Output",
-          },
-        ];
+    const examples =
+        problem.examples && problem.examples.length > 0
+            ? problem.examples
+            : [
+                  {
+                      input: 'Sample Input',
+                      output: 'Expected Output',
+                  },
+              ];
 
-  const startTime = performance.now();
-  let testResults: TestCaseRunResult[] = [];
+    const startTime = performance.now();
+    let testResults: TestCaseRunResult[] = [];
 
-  if (language === "js") {
-    testResults = executeJavaScript(code, examples);
-  } else {
-    testResults = evaluateStaticCode(code, language, examples);
-  }
-
-  const totalTime = Math.round(performance.now() - startTime);
-  const totalCases = testResults.length;
-  const passedCases = testResults.filter((r) => r.passed).length;
-
-  const hasCompileError = testResults.some(
-    (r) => r.error?.includes("Syntax") || r.error?.includes("Compilation"),
-  );
-  const hasRuntimeError = testResults.some((r) => r.error?.includes("Runtime"));
-
-  let status: RunEvaluationResult["status"] = "SUCCESS";
-  if (hasCompileError) {
-    status = "COMPILE_ERROR";
-  } else if (hasRuntimeError) {
-    status = "RUNTIME_ERROR";
-  } else if (passedCases < totalCases) {
-    status = "WRONG_ANSWER";
-  }
-
-  const statusLabel = {
-    SUCCESS: "All Sample Test Cases Passed",
-    WRONG_ANSWER: "Wrong Answer",
-    COMPILE_ERROR: "Compilation Error",
-    RUNTIME_ERROR: "Runtime Error",
-    TIMEOUT: "Time Limit Exceeded",
-  }[status];
-
-  const lines: string[] = [];
-  lines.push(`[Run Evaluation - ${statusLabel}]`);
-  lines.push(`Language: ${language.toUpperCase()}`);
-  lines.push(`Execution Time: ${Math.max(totalTime, 10)}ms`);
-  lines.push("");
-  lines.push("Tested against sample input:");
-
-  testResults.forEach((tc) => {
-    lines.push(`----------------------------------------`);
-    lines.push(`Test Case ${tc.index}:`);
-    lines.push(`Input:    ${tc.input}`);
-    if (tc.error) {
-      lines.push(`Error:    ${tc.error}`);
+    if (language === 'js') {
+        testResults = executeJavaScript(code, examples);
     } else {
-      lines.push(`Output:   ${tc.actualOutput ?? "None"}`);
-      lines.push(`Expected: ${tc.expectedOutput}`);
-      lines.push(`Result:   ${tc.passed ? "PASSED" : "FAILED"}`);
+        testResults = evaluateStaticCode(code, language, examples);
     }
-    if (tc.logs && tc.logs.length > 0) {
-      lines.push(`Console Logs:`);
-      tc.logs.forEach((log) => lines.push(`  ${log}`));
+
+    const totalTime = Math.round(performance.now() - startTime);
+    const totalCases = testResults.length;
+    const passedCases = testResults.filter((r) => r.passed).length;
+
+    const hasCompileError = testResults.some(
+        (r) => r.error?.includes('Syntax') || r.error?.includes('Compilation'),
+    );
+    const hasRuntimeError = testResults.some((r) => r.error?.includes('Runtime'));
+
+    let status: RunEvaluationResult['status'] = 'SUCCESS';
+    if (hasCompileError) {
+        status = 'COMPILE_ERROR';
+    } else if (hasRuntimeError) {
+        status = 'RUNTIME_ERROR';
+    } else if (passedCases < totalCases) {
+        status = 'WRONG_ANSWER';
     }
-  });
 
-  lines.push(`----------------------------------------`);
-  lines.push(`Summary: ${passedCases}/${totalCases} test cases passed.`);
+    const statusLabel = {
+        SUCCESS: 'All Sample Test Cases Passed',
+        WRONG_ANSWER: 'Wrong Answer',
+        COMPILE_ERROR: 'Compilation Error',
+        RUNTIME_ERROR: 'Runtime Error',
+        TIMEOUT: 'Time Limit Exceeded',
+    }[status];
 
-  return {
-    status,
-    outputMessage: lines.join("\n"),
-    totalCases,
-    passedCases,
-    executionTimeMs: Math.max(totalTime, 10),
-    results: testResults,
-  };
+    const lines: string[] = [];
+    lines.push(`[Run Evaluation - ${statusLabel}]`);
+    lines.push(`Language: ${language.toUpperCase()}`);
+    lines.push(`Execution Time: ${Math.max(totalTime, 10)}ms`);
+    lines.push('');
+    lines.push('Tested against sample input:');
+
+    testResults.forEach((tc) => {
+        lines.push(`----------------------------------------`);
+        lines.push(`Test Case ${tc.index}:`);
+        lines.push(`Input:    ${tc.input}`);
+        if (tc.error) {
+            lines.push(`Error:    ${tc.error}`);
+        } else {
+            lines.push(`Output:   ${tc.actualOutput ?? 'None'}`);
+            lines.push(`Expected: ${tc.expectedOutput}`);
+            lines.push(`Result:   ${tc.passed ? 'PASSED' : 'FAILED'}`);
+        }
+        if (tc.logs && tc.logs.length > 0) {
+            lines.push(`Console Logs:`);
+            tc.logs.forEach((log) => lines.push(`  ${log}`));
+        }
+    });
+
+    lines.push(`----------------------------------------`);
+    lines.push(`Summary: ${passedCases}/${totalCases} test cases passed.`);
+
+    return {
+        status,
+        outputMessage: lines.join('\n'),
+        totalCases,
+        passedCases,
+        executionTimeMs: Math.max(totalTime, 10),
+        results: testResults,
+    };
 }
 
 /**
@@ -465,55 +459,47 @@ export function runCode(
  * to execute or compile code on a server.
  */
 export function formatDemoRunNotice(problem: ParsedProblem): string {
-  const lines: string[] = [];
-  lines.push("[Online Demo Mode - Code Execution Unavailable]");
-  lines.push("");
-  lines.push(
-    "Live code execution is disabled in this hosted demo because running",
-  );
-  lines.push(
-    "sandboxed execution servers is expensive for an individual developer.",
-  );
-  lines.push("");
-  lines.push(
-    "To execute code and run automated tests in isolated Docker containers:",
-  );
-  lines.push(
-    "  1. Clone repository: git clone https://github.com/Osank31/LCArena.git",
-  );
-  lines.push("  2. Start locally: docker compose up");
-  lines.push("");
-  lines.push("Repository: https://github.com/Osank31/LCArena");
-  lines.push("");
-  lines.push("----------------------------------------");
-  lines.push("Sample Test Cases (Provided for Reference - Not Executed):");
-  lines.push("Tested against sample input:");
+    const lines: string[] = [];
+    lines.push('[Online Demo Mode - Code Execution Unavailable]');
+    lines.push('');
+    lines.push('Live code execution is disabled in this hosted demo because running');
+    lines.push('sandboxed execution servers is expensive for an individual developer.');
+    lines.push('');
+    lines.push('To execute code and run automated tests in isolated Docker containers:');
+    lines.push('  1. Clone repository: git clone https://github.com/Osank31/LCArena.git');
+    lines.push('  2. Start locally: docker compose up');
+    lines.push('');
+    lines.push('Repository: https://github.com/Osank31/LCArena');
+    lines.push('');
+    lines.push('----------------------------------------');
+    lines.push('Sample Test Cases (Provided for Reference - Not Executed):');
+    lines.push('Tested against sample input:');
 
-  const examples =
-    problem.examples && problem.examples.length > 0
-      ? problem.examples
-      : [
-          {
-            input: "Sample Input",
-            output: "Expected Output",
-          },
-        ];
+    const examples =
+        problem.examples && problem.examples.length > 0
+            ? problem.examples
+            : [
+                  {
+                      input: 'Sample Input',
+                      output: 'Expected Output',
+                  },
+              ];
 
-  examples.forEach((tc, idx) => {
+    examples.forEach((tc, idx) => {
+        lines.push(`----------------------------------------`);
+        lines.push(`Test Case ${idx + 1}:`);
+        lines.push(`Input:    ${tc.input}`);
+        lines.push(`Expected: ${tc.output}`);
+        lines.push(`Status:   Reference Only (Run locally for execution)`);
+        if (tc.explanation) {
+            lines.push(`Note:     ${tc.explanation}`);
+        }
+    });
+
     lines.push(`----------------------------------------`);
-    lines.push(`Test Case ${idx + 1}:`);
-    lines.push(`Input:    ${tc.input}`);
-    lines.push(`Expected: ${tc.output}`);
-    lines.push(`Status:   Reference Only (Run locally for execution)`);
-    if (tc.explanation) {
-      lines.push(`Note:     ${tc.explanation}`);
-    }
-  });
+    lines.push('Note: No code was executed on a server.');
 
-  lines.push(`----------------------------------------`);
-  lines.push("Note: No code was executed on a server.");
-
-  return lines.join("\n");
+    return lines.join('\n');
 }
 
 /**
@@ -522,41 +508,39 @@ export function formatDemoRunNotice(problem: ParsedProblem): string {
  * the code to the Docker judge and grades every hidden test case.
  */
 export function formatOnlineRunNotice(problem: ParsedProblem): string {
-  const lines: string[] = [];
-  lines.push("[Sample Preview - Live Backend Connected]");
-  lines.push("");
-  lines.push("Run previews the sample cases below. To compile and grade your");
-  lines.push(
-    "solution against the complete test suite in the sandboxed judge,",
-  );
-  lines.push("press Submit.");
-  lines.push("");
+    const lines: string[] = [];
+    lines.push('[Sample Preview - Live Backend Connected]');
+    lines.push('');
+    lines.push('Run previews the sample cases below. To compile and grade your');
+    lines.push('solution against the complete test suite in the sandboxed judge,');
+    lines.push('press Submit.');
+    lines.push('');
 
-  const examples =
-    problem.examples && problem.examples.length > 0
-      ? problem.examples
-      : [
-          {
-            input: "Sample Input",
-            output: "Expected Output",
-          },
-        ];
+    const examples =
+        problem.examples && problem.examples.length > 0
+            ? problem.examples
+            : [
+                  {
+                      input: 'Sample Input',
+                      output: 'Expected Output',
+                  },
+              ];
 
-  lines.push("----------------------------------------");
-  lines.push("Tested against sample input:");
+    lines.push('----------------------------------------');
+    lines.push('Tested against sample input:');
 
-  examples.forEach((tc, idx) => {
+    examples.forEach((tc, idx) => {
+        lines.push(`----------------------------------------`);
+        lines.push(`Test Case ${idx + 1}:`);
+        lines.push(`Input:    ${tc.input}`);
+        lines.push(`Expected: ${tc.output}`);
+        lines.push(`Status:   Sample Preview (Submit to execute)`);
+        if (tc.explanation) {
+            lines.push(`Note:     ${tc.explanation}`);
+        }
+    });
+
     lines.push(`----------------------------------------`);
-    lines.push(`Test Case ${idx + 1}:`);
-    lines.push(`Input:    ${tc.input}`);
-    lines.push(`Expected: ${tc.output}`);
-    lines.push(`Status:   Sample Preview (Submit to execute)`);
-    if (tc.explanation) {
-      lines.push(`Note:     ${tc.explanation}`);
-    }
-  });
 
-  lines.push(`----------------------------------------`);
-
-  return lines.join("\n");
+    return lines.join('\n');
 }

@@ -85,18 +85,18 @@ apps/apis/ai-suggestion-service/
    raises `HTTPException(400, "Cannot generate suggestion: both prefix and suffix are empty.")`.
 3. **Disconnect-aware fan-out** — two asyncio tasks race:
 
-   ```python
-   llm_task        = asyncio.create_task(self.service.get_suggestion(data))
-   disconnect_task = asyncio.create_task(self._watch_disconnect(request))
-   done, pending   = await asyncio.wait({llm_task, disconnect_task},
-                                       return_when=asyncio.FIRST_COMPLETED)
-   ```
+    ```python
+    llm_task        = asyncio.create_task(self.service.get_suggestion(data))
+    disconnect_task = asyncio.create_task(self._watch_disconnect(request))
+    done, pending   = await asyncio.wait({llm_task, disconnect_task},
+                                        return_when=asyncio.FIRST_COMPLETED)
+    ```
 
-   - If the **disconnect** task finishes first, the in-flight LLM call is
-     cancelled and a `499` ("client closed request") is raised. The client never
-     sees it; the point is to stop paying for tokens the user no longer wants.
-   - Otherwise the disconnect watcher is cancelled and the LLM result is used.
-   - `_watch_disconnect` polls `request.is_disconnected()` every 0.25s.
+    - If the **disconnect** task finishes first, the in-flight LLM call is
+      cancelled and a `499` ("client closed request") is raised. The client never
+      sees it; the point is to stop paying for tokens the user no longer wants.
+    - Otherwise the disconnect watcher is cancelled and the LLM result is used.
+    - `_watch_disconnect` polls `request.is_disconnected()` every 0.25s.
 
 4. **Latency** — `time.perf_counter()` around the whole operation, reported as
    `latency_ms` (rounded to 2 decimals). This overwrites the placeholder `0.0`
@@ -144,19 +144,19 @@ Response (`GetSuggestionResponse`):
 
 ```jsonc
 {
-  "id": "<provider request id>",
-  "model": "<model name from response metadata>",
-  "choices": [
-    {
-      "index": 0,
-      "insert_text": "return a + b;",
-      "finish_reason": "stop", // "stop" | "length" | "model_length" | "cancelled"
-      "range": null, // or { start_row, start_col, end_row, end_col }
-      "score": 0.9, // 0..1
-    },
-  ],
-  "usage": { "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0 },
-  "latency_ms": 812.34,
+    "id": "<provider request id>",
+    "model": "<model name from response metadata>",
+    "choices": [
+        {
+            "index": 0,
+            "insert_text": "return a + b;",
+            "finish_reason": "stop", // "stop" | "length" | "model_length" | "cancelled"
+            "range": null, // or { start_row, start_col, end_row, end_col }
+            "score": 0.9, // 0..1
+        },
+    ],
+    "usage": { "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0 },
+    "latency_ms": 812.34,
 }
 ```
 

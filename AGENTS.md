@@ -93,34 +93,34 @@ The Gateway is the perimeter security boundary and single public HTTP ingress po
 #### Responsibilities:
 
 1. **Reverse Proxying (`http-proxy-middleware` via `proxy.factory.ts`)**:
-   - Routes `/api/problems/*` to `PROBLEM_SERVICE_URL` (`:3001`).
-   - Routes `/api/submissions/*` to `SUBMISSION_SERVICE_URL` (`:3002`).
-   - **Fails Closed**: Unmapped routes or unmapped HTTP methods are rejected immediately with a standardized JSON 404 (`notFoundHandler`), never forwarding unknown paths to downstream services.
-   - **Timeout Handling**: Translates `ECONNRESET`, `ETIMEDOUT`, or gateway socket timeouts into `504 Gateway Timeout` or `502 Bad Gateway`.
+    - Routes `/api/problems/*` to `PROBLEM_SERVICE_URL` (`:3001`).
+    - Routes `/api/submissions/*` to `SUBMISSION_SERVICE_URL` (`:3002`).
+    - **Fails Closed**: Unmapped routes or unmapped HTTP methods are rejected immediately with a standardized JSON 404 (`notFoundHandler`), never forwarding unknown paths to downstream services.
+    - **Timeout Handling**: Translates `ECONNRESET`, `ETIMEDOUT`, or gateway socket timeouts into `504 Gateway Timeout` or `502 Bad Gateway`.
 2. **Perimeter Security & Header Sanitization**:
-   - **Strips Client Spoofing**: `proxyReq.removeHeader("x-user-id")` and `proxyReq.removeHeader("authorization")` are stripped from incoming client requests to eliminate identity spoofing.
-   - **Injects Verified Identity**: Derives `userId` from the cryptographically verified JWT access token and injects verified `x-user-id: <userId>` into the upstream request to downstream services.
-   - **Forwards Client Tracking Metadata**: Attaches `x-forwarded-for`, `x-forwarded-proto`, and `x-forwarded-host`.
-   - **Body Forwarding**: Uses `fixRequestBody(proxyReq, req)` to ensure express-parsed JSON bodies stream cleanly downstream.
+    - **Strips Client Spoofing**: `proxyReq.removeHeader("x-user-id")` and `proxyReq.removeHeader("authorization")` are stripped from incoming client requests to eliminate identity spoofing.
+    - **Injects Verified Identity**: Derives `userId` from the cryptographically verified JWT access token and injects verified `x-user-id: <userId>` into the upstream request to downstream services.
+    - **Forwards Client Tracking Metadata**: Attaches `x-forwarded-for`, `x-forwarded-proto`, and `x-forwarded-host`.
+    - **Body Forwarding**: Uses `fixRequestBody(proxyReq, req)` to ensure express-parsed JSON bodies stream cleanly downstream.
 3. **Authentication & Session Lifecycle (`auth.controller.ts`, `auth.service.ts`, `token.service.ts`)**:
-   - **Dual-Token System**:
-     - **Access Token**: Short-lived JWT (default 15 minutes / 900s), sent via `Authorization: Bearer <token>`, carrying `{ userId, email, name, userRole, jti }`.
-     - **Refresh Token**: Long-lived JWT (default 7 days / 604800s), transmitted via `httpOnly`, `sameSite: lax`, `path: /auth` cookie (also accepts body fallback).
-   - **Redis Session Storage**: Stored at `session:<userId>` containing the current active `refreshToken`.
-   - **Refresh Token Rotation**: Each call to `/auth/refresh` issues a new refresh token and overwrites the Redis session key. Stale or replayed refresh tokens immediately fail with `401 Session is no longer active`.
-   - **Immediate Revocation (Logout / Account Deletion)**:
-     - On logout, the refresh token session in Redis is deleted (`session:<userId>`).
-     - The access token's `jti` is stored in Redis at `revoked_access:<jti>` with TTL equal to the token's remaining lifespan. The `authenticate` middleware checks `isAccessTokenRevoked(jti)` on every request, ensuring instant revocation.
+    - **Dual-Token System**:
+        - **Access Token**: Short-lived JWT (default 15 minutes / 900s), sent via `Authorization: Bearer <token>`, carrying `{ userId, email, name, userRole, jti }`.
+        - **Refresh Token**: Long-lived JWT (default 7 days / 604800s), transmitted via `httpOnly`, `sameSite: lax`, `path: /auth` cookie (also accepts body fallback).
+    - **Redis Session Storage**: Stored at `session:<userId>` containing the current active `refreshToken`.
+    - **Refresh Token Rotation**: Each call to `/auth/refresh` issues a new refresh token and overwrites the Redis session key. Stale or replayed refresh tokens immediately fail with `401 Session is no longer active`.
+    - **Immediate Revocation (Logout / Account Deletion)**:
+        - On logout, the refresh token session in Redis is deleted (`session:<userId>`).
+        - The access token's `jti` is stored in Redis at `revoked_access:<jti>` with TTL equal to the token's remaining lifespan. The `authenticate` middleware checks `isAccessTokenRevoked(jti)` on every request, ensuring instant revocation.
 4. **OTP Subsystem (`otp.service.ts`)**:
-   - Secure numeric 6-digit OTPs (`crypto.randomInt(100000, 1000000)`).
-   - Stored in Redis at `otp:<normalized_email>` with a 5-minute (300s) TTL.
-   - Single-use: Deleted from Redis immediately upon successful verification.
-   - Supports both password registration verification (`/auth/register`) and passwordless login (`/auth/login-otp`).
+    - Secure numeric 6-digit OTPs (`crypto.randomInt(100000, 1000000)`).
+    - Stored in Redis at `otp:<normalized_email>` with a 5-minute (300s) TTL.
+    - Single-use: Deleted from Redis immediately upon successful verification.
+    - Supports both password registration verification (`/auth/register`) and passwordless login (`/auth/login-otp`).
 5. **Role-Based Access Control (RBAC)**:
-   - User types: `Regular`, `Admin`, `Premium`.
-   - Mutation endpoints on `/api/problems` (`POST`, `PUT`, `DELETE`) require `UserType.Admin`.
-   - `/auth/users/:userId/role` is Admin-only for promoting/demoting users.
-   - Submissions read/update (`GET /api/submissions/:id`, `PUT /api/submissions/:id`) are guarded by `submissionOwner.middleware.ts`, allowing access only if `submission.userId === caller.userId` or caller has `Admin` privileges.
+    - User types: `Regular`, `Admin`, `Premium`.
+    - Mutation endpoints on `/api/problems` (`POST`, `PUT`, `DELETE`) require `UserType.Admin`.
+    - `/auth/users/:userId/role` is Admin-only for promoting/demoting users.
+    - Submissions read/update (`GET /api/submissions/:id`, `PUT /api/submissions/:id`) are guarded by `submissionOwner.middleware.ts`, allowing access only if `submission.userId === caller.userId` or caller has `Admin` privileges.
 
 ---
 
@@ -130,18 +130,18 @@ Manages coding challenges, problem descriptions, and test case resources.
 
 - **Port**: `3001`
 - **Data Model**: `Problem` collection in MongoDB.
-  - `description`: Detailed markdown problem description.
-  - `difficulty`: `"Easy" | "Medium" | "Hard"`.
-  - `sampleTestCaseUrl`: Public URL for sample input/output.
-  - `testCasesUrl`: URL/path for the complete test case suite archive.
-  - `time_limit`: Execution time limit per test case in milliseconds (default `5000ms`).
+    - `description`: Detailed markdown problem description.
+    - `difficulty`: `"Easy" | "Medium" | "Hard"`.
+    - `sampleTestCaseUrl`: Public URL for sample input/output.
+    - `testCasesUrl`: URL/path for the complete test case suite archive.
+    - `time_limit`: Execution time limit per test case in milliseconds (default `5000ms`).
 - **Endpoints**:
-  - `GET /health`: Health check.
-  - `GET /`: List all problems (public).
-  - `GET /:id`: Fetch single problem by ID (public).
-  - `POST /`: Create problem (Admin via gateway).
-  - `PUT /:id`: Update problem fields (Admin via gateway).
-  - `DELETE /:id`: Delete problem (Admin via gateway).
+    - `GET /health`: Health check.
+    - `GET /`: List all problems (public).
+    - `GET /:id`: Fetch single problem by ID (public).
+    - `POST /`: Create problem (Admin via gateway).
+    - `PUT /:id`: Update problem fields (Admin via gateway).
+    - `DELETE /:id`: Delete problem (Admin via gateway).
 
 ---
 
@@ -152,24 +152,24 @@ Ingress point for user code submissions.
 - **Port**: `3002`
 - **Security**: Validates caller identity through `userValidation` middleware which expects the verified `x-user-id` header provided by the API Gateway.
 - **Workflow**:
-  1. Receives `{ problemId, code, language }`.
-  2. Creates a `Submission` record in MongoDB with `status: { status: "PENDING" }`.
-  3. Publishes an event to RabbitMQ queue `submission.created`:
-     ```json
-     {
-       "code": "...",
-       "language": "cpp",
-       "status": { "status": "PENDING" },
-       "submissionId": "<ObjectId>",
-       "userId": "<ObjectId>",
-       "problemId": "<ObjectId>"
-     }
-     ```
-  4. Returns `201 Created` with the newly created submission document.
+    1. Receives `{ problemId, code, language }`.
+    2. Creates a `Submission` record in MongoDB with `status: { status: "PENDING" }`.
+    3. Publishes an event to RabbitMQ queue `submission.created`:
+        ```json
+        {
+            "code": "...",
+            "language": "cpp",
+            "status": { "status": "PENDING" },
+            "submissionId": "<ObjectId>",
+            "userId": "<ObjectId>",
+            "problemId": "<ObjectId>"
+        }
+        ```
+    4. Returns `201 Created` with the newly created submission document.
 - **Endpoints**:
-  - `POST /`: Submit solution (authenticated).
-  - `GET /:submissionId`: Fetch submission status and details.
-  - `PUT /:submissionId`: Update submission code/language/status.
+    - `POST /`: Submit solution (authenticated).
+    - `GET /:submissionId`: Fetch submission status and details.
+    - `PUT /:submissionId`: Update submission code/language/status.
 
 ---
 
@@ -180,50 +180,50 @@ The sandboxed code execution core. Evaluates untrusted user code against test ca
 #### Architecture:
 
 - **Base Class (`Executor`)**:
-  - Manages Docker image lifecycle (`pullImage`).
-  - Executes shell commands within running containers (`runCommand`) via Docker Exec and demultiplexed stdout/stderr streams.
-  - Packs test cases from disk into a POSIX tar archive (`tar-stream`) and injects them into the container's `/workspace` (`copyTestCasesToContainer`).
-  - Synthesizes an automated bash test harness (`generateRunnerScript`).
+    - Manages Docker image lifecycle (`pullImage`).
+    - Executes shell commands within running containers (`runCommand`) via Docker Exec and demultiplexed stdout/stderr streams.
+    - Packs test cases from disk into a POSIX tar archive (`tar-stream`) and injects them into the container's `/workspace` (`copyTestCasesToContainer`).
+    - Synthesizes an automated bash test harness (`generateRunnerScript`).
 - **Language-Specific Implementations**:
-  | Language       | Executor Class   | Docker Image       | Wrapper Strategy                                                                                                   | Compile / Syntax Command                    | Run Command      |
-  | :------------- | :--------------- | :----------------- | :----------------------------------------------------------------------------------------------------------------- | :------------------------------------------ | :--------------- |
-  | **C++**        | `CPPExecutor`    | `gcc:latest`       | Wraps `#include "Solution.cpp"` with boilerplate `Main.cpp` reading standard input and invoking `Solution::solve`. | `g++ -O3 -std=c++17 Main.cpp -o ./solution` | `./solution`     |
-  | **Java**       | `JavaExecutor`   | `eclipse-temurin`  | Wraps user `Solution` with a `Main.java` reading tokens via `Scanner` and invoking `sol.solve`.                    | `javac Main.java Solution.java`             | `java Main`      |
-  | **Python**     | `PythonExecutor` | `python:3.11-slim` | Wraps user `Solution` with `main.py` reading `sys.stdin` and invoking `sol.solve`.                                 | `python -m py_compile solution.py`          | `python main.py` |
-  | **JavaScript** | `JSExecutor`     | `node:20-slim`     | Wraps `Solution` class with `main.js` reading standard input via `fs.readFileSync(0)`.                             | `node -c solution.js`                       | `node main.js`   |
+    | Language       | Executor Class   | Docker Image       | Wrapper Strategy                                                                                                   | Compile / Syntax Command                    | Run Command      |
+    | :------------- | :--------------- | :----------------- | :----------------------------------------------------------------------------------------------------------------- | :------------------------------------------ | :--------------- |
+    | **C++**        | `CPPExecutor`    | `gcc:latest`       | Wraps `#include "Solution.cpp"` with boilerplate `Main.cpp` reading standard input and invoking `Solution::solve`. | `g++ -O3 -std=c++17 Main.cpp -o ./solution` | `./solution`     |
+    | **Java**       | `JavaExecutor`   | `eclipse-temurin`  | Wraps user `Solution` with a `Main.java` reading tokens via `Scanner` and invoking `sol.solve`.                    | `javac Main.java Solution.java`             | `java Main`      |
+    | **Python**     | `PythonExecutor` | `python:3.11-slim` | Wraps user `Solution` with `main.py` reading `sys.stdin` and invoking `sol.solve`.                                 | `python -m py_compile solution.py`          | `python main.py` |
+    | **JavaScript** | `JSExecutor`     | `node:20-slim`     | Wraps `Solution` class with `main.js` reading standard input via `fs.readFileSync(0)`.                             | `node -c solution.js`                       | `node main.js`   |
 
 #### Test Harness & Runner Script (`generateRunnerScript`):
 
 Inside the container, a temporary `runner.sh` script is generated:
 
 1. **Compilation Check**: Runs `compileCmd`. If exit code != 0, returns immediately with:
-   ```json
-   { "status": "COMPILE_ERROR", "compileError": "<compiler_output>" }
-   ```
+    ```json
+    { "status": "COMPILE_ERROR", "compileError": "<compiler_output>" }
+    ```
 2. **Iterative Test Execution**:
-   - Loops over every test case directory in `./testcases/`.
-   - Locates `*.in` (input) and `*.ans` (expected output).
-   - Measures execution time using high-resolution timestamps (`date +%s%N`).
-   - Runs `timeout "$TIME_LIMIT" <runCmd> < "$input_file" > "$user_out"`.
-   - **Verdict Categorization**:
-     - Exit code `124`: **Time Limit Exceeded (`TLE`)**.
-     - Exit code `!= 0`: **Runtime Error (`RE`)**.
-     - Output mismatch via `diff -b -B "$ans_file" "$user_out"`: **Wrong Answer (`WA`)**.
-     - Matches: **Passed**.
+    - Loops over every test case directory in `./testcases/`.
+    - Locates `*.in` (input) and `*.ans` (expected output).
+    - Measures execution time using high-resolution timestamps (`date +%s%N`).
+    - Runs `timeout "$TIME_LIMIT" <runCmd> < "$input_file" > "$user_out"`.
+    - **Verdict Categorization**:
+        - Exit code `124`: **Time Limit Exceeded (`TLE`)**.
+        - Exit code `!= 0`: **Runtime Error (`RE`)**.
+        - Output mismatch via `diff -b -B "$ans_file" "$user_out"`: **Wrong Answer (`WA`)**.
+        - Matches: **Passed**.
 3. **Structured JSON Output**:
-   ```json
-   {
-     "status": "SUCCESS",
-     "passed": 40,
-     "total": 40,
-     "executionTimeMs": { "tc_01": 12, "tc_02": 15 },
-     "failedCases": {
-       "tle": [],
-       "re": [],
-       "wa": []
-     }
-   }
-   ```
+    ```json
+    {
+        "status": "SUCCESS",
+        "passed": 40,
+        "total": 40,
+        "executionTimeMs": { "tc_01": 12, "tc_02": 15 },
+        "failedCases": {
+            "tle": [],
+            "re": [],
+            "wa": []
+        }
+    }
+    ```
 4. **Cleanup**: Container is guaranteed to be stopped and removed in a `finally` block.
 
 ---
@@ -237,10 +237,10 @@ Provides instant status updates to browser clients via WebSockets when code eval
 - **Connection Registry**: Maintains in-memory user-to-socket mapping:
   `userSockets: Map<userId, Set<socketId>>`
 - **Event Flow**:
-  1. Listens to RabbitMQ queue `submission.completed`.
-  2. Extracts `{ userId, submissionId, problemId, status, results, failedTestCase }`.
-  3. Finds all active socket IDs associated with `userId`.
-  4. Emits `submissionCompleted` event directly to those sockets.
+    1. Listens to RabbitMQ queue `submission.completed`.
+    2. Extracts `{ userId, submissionId, problemId, status, results, failedTestCase }`.
+    3. Finds all active socket IDs associated with `userId`.
+    4. Emits `submissionCompleted` event directly to those sockets.
 
 ---
 
@@ -252,12 +252,12 @@ FastAPI microservice acting as an intelligent Copilot for the Monaco code editor
 - **Framework**: FastAPI + Pydantic v2 + LangChain (`langchain-anthropic`).
 - **Model**: Anthropic Claude Sonnet (`claude-sonnet-4-5-20250929`).
 - **Mechanism**: Fill-In-The-Middle (FIM) code completion.
-  - Takes: `prefix`, `suffix`, `language_id`, `cursor_position`, `editor_info`.
-  - Enforces strict system instructions: Predicts exclusively the minimal insertion code at the cursor, forbids markdown code fences, respects indentation and language semantics, avoids code duplication from prefix/suffix.
-  - Returns structured `GetSuggestionResponse` containing candidate `choices`, model ID, and token usage statistics.
+    - Takes: `prefix`, `suffix`, `language_id`, `cursor_position`, `editor_info`.
+    - Enforces strict system instructions: Predicts exclusively the minimal insertion code at the cursor, forbids markdown code fences, respects indentation and language semantics, avoids code duplication from prefix/suffix.
+    - Returns structured `GetSuggestionResponse` containing candidate `choices`, model ID, and token usage statistics.
 - **Frontend Integration (`CodeEditor.tsx`)**:
-  - Debounced keystroke events (`DEBOUNCE_MS = 400ms`).
-  - Supports request cancellation via `AbortController`: In-flight completions are automatically aborted whenever the user types additional keystrokes, avoiding stale predictions and saving network bandwidth.
+    - Debounced keystroke events (`DEBOUNCE_MS = 400ms`).
+    - Supports request cancellation via `AbortController`: In-flight completions are automatically aborted whenever the user types additional keystrokes, avoiding stale predictions and saving network bandwidth.
 
 ---
 
@@ -265,10 +265,10 @@ FastAPI microservice acting as an intelligent Copilot for the Monaco code editor
 
 - **Stack**: React 18, Vite, TypeScript, Chakra UI v3, Monaco Editor (`@monaco-editor/react`).
 - **Layout Architecture**:
-  - Modular resizable split-pane layout (`Resizable.tsx`):
-    - Left Pane: Problem description, requirements, sample cases (`DescriptionBox.tsx`).
-    - Right Top Pane: Monaco Editor with multi-language selector (`CodeEditor.tsx`, `LanguageSelector.tsx`).
-    - Right Bottom Pane: Test case inputs, outputs, console results (`TestCases.tsx`).
+    - Modular resizable split-pane layout (`Resizable.tsx`):
+        - Left Pane: Problem description, requirements, sample cases (`DescriptionBox.tsx`).
+        - Right Top Pane: Monaco Editor with multi-language selector (`CodeEditor.tsx`, `LanguageSelector.tsx`).
+        - Right Bottom Pane: Test case inputs, outputs, console results (`TestCases.tsx`).
 
 ---
 
@@ -372,13 +372,13 @@ Output comparison normalizes line breaks and whitespace while strictly verifying
 ### 5.5 RabbitMQ Queues & Payloads
 
 - **`submission.created`**:
-  - Published by: `Submission Service`
-  - Consumed by: `Evaluation Worker`
-  - Payload: `{ submissionId, userId, problemId, code, language, status }`
+    - Published by: `Submission Service`
+    - Consumed by: `Evaluation Worker`
+    - Payload: `{ submissionId, userId, problemId, code, language, status }`
 - **`submission.completed`**:
-  - Published by: `Evaluation Worker`
-  - Consumed by: `Sockets Service`
-  - Payload: `{ submissionId, userId, problemId, status, results, failedTestCase }`
+    - Published by: `Evaluation Worker`
+    - Consumed by: `Sockets Service`
+    - Payload: `{ submissionId, userId, problemId, status, results, failedTestCase }`
 
 ---
 
@@ -408,21 +408,21 @@ Output comparison normalizes line breaks and whitespace while strictly verifying
 When authoring or modifying code in LCArena, AI agents **MUST** enforce the following security invariants:
 
 1. **Perimeter Identity Boundary**:
-   - Downstream services (Problem, Submission) **MUST NEVER** trust client-supplied headers like `x-user-id` or `authorization`.
-   - The Gateway **MUST ALWAYS** strip any incoming client `x-user-id` and `authorization` headers prior to proxying.
-   - Verified identities must be minted exclusively by the Gateway's `authenticate` middleware after checking JWT signatures and verifying the JTI blacklist in Redis.
+    - Downstream services (Problem, Submission) **MUST NEVER** trust client-supplied headers like `x-user-id` or `authorization`.
+    - The Gateway **MUST ALWAYS** strip any incoming client `x-user-id` and `authorization` headers prior to proxying.
+    - Verified identities must be minted exclusively by the Gateway's `authenticate` middleware after checking JWT signatures and verifying the JTI blacklist in Redis.
 2. **Fail-Closed Gateways**:
-   - The Gateway **MUST NEVER** proxy unmatched endpoints. Unregistered routes and unallowed HTTP methods must be rejected with 404/405 before hitting downstream services.
+    - The Gateway **MUST NEVER** proxy unmatched endpoints. Unregistered routes and unallowed HTTP methods must be rejected with 404/405 before hitting downstream services.
 3. **Information Disclosure Prevention**:
-   - The User document's `password` (bcrypt hash) **MUST NEVER** be returned in any HTTP response. Always use `toPublicUser()`.
-   - Login error messages for wrong passwords and non-existent emails **MUST BE IDENTICAL** (`"Invalid email or password"`) to prevent account enumeration.
+    - The User document's `password` (bcrypt hash) **MUST NEVER** be returned in any HTTP response. Always use `toPublicUser()`.
+    - Login error messages for wrong passwords and non-existent emails **MUST BE IDENTICAL** (`"Invalid email or password"`) to prevent account enumeration.
 4. **Session Invalidation**:
-   - Passwords changes, account deletions, and logouts **MUST** revoke both the Redis session key (`session:<userId>`) and blacklist the active access token's `jti` in Redis.
+    - Passwords changes, account deletions, and logouts **MUST** revoke both the Redis session key (`session:<userId>`) and blacklist the active access token's `jti` in Redis.
 5. **Execution Sandboxing**:
-   - Untrusted code **MUST NEVER** be run directly on the host machine.
-   - All executions must run inside ephemeral Docker containers without host filesystem mounts and under strict command timeouts (`timeout "$TIME_LIMIT"`).
+    - Untrusted code **MUST NEVER** be run directly on the host machine.
+    - All executions must run inside ephemeral Docker containers without host filesystem mounts and under strict command timeouts (`timeout "$TIME_LIMIT"`).
 6. **Error Format Consistency**:
-   - Errors must route through `appErrorHandler` to preserve standard `{ success: false, message, errors? }` shapes.
+    - Errors must route through `appErrorHandler` to preserve standard `{ success: false, message, errors? }` shapes.
 
 ---
 
@@ -474,9 +474,9 @@ To add language support (e.g., Rust):
 
 1. Add language enum entry to `ELanguage` in `packages/backend/models/src/submission.model.ts` (e.g., `rust = "rust"`).
 2. Create `RustExecutor` subclassing `Executor` in `packages/backend/execution/src/executors/RustExecutor.ts`:
-   - Set `IMAGE_NAME = "rust:latest"`.
-   - Provide wrapper boilerplate reading input and calling `Solution::solve`.
-   - Provide `compileCmd` (e.g., `rustc main.rs -O -o solution`) and `runCmd` (e.g., `./solution`).
+    - Set `IMAGE_NAME = "rust:latest"`.
+    - Provide wrapper boilerplate reading input and calling `Solution::solve`.
+    - Provide `compileCmd` (e.g., `rustc main.rs -O -o solution`) and `runCmd` (e.g., `./solution`).
 3. Export from `packages/backend/execution/src/index.ts`.
 4. Register the new executor in the evaluation worker's language router.
 

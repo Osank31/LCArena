@@ -12,15 +12,14 @@
  * is removed. Safe https:// and relative links are preserved.
  */
 
-import DOMPurify from "dompurify";
-import { JSDOM } from "jsdom";
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
-const window = new JSDOM("").window;
+const window = new JSDOM('').window;
 const purify = DOMPurify(window as unknown as Window & typeof globalThis);
 
 // URI schemes considered safe for href/src attributes.
-const ALLOWED_URI_REGEXP =
-  /^(?:(?:(?:f|ht)tps?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i;
+const ALLOWED_URI_REGEXP = /^(?:(?:(?:f|ht)tps?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i;
 
 /**
  * Sanitize an HTML string, removing XSS vectors while preserving safe
@@ -30,11 +29,11 @@ const ALLOWED_URI_REGEXP =
  * @returns Sanitized HTML string.
  */
 export function sanitizeHtml(html: string): string {
-  return purify.sanitize(html, {
-    ADD_TAGS: ["span"],
-    ADD_ATTR: ["class"],
-    ADD_URI_SAFE_ATTR: ["href", "src"],
-    ALLOWED_URI_REGEXP,
-    FORCE_BODY: false,
-  });
+    return purify.sanitize(html, {
+        ADD_TAGS: ['span'],
+        ADD_ATTR: ['class'],
+        ADD_URI_SAFE_ATTR: ['href', 'src'],
+        ALLOWED_URI_REGEXP,
+        FORCE_BODY: false,
+    });
 }

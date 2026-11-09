@@ -4,8 +4,8 @@
  * failure (the submission must not be reported as `SUCCESS` with zero tests).
  */
 export class TestCasesUnavailableError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "TestCasesUnavailableError";
-  }
+    constructor(message: string) {
+        super(message);
+        this.name = 'TestCasesUnavailableError';
+    }
 }

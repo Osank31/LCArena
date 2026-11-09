@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { ELanguage } from "@LCArena/models";
-import type { ExecutionResult } from "@LCArena/execution";
+import { z } from 'zod';
+import { ELanguage } from '@LCArena/models';
+import type { ExecutionResult } from '@LCArena/execution';
 
 // --- Canonical execution-verdict schema -------------------------------------
 // This mirrors the `ExecutionResult` union exported by @LCArena/execution
@@ -8,39 +8,39 @@ import type { ExecutionResult } from "@LCArena/execution";
 // database model and the evaluation worker all agree on one shape.
 
 const failedCasesSchema = z.object({
-  tle: z.array(z.string()),
-  re: z.array(z.string()),
-  wa: z.array(z.string()),
+    tle: z.array(z.string()),
+    re: z.array(z.string()),
+    wa: z.array(z.string()),
 });
 
 const pendingResultSchema = z.object({
-  status: z.literal("PENDING"),
+    status: z.literal('PENDING'),
 });
 
 const compileErrorResultSchema = z.object({
-  status: z.literal("COMPILE_ERROR"),
-  compileError: z.string(),
+    status: z.literal('COMPILE_ERROR'),
+    compileError: z.string(),
 });
 
 const executionSuccessResultSchema = z.object({
-  status: z.literal("SUCCESS"),
-  passed: z.number().int().nonnegative(),
-  total: z.number().int().nonnegative(),
-  failedCases: failedCasesSchema,
-  // Maps a test-case folder name to its wall-clock execution time in ms.
-  executionTimeMs: z.record(z.string(), z.number()),
+    status: z.literal('SUCCESS'),
+    passed: z.number().int().nonnegative(),
+    total: z.number().int().nonnegative(),
+    failedCases: failedCasesSchema,
+    // Maps a test-case folder name to its wall-clock execution time in ms.
+    executionTimeMs: z.record(z.string(), z.number()),
 });
 
 const internalErrorResultSchema = z.object({
-  status: z.literal("INTERNAL_ERROR"),
-  message: z.string(),
+    status: z.literal('INTERNAL_ERROR'),
+    message: z.string(),
 });
 
-export const submissionStatusSchema = z.discriminatedUnion("status", [
-  pendingResultSchema,
-  compileErrorResultSchema,
-  executionSuccessResultSchema,
-  internalErrorResultSchema,
+export const submissionStatusSchema = z.discriminatedUnion('status', [
+    pendingResultSchema,
+    compileErrorResultSchema,
+    executionSuccessResultSchema,
+    internalErrorResultSchema,
 ]);
 
 /**
@@ -49,7 +49,7 @@ export const submissionStatusSchema = z.discriminatedUnion("status", [
  * compiling, which is exactly what we want instead of a silent mismatch.
  */
 const _assertCanonicalStatusCompatibility: ExecutionResult = {} as z.infer<
-  typeof submissionStatusSchema
+    typeof submissionStatusSchema
 >;
 void _assertCanonicalStatusCompatibility;
 
@@ -58,24 +58,24 @@ void _assertCanonicalStatusCompatibility;
 // verdict of a submission. Zod strips unknown keys, so a client-supplied
 // `status` is ignored and the service always initialises `{ status: "PENDING" }`.
 export const createSubmissionSchema = z.object({
-  problemId: z.string().min(1, "Problem Id is required"),
+    problemId: z.string().min(1, 'Problem Id is required'),
 
-  code: z.string().min(1, "Code is required"),
+    code: z.string().min(1, 'Code is required'),
 
-  language: z.nativeEnum(ELanguage).default(ELanguage.cpp),
+    language: z.nativeEnum(ELanguage).default(ELanguage.cpp),
 });
 
 // --- Update -----------------------------------------------------------------
 // Legitimate execution-status updates (and manual admin edits) are supported;
 // every verdict must remain one of the canonical outcomes.
 export const updateSubmissionSchema = z.object({
-  problemId: z.string().min(1, "Problem Id is required").optional(),
+    problemId: z.string().min(1, 'Problem Id is required').optional(),
 
-  code: z.string().min(1, "Code is required").optional(),
+    code: z.string().min(1, 'Code is required').optional(),
 
-  language: z.nativeEnum(ELanguage).optional(),
+    language: z.nativeEnum(ELanguage).optional(),
 
-  status: submissionStatusSchema.optional(),
+    status: submissionStatusSchema.optional(),
 });
 
 // Types

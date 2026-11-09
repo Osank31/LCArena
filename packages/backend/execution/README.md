@@ -77,25 +77,25 @@ workspace instead.
 ## The `ExecutionResult` contract
 
 ```ts
-type ExecutionStatus = "SUCCESS" | "COMPILE_ERROR" | "INTERNAL_ERROR";
+type ExecutionStatus = 'SUCCESS' | 'COMPILE_ERROR' | 'INTERNAL_ERROR';
 
 interface FailedCases {
-  tle: string[];
-  re: string[];
-  wa: string[];
+    tle: string[];
+    re: string[];
+    wa: string[];
 }
 
 type ExecutionResult =
-  | { status: "PENDING" }
-  | { status: "COMPILE_ERROR"; compileError: string }
-  | {
-      status: "SUCCESS";
-      passed: number;
-      total: number;
-      failedCases: FailedCases;
-      executionTimeMs: any;
-    }
-  | { status: "INTERNAL_ERROR"; message: string };
+    | { status: 'PENDING' }
+    | { status: 'COMPILE_ERROR'; compileError: string }
+    | {
+          status: 'SUCCESS';
+          passed: number;
+          total: number;
+          failedCases: FailedCases;
+          executionTimeMs: any;
+      }
+    | { status: 'INTERNAL_ERROR'; message: string };
 ```
 
 Two subtleties that matter everywhere downstream:
@@ -275,23 +275,19 @@ There is no HTTP API. The programmatic surface is:
 
 ```ts
 import {
-  Executor,
-  CPPExecutor,
-  JavaExecutor,
-  PythonExecutor,
-  JSExecutor,
-  TestCasesUnavailableError,
-  compareOutputs,
-  normalizeOutput,
-  type ExecutionResult,
-} from "@LCArena/execution";
+    Executor,
+    CPPExecutor,
+    JavaExecutor,
+    PythonExecutor,
+    JSExecutor,
+    TestCasesUnavailableError,
+    compareOutputs,
+    normalizeOutput,
+    type ExecutionResult,
+} from '@LCArena/execution';
 
-const executor: Executor = new JSExecutor("/tmp/isolated-testcases");
-const result: ExecutionResult = await executor.execute(
-  userCode,
-  5 /* seconds */,
-  "testcases",
-);
+const executor: Executor = new JSExecutor('/tmp/isolated-testcases');
+const result: ExecutionResult = await executor.execute(userCode, 5 /* seconds */, 'testcases');
 ```
 
 - `execute(clientCode, time_limit, testcases_dir)` — `time_limit` is in **seconds**

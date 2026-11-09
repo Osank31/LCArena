@@ -1,7 +1,7 @@
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import { REDUCED_MOTION_QUERY } from "./motion";
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+import { REDUCED_MOTION_QUERY } from './motion';
 
 /**
  * Register the plugins the app relies on. `registerPlugin` is idempotent, and
@@ -22,18 +22,15 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
  *
  * @returns a cleanup function that cancels the pending fallback.
  */
-export function scheduleVisibilityFallback(
-  targets: gsap.DOMTarget,
-  totalMs: number,
-): () => void {
-  if (typeof window === "undefined") return () => {};
-  const id = window.setTimeout(
-    () => {
-      gsap.set(targets, { clearProps: "opacity,transform,visibility" });
-    },
-    Math.max(300, totalMs + 400),
-  );
-  return () => window.clearTimeout(id);
+export function scheduleVisibilityFallback(targets: gsap.DOMTarget, totalMs: number): () => void {
+    if (typeof window === 'undefined') return () => {};
+    const id = window.setTimeout(
+        () => {
+            gsap.set(targets, { clearProps: 'opacity,transform,visibility' });
+        },
+        Math.max(300, totalMs + 400),
+    );
+    return () => window.clearTimeout(id);
 }
 
 /**
@@ -45,13 +42,10 @@ export function scheduleVisibilityFallback(
  * do nothing, leaving elements in their natural (visible) state.
  */
 export function prefersReducedMotion(): boolean {
-  if (
-    typeof window === "undefined" ||
-    typeof window.matchMedia !== "function"
-  ) {
-    return false;
-  }
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+        return false;
+    }
+    return window.matchMedia(REDUCED_MOTION_QUERY).matches;
 }
 
 export { gsap, ScrollTrigger, useGSAP };

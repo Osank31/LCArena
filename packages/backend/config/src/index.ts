@@ -1,19 +1,6 @@
-import { dbConnect } from "./db.config.js";
-import {
-  channel,
-  closeQueue,
-  connectToQueue,
-  queue,
-} from "./rabbitMQ.config.js";
-import { getRedisClient, redisConnect } from "./redis.config.js";
-export * from "./storage.config.js";
+import { dbConnect } from './db.config.js';
+import { channel, closeQueue, connectToQueue, queue } from './rabbitMQ.config.js';
+import { getRedisClient, redisConnect } from './redis.config.js';
+export * from './storage.config.js';
 
-export {
-  getRedisClient,
-  redisConnect,
-  dbConnect,
-  channel,
-  queue,
-  connectToQueue,
-  closeQueue,
-};
+export { getRedisClient, redisConnect, dbConnect, channel, queue, connectToQueue, closeQueue };

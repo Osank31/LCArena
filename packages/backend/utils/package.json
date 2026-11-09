@@ -1,23 +1,23 @@
 {
-  "name": "@LCArena/utils",
-  "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "check-types": "tsc --noEmit",
-    "test": "npm run test:unit",
-    "test:unit": "node --import tsx --test \"test/unit/*.test.ts\""
-  },
-  "dependencies": {
-    "express": "^5.2.1",
-    "winston": "^3.19.0"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.6"
-  }
+    "name": "@LCArena/utils",
+    "version": "1.0.0",
+    "description": "",
+    "license": "ISC",
+    "author": "",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "check-types": "tsc --noEmit",
+        "test": "npm run test:unit",
+        "test:unit": "node --import tsx --test \"test/unit/*.test.ts\""
+    },
+    "dependencies": {
+        "express": "^5.2.1",
+        "winston": "^3.19.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.6"
+    }
 }

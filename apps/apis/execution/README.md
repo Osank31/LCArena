@@ -159,27 +159,24 @@ Production `EvaluationDeps` (`evaluation.ts`):
 loadSubmission: (id) => Submission.findById(id);
 loadProblem: (id) => Problem.findById(id);
 acquireTestCases: (problem) =>
-  acquireTestCases({
-    testCasesUrl,
-    testCaseStoragePrefix,
-    problemId,
-    maxBytes,
-    maxEntries,
-  });
-runExecutor: (lang, code, secs, dir) =>
-  createExecutor(lang, dir).execute(code, secs, "testcases");
+    acquireTestCases({
+        testCasesUrl,
+        testCaseStoragePrefix,
+        problemId,
+        maxBytes,
+        maxEntries,
+    });
+runExecutor: (lang, code, secs, dir) => createExecutor(lang, dir).execute(code, secs, 'testcases');
 persistVerdict: (id, status) =>
-  Submission.findOneAndUpdate(
-    { _id: id, "status.status": "PENDING" },
-    { $set: { status } },
-    { returnDocument: "after" },
-  );
+    Submission.findOneAndUpdate(
+        { _id: id, 'status.status': 'PENDING' },
+        { $set: { status } },
+        { returnDocument: 'after' },
+    );
 publishCompletion: (payload) =>
-  channel.sendToQueue(
-    "submission.completed",
-    Buffer.from(JSON.stringify(payload)),
-    { persistent: true },
-  );
+    channel.sendToQueue('submission.completed', Buffer.from(JSON.stringify(payload)), {
+        persistent: true,
+    });
 ```
 
 ### Test-case acquisition (`testCases.ts`)
@@ -265,11 +262,11 @@ Runner output shape:
 
 ```json
 {
-  "status": "SUCCESS",
-  "passed": 40,
-  "total": 40,
-  "executionTimeMs": { "test_case_001": 12, "test_case_002": 15 },
-  "failedCases": { "tle": [], "re": [], "wa": [] }
+    "status": "SUCCESS",
+    "passed": 40,
+    "total": 40,
+    "executionTimeMs": { "test_case_001": 12, "test_case_002": 15 },
+    "failedCases": { "tle": [], "re": [], "wa": [] }
 }
 ```
 

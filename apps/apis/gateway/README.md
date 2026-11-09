@@ -202,11 +202,11 @@ Admin.
   10s; failures are logged and swallowed.
 - **HTTP in (proxied):** `PROBLEM_SERVICE_URL`, `SUBMISSION_SERVICE_URL`. On each
   proxied request the factory:
-  - removes client-supplied `x-user-id` and `authorization`
-    (spoofing defence),
-  - sets `x-user-id` to `req.user.userId` when authenticated,
-  - sets `x-forwarded-for` (from `req.ip`), `x-forwarded-proto`, `x-forwarded-host`,
-  - calls `fixRequestBody(proxyReq, req)` so a parsed JSON body is re-streamed.
+    - removes client-supplied `x-user-id` and `authorization`
+      (spoofing defence),
+    - sets `x-user-id` to `req.user.userId` when authenticated,
+    - sets `x-forwarded-for` (from `req.ip`), `x-forwarded-proto`, `x-forwarded-host`,
+    - calls `fixRequestBody(proxyReq, req)` so a parsed JSON body is re-streamed.
 - **Error translation:** `ECONNRESET`/`ETIMEDOUT`/timeout messages become
   `504 <service> service did not respond in time`; anything else becomes
   `502 <service> service is unreachable` (both `{ success: false, message }`).

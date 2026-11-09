@@ -201,9 +201,9 @@ Invalid access token`, checks `revoked_access:<jti>` in Redis, and **re-reads
 
 ```ts
 createSubmissionSchema = z.object({
-  problemId: z.string().min(1, "Problem Id is required"),
-  code: z.string().min(1, "Code is required"),
-  language: z.nativeEnum(ELanguage).default(ELanguage.cpp),
+    problemId: z.string().min(1, 'Problem Id is required'),
+    code: z.string().min(1, 'Code is required'),
+    language: z.nativeEnum(ELanguage).default(ELanguage.cpp),
 });
 ```
 
@@ -220,28 +220,28 @@ quotes, looks the user up in MongoDB, sets `req.user`. Missing header →
 **Persistence and enqueue** (`evaluationService`):
 
 ```ts
-const status: ExecutionResult = { status: "PENDING" }; // always server-minted
+const status: ExecutionResult = { status: 'PENDING' }; // always server-minted
 
 const submission = await Submission.create({
-  problemId: new mongoose.Types.ObjectId(problemId),
-  code,
-  language,
-  userId: new mongoose.Types.ObjectId(userId),
-  status,
+    problemId: new mongoose.Types.ObjectId(problemId),
+    code,
+    language,
+    userId: new mongoose.Types.ObjectId(userId),
+    status,
 });
 
 channel.sendToQueue(
-  queue.submissionCreated,
-  Buffer.from(
-    JSON.stringify({
-      code,
-      language,
-      status: submission.status,
-      submissionId: submission._id,
-      userId,
-      problemId,
-    }),
-  ),
+    queue.submissionCreated,
+    Buffer.from(
+        JSON.stringify({
+            code,
+            language,
+            status: submission.status,
+            submissionId: submission._id,
+            userId,
+            problemId,
+        }),
+    ),
 );
 ```
 
@@ -277,12 +277,12 @@ Message payload (produced by the submission service, validated by the worker):
 
 ```jsonc
 {
-  "code": "<user source>",
-  "language": "cpp", // ELanguage: py | cpp | java | js
-  "status": { "status": "PENDING" }, // present but NEVER trusted
-  "submissionId": "<ObjectId>",
-  "userId": "<ObjectId string>",
-  "problemId": "<ObjectId string>",
+    "code": "<user source>",
+    "language": "cpp", // ELanguage: py | cpp | java | js
+    "status": { "status": "PENDING" }, // present but NEVER trusted
+    "submissionId": "<ObjectId>",
+    "userId": "<ObjectId string>",
+    "problemId": "<ObjectId string>",
 }
 ```
 
@@ -296,9 +296,9 @@ Retry envelope written on re-publish:
 
 ```ts
 channel.sendToQueue(queues.submissionCreated, message.content, {
-  persistent: true, // note: upgrades persistence on retry only
-  contentType: message.properties.contentType,
-  headers: { ...message.properties.headers, "x-attempts": nextAttempt },
+    persistent: true, // note: upgrades persistence on retry only
+    contentType: message.properties.contentType,
+    headers: { ...message.properties.headers, 'x-attempts': nextAttempt },
 });
 ```
 
@@ -386,11 +386,11 @@ generated `runner.sh`:
 
 ```json
 {
-  "status": "SUCCESS",
-  "passed": 40,
-  "total": 40,
-  "executionTimeMs": { "test_case_001": 12, "test_case_002": 15 },
-  "failedCases": { "tle": [], "re": [], "wa": [] }
+    "status": "SUCCESS",
+    "passed": 40,
+    "total": 40,
+    "executionTimeMs": { "test_case_001": 12, "test_case_002": 15 },
+    "failedCases": { "tle": [], "re": [], "wa": [] }
 }
 ```
 
@@ -453,9 +453,9 @@ derived from `failedCases` with precedence **TLE → RE → WA → Accepted**.
 
 ```ts
 Submission.findOneAndUpdate(
-  { _id: submissionId, "status.status": "PENDING" }, // guard
-  { $set: { status } },
-  { returnDocument: "after" },
+    { _id: submissionId, 'status.status': 'PENDING' }, // guard
+    { $set: { status } },
+    { returnDocument: 'after' },
 );
 ```
 
@@ -464,24 +464,22 @@ Submission.findOneAndUpdate(
 - A submission whose status is already terminal is never re-executed. Instead its
   **stored** verdict is re-published:
 
-  ```ts
-  if (submission.status?.status !== "PENDING") {
-    await deps.publishCompletion(
-      buildCompletionPayload(submission, submission.status),
-    );
-    return {
-      outcome: "skipped",
-      reason: "already-finalized",
-      status: submission.status,
-    };
-  }
-  ```
+    ```ts
+    if (submission.status?.status !== 'PENDING') {
+        await deps.publishCompletion(buildCompletionPayload(submission, submission.status));
+        return {
+            outcome: 'skipped',
+            reason: 'already-finalized',
+            status: submission.status,
+        };
+    }
+    ```
 
-  This is the compensation for "persisted but crashed before publishing", so a
-  completion event is not lost. **[gap]** It re-emits on _every_ duplicate
-  delivery for the same id, so a re-delivered message produces a second
-  `submission.completed` for the same submission (the E2E test asserts
-  `eventCountAfter >= eventCountBefore`, i.e. it accepts duplicates).
+    This is the compensation for "persisted but crashed before publishing", so a
+    completion event is not lost. **[gap]** It re-emits on _every_ duplicate
+    delivery for the same id, so a re-delivered message produces a second
+    `submission.completed` for the same submission (the E2E test asserts
+    `eventCountAfter >= eventCountBefore`, i.e. it accepts duplicates).
 
 **Partial results.** There is no partial-result model: the verdict is written once,
 in full. Per-case timings live only inside `status.executionTimeMs`.
@@ -503,13 +501,9 @@ Built by `buildCompletionPayload(submission, status)` in
 `apps/apis/execution/src/service.ts` and published by `publishCompletion`:
 
 ```ts
-channel.sendToQueue(
-  queue.submissionCompleted,
-  Buffer.from(JSON.stringify(payload)),
-  {
+channel.sendToQueue(queue.submissionCompleted, Buffer.from(JSON.stringify(payload)), {
     persistent: true,
-  },
-);
+});
 ```
 
 ```jsonc

@@ -106,16 +106,16 @@ or queue not found")` if the broker never connected. **Note the ordering:** the
 5. `channel.sendToQueue(queue.submissionCreated, Buffer.from(JSON.stringify({...})))`.
    The published payload is:
 
-   ```json
-   {
-     "code": "<user source>",
-     "language": "cpp",
-     "status": { "status": "PENDING" },
-     "submissionId": "<ObjectId>",
-     "userId": "<string>",
-     "problemId": "<string>"
-   }
-   ```
+    ```json
+    {
+        "code": "<user source>",
+        "language": "cpp",
+        "status": { "status": "PENDING" },
+        "submissionId": "<ObjectId>",
+        "userId": "<string>",
+        "problemId": "<string>"
+    }
+    ```
 
 6. Returns the document; the controller responds `201 Submission created successfully`.
 

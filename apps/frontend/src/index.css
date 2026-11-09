@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ------------------------------------------------------------------
    LCArena "Paper & Ink" design system
@@ -7,53 +7,53 @@
    (bg-paper, text-ink, border-rule, font-serif, font-mono, ...).
    ------------------------------------------------------------------ */
 @theme {
-  /* Paper surfaces */
-  --color-paper: #f4ebdd; /* main page background */
-  --color-paper-2: #e8ddc9; /* secondary paper / subtle fills */
-  --color-paper-3: #efe7d8; /* raised paper (popovers, toolbars) */
+    /* Paper surfaces */
+    --color-paper: #f4ebdd; /* main page background */
+    --color-paper-2: #e8ddc9; /* secondary paper / subtle fills */
+    --color-paper-3: #efe7d8; /* raised paper (popovers, toolbars) */
 
-  /* Ink */
-  --color-ink: #211e19; /* primary text, code, headings */
-  --color-ink-2: #3d382f; /* strong secondary text */
-  --color-ink-3: #6b6151; /* muted brown-grey metadata */
+    /* Ink */
+    --color-ink: #211e19; /* primary text, code, headings */
+    --color-ink-2: #3d382f; /* strong secondary text */
+    --color-ink-3: #6b6151; /* muted brown-grey metadata */
 
-  /* Rules & dividers */
-  --color-rule: #d8cbb5; /* borders, dividers */
-  --color-rule-2: #c6b79c; /* stronger borders */
+    /* Rules & dividers */
+    --color-rule: #d8cbb5; /* borders, dividers */
+    --color-rule-2: #c6b79c; /* stronger borders */
 
-  /* Typography */
-  --font-serif:
-    "Libre Baskerville", "Iowan Old Style", "Palatino Linotype", Palatino,
-    Georgia, "Times New Roman", serif;
-  --font-mono:
-    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+    /* Typography */
+    --font-serif:
+        'Libre Baskerville', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia,
+        'Times New Roman', serif;
+    --font-mono:
+        'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+        'Courier New', monospace;
 }
 
 :root {
-  color-scheme: light;
+    color-scheme: light;
 }
 
 html {
-  background-color: var(--color-paper);
+    background-color: var(--color-paper);
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  background-color: var(--color-paper);
-  color: var(--color-ink);
-  font-family: var(--font-serif);
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 /* Selection reads as a highlighter on paper */
 ::selection {
-  background-color: var(--color-rule);
-  color: var(--color-ink);
+    background-color: var(--color-rule);
+    color: var(--color-ink);
 }
 
 /* Code & technical values always render in the monospace face */
@@ -62,72 +62,72 @@ pre,
 kbd,
 samp,
 .monaco-editor {
-  font-family: var(--font-mono);
+    font-family: var(--font-mono);
 }
 
 /* Monospace numerals for technical readouts */
 .font-mono,
 code,
 pre {
-  font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Paper-toned scrollbars */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+    width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-paper);
+    background: var(--color-paper);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-rule);
-  border: 2px solid var(--color-paper);
-  border-radius: 6px;
+    background: var(--color-rule);
+    border: 2px solid var(--color-paper);
+    border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-rule-2);
+    background: var(--color-rule-2);
 }
 
 * {
-  scrollbar-color: var(--color-rule) var(--color-paper);
+    scrollbar-color: var(--color-rule) var(--color-paper);
 }
 
 /* Subtle confirmation pop for copy-to-clipboard feedback (CSS, not GSAP,
    so it can restart cleanly when the label is toggled). */
 @keyframes lcarena-pop-in {
-  from {
-    opacity: 0;
-    transform: translateY(-2px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-2px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .confirmation-pop {
-  animation: lcarena-pop-in 0.18s ease-out;
+    animation: lcarena-pop-in 0.18s ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .confirmation-pop {
-    animation: none;
-  }
+    .confirmation-pop {
+        animation: none;
+    }
 }
 
 /* Accessibility helper used by the editor's hidden test textarea */
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }

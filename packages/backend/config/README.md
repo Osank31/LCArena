@@ -101,9 +101,9 @@ Only the gateway uses Redis today.
 
 ```ts
 export const queue = {
-  submissionCreated: "submission.created",
-  submissionCompleted: "submission.completed",
-  submissionCreatedDeadLetter: "submission.created.dead",
+    submissionCreated: 'submission.created',
+    submissionCompleted: 'submission.completed',
+    submissionCreatedDeadLetter: 'submission.created.dead',
 };
 ```
 
@@ -180,33 +180,33 @@ Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_002/input.in
 
 ```ts
 import {
-  // connections
-  dbConnect,
-  redisConnect,
-  getRedisClient,
-  connectToQueue,
-  closeQueue,
-  channel,
-  queue,
-  // storage
-  getStorageConfig,
-  getS3Client,
-  resetS3Client,
-  getBucketName,
-  ensureBucketExists,
-  putObject,
-  getObject,
-  listObjects,
-  deleteObject,
-  deleteObjectsWithPrefix,
-  getPresignedDownloadUrl,
-  // key layout
-  formatTestCaseFolderName,
-  getProblemTestCasePrefix,
-  getTestCaseInputKey,
-  getTestCaseOutputKey,
-  type StorageConfig,
-} from "@LCArena/config";
+    // connections
+    dbConnect,
+    redisConnect,
+    getRedisClient,
+    connectToQueue,
+    closeQueue,
+    channel,
+    queue,
+    // storage
+    getStorageConfig,
+    getS3Client,
+    resetS3Client,
+    getBucketName,
+    ensureBucketExists,
+    putObject,
+    getObject,
+    listObjects,
+    deleteObject,
+    deleteObjectsWithPrefix,
+    getPresignedDownloadUrl,
+    // key layout
+    formatTestCaseFolderName,
+    getProblemTestCasePrefix,
+    getTestCaseInputKey,
+    getTestCaseOutputKey,
+    type StorageConfig,
+} from '@LCArena/config';
 ```
 
 | Signature                                                  | Returns                                                                   | Notes                                              |
@@ -236,11 +236,11 @@ import {
 
 ```ts
 interface StorageConfig {
-  endpoint?: string;
-  region: string;
-  credentials: { accessKeyId: string; secretAccessKey: string };
-  forcePathStyle: boolean;
-  bucketName: string;
+    endpoint?: string;
+    region: string;
+    credentials: { accessKeyId: string; secretAccessKey: string };
+    forcePathStyle: boolean;
+    bucketName: string;
 }
 ```
 

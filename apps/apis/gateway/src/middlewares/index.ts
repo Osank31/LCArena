@@ -1,3 +1,3 @@
-export * from "./authenticate.middleware";
-export * from "./submissionOwner.middleware";
-export * from "./notFound.middleware";
+export * from './authenticate.middleware';
+export * from './submissionOwner.middleware';
+export * from './notFound.middleware';

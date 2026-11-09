@@ -95,13 +95,13 @@ That is why `roleValidation.ts` and `express-request.ts` both end with `export {
 ### `userValidation`
 
 ```ts
-const rawUserId = req.headers["x-user-id"];
-if (!rawUserId || typeof rawUserId !== "string")
-  return res.status(401).json({ message: "Missing user header" });
+const rawUserId = req.headers['x-user-id'];
+if (!rawUserId || typeof rawUserId !== 'string')
+    return res.status(401).json({ message: 'Missing user header' });
 
-const userId = rawUserId.replace(/"/g, ""); // tolerates a quoted header value
+const userId = rawUserId.replace(/"/g, ''); // tolerates a quoted header value
 const user = await User.findById(userId);
-if (!user) throw new NotFoundError("User not found");
+if (!user) throw new NotFoundError('User not found');
 
 req.user = { userId, userRole: user.userType };
 next();
@@ -122,7 +122,7 @@ when the role is not in the allowlist. Denials go through `next(error)` so
 Usage (gateway):
 
 ```ts
-router.post("/", authenticate, roleValidation(UserType.Admin), problemProxy);
+router.post('/', authenticate, roleValidation(UserType.Admin), problemProxy);
 ```
 
 ### `appErrorHandler`

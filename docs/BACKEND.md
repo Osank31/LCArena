@@ -247,14 +247,14 @@ Cloudflare R2 provides a free tier of 10 GB storage and 10 million Class B read 
 3. Under **Manage R2 API Tokens**, create an API token with **Object Read & Write** permissions for the `lcarena-testcases` bucket.
 4. Copy the generated Access Key ID and Secret Access Key.
 5. In your production `.env`, set:
-   ```env
-   S3_ENDPOINT=https://<YOUR_CLOUDFLARE_ACCOUNT_ID>.r2.cloudflarestorage.com
-   S3_REGION=auto
-   S3_ACCESS_KEY_ID=<YOUR_R2_ACCESS_KEY_ID>
-   S3_SECRET_ACCESS_KEY=<YOUR_R2_SECRET_ACCESS_KEY>
-   S3_BUCKET_NAME=lcarena-testcases
-   S3_FORCE_PATH_STYLE=false
-   ```
+    ```env
+    S3_ENDPOINT=https://<YOUR_CLOUDFLARE_ACCOUNT_ID>.r2.cloudflarestorage.com
+    S3_REGION=auto
+    S3_ACCESS_KEY_ID=<YOUR_R2_ACCESS_KEY_ID>
+    S3_SECRET_ACCESS_KEY=<YOUR_R2_SECRET_ACCESS_KEY>
+    S3_BUCKET_NAME=lcarena-testcases
+    S3_FORCE_PATH_STYLE=false
+    ```
 
 #### Problem Creation Flow & Failure Compensation
 
@@ -272,9 +272,9 @@ Cloudflare R2 provides a free tier of 10 GB storage and 10 million Class B read 
 4. **Download & Validation**: Downloads all objects under the problem prefix from S3 into `./testcases/` and enforces folder completeness (`input.in` and `output.ans` must both exist for every `test_case_XXX`).
 5. **Sandboxed Execution**: Executes untrusted code inside an ephemeral Docker container (`gcc:latest`, `eclipse-temurin`, `python:3.11-slim`, `node:20-slim`) under strict time limits (`timeout "$TIME_LIMIT"`). Untrusted host filesystem mounts and credentials are forbidden.
 6. **Judging Policy (`compareOutputs`)**:
-   - Normalizes CRLF and CR to LF.
-   - Trims trailing whitespace on each line.
-   - Ignores trailing blank lines at EOF while preserving token-level differences.
+    - Normalizes CRLF and CR to LF.
+    - Trims trailing whitespace on each line.
+    - Ignores trailing blank lines at EOF while preserving token-level differences.
 7. **Verdicts**: Categorizes results into Accepted (`SUCCESS`), Wrong Answer (`WA`), Compilation Error (`COMPILE_ERROR`), Runtime Error (`RE`), Time Limit Exceeded (`TLE`), or Internal Evaluation Error (`INTERNAL_ERROR`).
 8. **Persistence & Notification**: Atomically updates MongoDB with passed/total counts, runtime stats, and sanitized errors, then publishes `submission.completed`.
 9. **Cleanup**: Temporary workspace folders and Docker containers are unconditionally destroyed in `finally` blocks on both success and error paths.

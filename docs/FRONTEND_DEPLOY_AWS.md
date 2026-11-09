@@ -327,22 +327,22 @@ Two ways out:
 1. **Tunnel the gateway and point the bundle at it (cross-origin).** Expose the
    gateway over public HTTPS, e.g. with a [cloudflared quick
    tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/use-cases/tunnel-for-examples/):
-   ```bash
-   cloudflared tunnel --url http://127.0.0.1:3000   # prints an https:// trycloudflare.com URL
-   ```
-   Then bake that URL into the build — `VITE_*` variables are inlined at build
-   time, not runtime:
-   ```bash
-   cd apps/frontend
-   VITE_API_URL=https://<tunnel-host> npm run build
-   ```
-   The gateway's CORS already reflects any origin with credentials
-   (`CORS_ORIGIN=*` → `origin: true`), so credentialed requests are accepted.
-   The `sameSite: lax` refresh cookie is **not** sent cross-site, but the
-   frontend's refresh interceptor already falls back to the refresh token in
-   the request body, so session renewal still works. The AI suggestion service
-   (`:8000`, also loopback-bound) needs its own tunnel and `VITE_AI_URL`; if
-   unset, `/suggestions` follows `VITE_API_URL`.
+    ```bash
+    cloudflared tunnel --url http://127.0.0.1:3000   # prints an https:// trycloudflare.com URL
+    ```
+    Then bake that URL into the build — `VITE_*` variables are inlined at build
+    time, not runtime:
+    ```bash
+    cd apps/frontend
+    VITE_API_URL=https://<tunnel-host> npm run build
+    ```
+    The gateway's CORS already reflects any origin with credentials
+    (`CORS_ORIGIN=*` → `origin: true`), so credentialed requests are accepted.
+    The `sameSite: lax` refresh cookie is **not** sent cross-site, but the
+    frontend's refresh interceptor already falls back to the refresh token in
+    the request body, so session renewal still works. The AI suggestion service
+    (`:8000`, also loopback-bound) needs its own tunnel and `VITE_AI_URL`; if
+    unset, `/suggestions` follows `VITE_API_URL`.
 2. **Tunnel the gateway and proxy through CloudFront (same-origin, cleanest).**
    Use the tunnel's HTTPS URL as the second origin from section 9 and add the
    `/auth/*`, `/api/*`, `/health`, `/suggestions*` behaviors. No build-time env
@@ -389,18 +389,18 @@ paths and leaves real files alone:
 
 ```js
 function handler(event) {
-  var request = event.request;
-  var uri = request.uri;
-  if (
-    uri.startsWith("/assets/") ||
-    uri.startsWith("/api/") ||
-    uri.startsWith("/auth/") ||
-    uri.includes(".")
-  ) {
+    var request = event.request;
+    var uri = request.uri;
+    if (
+        uri.startsWith('/assets/') ||
+        uri.startsWith('/api/') ||
+        uri.startsWith('/auth/') ||
+        uri.includes('.')
+    ) {
+        return request;
+    }
+    request.uri = '/index.html';
     return request;
-  }
-  request.uri = "/index.html";
-  return request;
 }
 ```
 

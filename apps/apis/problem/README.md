@@ -76,11 +76,11 @@ apps/apis/problem/
    supplied, so the schema's "URL or cases" rule is satisfied.
 2. `createProblemService` mints the `_id` **first** (so storage keys are known
    before the document exists) and calls `uploadProblemTestCases`:
-   - `ensureBucketExists()` (idempotent; tolerates a concurrent creator),
-   - `putObject(<prefix>test_case_NNN/input.in, input)`,
-   - `putObject(<prefix>test_case_NNN/output.ans, output)`,
-   - on any failure: `deleteObjectsWithPrefix(prefix)` then a
-     `500 InternalServerError`.
+    - `ensureBucketExists()` (idempotent; tolerates a concurrent creator),
+    - `putObject(<prefix>test_case_NNN/input.in, input)`,
+    - `putObject(<prefix>test_case_NNN/output.ans, output)`,
+    - on any failure: `deleteObjectsWithPrefix(prefix)` then a
+      `500 InternalServerError`.
 3. `Problem.create({ _id, ..., testCaseStoragePrefix, testCasesCount })`.
    If this throws, the uploaded objects are deleted again before the DB error is
    re-thrown.

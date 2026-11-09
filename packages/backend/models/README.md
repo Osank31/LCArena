@@ -169,17 +169,17 @@ from those arrays (see `apps/frontend/src/utils/verdictHelper.ts`).
 
 ```ts
 import {
-  User,
-  type IUser,
-  type IUserMethods,
-  type UserModel,
-  UserType,
-  Problem,
-  type IProblem,
-  Submission,
-  type ISubmission,
-  ELanguage,
-} from "@LCArena/models";
+    User,
+    type IUser,
+    type IUserMethods,
+    type UserModel,
+    UserType,
+    Problem,
+    type IProblem,
+    Submission,
+    type ISubmission,
+    ELanguage,
+} from '@LCArena/models';
 ```
 
 | Export                               | Kind         | Notes                                                  |
@@ -202,11 +202,11 @@ Typical usage:
 
 ```ts
 const submission = await Submission.create({
-  problemId: new mongoose.Types.ObjectId(problemId),
-  userId: new mongoose.Types.ObjectId(userId),
-  code,
-  language,
-  status: { status: "PENDING" },
+    problemId: new mongoose.Types.ObjectId(problemId),
+    userId: new mongoose.Types.ObjectId(userId),
+    code,
+    language,
+    status: { status: 'PENDING' },
 });
 ```
 

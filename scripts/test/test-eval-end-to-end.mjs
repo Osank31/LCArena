@@ -26,81 +26,73 @@ class Solution:
 `;
 
 async function test() {
-  console.log("Submitting solution to Problem: Max Points on a Line...");
-  const res = await fetch("http://127.0.0.1:3002/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-user-id": "6acb3db878de73ea0b742ffb",
-    },
-    body: JSON.stringify({
-      problemId: "6acbe44e0037ad06dc5f0c20",
-      language: "py",
-      code: pythonCode,
-    }),
-  });
-  const data = await res.json();
-  console.log("Submission response:", data);
-  const subId = data.data?._id;
-  if (!subId) return;
-
-  console.log(`Tracking evaluation for submission ID: ${subId}...`);
-  for (let attempt = 0; attempt < 25; attempt++) {
-    await new Promise((r) => setTimeout(r, 1000));
-    const subRes = await fetch("http://127.0.0.1:3002/" + subId, {
-      headers: { "x-user-id": "6acb3db878de73ea0b742ffb" },
+    console.log('Submitting solution to Problem: Max Points on a Line...');
+    const res = await fetch('http://127.0.0.1:3002/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': '6acb3db878de73ea0b742ffb',
+        },
+        body: JSON.stringify({
+            problemId: '6acbe44e0037ad06dc5f0c20',
+            language: 'py',
+            code: pythonCode,
+        }),
     });
-    const subData = await subRes.json();
-    const status = subData.data?.status;
-    console.log(`[Poll ${attempt + 1}] Current status:`, status?.status);
-    if (status?.status && status.status !== "PENDING") {
-      console.log(
-        "\n================ EVALUATION COMPLETED (ACCEPTED) ================",
-      );
-      console.log("Final Result:", JSON.stringify(status, null, 2));
-      console.log(
-        "==================================================================\n",
-      );
-      break;
+    const data = await res.json();
+    console.log('Submission response:', data);
+    const subId = data.data?._id;
+    if (!subId) return;
+
+    console.log(`Tracking evaluation for submission ID: ${subId}...`);
+    for (let attempt = 0; attempt < 25; attempt++) {
+        await new Promise((r) => setTimeout(r, 1000));
+        const subRes = await fetch('http://127.0.0.1:3002/' + subId, {
+            headers: { 'x-user-id': '6acb3db878de73ea0b742ffb' },
+        });
+        const subData = await subRes.json();
+        const status = subData.data?.status;
+        console.log(`[Poll ${attempt + 1}] Current status:`, status?.status);
+        if (status?.status && status.status !== 'PENDING') {
+            console.log('\n================ EVALUATION COMPLETED (ACCEPTED) ================');
+            console.log('Final Result:', JSON.stringify(status, null, 2));
+            console.log('==================================================================\n');
+            break;
+        }
     }
-  }
 
-  console.log("Submitting intentionally incorrect solution (expecting WA)...");
-  const badCode = `class Solution:\n    def solve(self, points: list[list[int]]) -> int:\n        return -9999\n`;
-  const badRes = await fetch("http://127.0.0.1:3002/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-user-id": "6acb3db878de73ea0b742ffb",
-    },
-    body: JSON.stringify({
-      problemId: "6acbe44e0037ad06dc5f0c20",
-      language: "py",
-      code: badCode,
-    }),
-  });
-  const badData = await badRes.json();
-  const badSubId = badData.data?._id;
-
-  for (let attempt = 0; attempt < 25; attempt++) {
-    await new Promise((r) => setTimeout(r, 1000));
-    const subRes = await fetch("http://127.0.0.1:3002/" + badSubId, {
-      headers: { "x-user-id": "6acb3db878de73ea0b742ffb" },
+    console.log('Submitting intentionally incorrect solution (expecting WA)...');
+    const badCode = `class Solution:\n    def solve(self, points: list[list[int]]) -> int:\n        return -9999\n`;
+    const badRes = await fetch('http://127.0.0.1:3002/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': '6acb3db878de73ea0b742ffb',
+        },
+        body: JSON.stringify({
+            problemId: '6acbe44e0037ad06dc5f0c20',
+            language: 'py',
+            code: badCode,
+        }),
     });
-    const subData = await subRes.json();
-    const status = subData.data?.status;
-    console.log(`[WA Poll ${attempt + 1}] Current status:`, status?.status);
-    if (status?.status && status.status !== "PENDING") {
-      console.log(
-        "\n================ EVALUATION COMPLETED (WRONG ANSWER) ================",
-      );
-      console.log("Final Result:", JSON.stringify(status, null, 2));
-      console.log(
-        "=====================================================================\n",
-      );
-      return;
+    const badData = await badRes.json();
+    const badSubId = badData.data?._id;
+
+    for (let attempt = 0; attempt < 25; attempt++) {
+        await new Promise((r) => setTimeout(r, 1000));
+        const subRes = await fetch('http://127.0.0.1:3002/' + badSubId, {
+            headers: { 'x-user-id': '6acb3db878de73ea0b742ffb' },
+        });
+        const subData = await subRes.json();
+        const status = subData.data?.status;
+        console.log(`[WA Poll ${attempt + 1}] Current status:`, status?.status);
+        if (status?.status && status.status !== 'PENDING') {
+            console.log('\n================ EVALUATION COMPLETED (WRONG ANSWER) ================');
+            console.log('Final Result:', JSON.stringify(status, null, 2));
+            console.log('=====================================================================\n');
+            return;
+        }
     }
-  }
 }
 
 test().catch(console.error);

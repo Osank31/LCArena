@@ -40,29 +40,29 @@
 3. [Overall testing flowchart](#3-overall-testing-flowchart)
 4. [Evidence base and audit method](#4-evidence-base-and-audit-method)
 5. [Testing types in detail](#5-testing-types-in-detail)
-   - [5.1 Static type checking](#51-static-type-checking)
-   - [5.2 Linting (ESLint)](#52-linting-eslint)
-   - [5.3 Backend unit tests](#53-backend-unit-tests)
-   - [5.4 Frontend unit and component tests](#54-frontend-unit-and-component-tests)
-   - [5.5 Backend coverage](#55-backend-coverage)
-   - [5.6 Frontend coverage](#56-frontend-coverage)
-   - [5.7 HTTP API integration tests](#57-http-api-integration-tests)
-   - [5.8 Database persistence tests](#58-database-persistence-tests)
-   - [5.9 Message queue and asynchronous tests](#59-message-queue-and-asynchronous-tests)
-   - [5.10 End-to-end sandboxed evaluation tests](#510-end-to-end-sandboxed-evaluation-tests)
-   - [5.11 Language-matrix E2E tests (not run)](#511-language-matrix-e2e-tests-not-run)
-   - [5.12 Closed-loop load tests](#512-closed-loop-load-tests)
-   - [5.13 k6 endpoint and isolated-service load tests](#513-k6-endpoint-and-isolated-service-load-tests)
-   - [5.14 k6 workflow and lifecycle tests](#514-k6-workflow-and-lifecycle-tests)
-   - [5.15 Stress testing](#515-stress-testing)
-   - [5.16 Spike testing](#516-spike-testing)
-   - [5.17 Soak testing](#517-soak-testing)
-   - [5.18 Recovery testing](#518-recovery-testing)
-   - [5.19 Security-focused tests](#519-security-focused-tests)
-   - [5.20 Validation and error-handling tests](#520-validation-and-error-handling-tests)
-   - [5.21 Build verification](#521-build-verification)
-   - [5.22 CI/CD test pipeline](#522-cicd-test-pipeline)
-   - [5.23 Testing categories not implemented](#523-testing-categories-not-implemented)
+    - [5.1 Static type checking](#51-static-type-checking)
+    - [5.2 Linting (ESLint)](#52-linting-eslint)
+    - [5.3 Backend unit tests](#53-backend-unit-tests)
+    - [5.4 Frontend unit and component tests](#54-frontend-unit-and-component-tests)
+    - [5.5 Backend coverage](#55-backend-coverage)
+    - [5.6 Frontend coverage](#56-frontend-coverage)
+    - [5.7 HTTP API integration tests](#57-http-api-integration-tests)
+    - [5.8 Database persistence tests](#58-database-persistence-tests)
+    - [5.9 Message queue and asynchronous tests](#59-message-queue-and-asynchronous-tests)
+    - [5.10 End-to-end sandboxed evaluation tests](#510-end-to-end-sandboxed-evaluation-tests)
+    - [5.11 Language-matrix E2E tests (not run)](#511-language-matrix-e2e-tests-not-run)
+    - [5.12 Closed-loop load tests](#512-closed-loop-load-tests)
+    - [5.13 k6 endpoint and isolated-service load tests](#513-k6-endpoint-and-isolated-service-load-tests)
+    - [5.14 k6 workflow and lifecycle tests](#514-k6-workflow-and-lifecycle-tests)
+    - [5.15 Stress testing](#515-stress-testing)
+    - [5.16 Spike testing](#516-spike-testing)
+    - [5.17 Soak testing](#517-soak-testing)
+    - [5.18 Recovery testing](#518-recovery-testing)
+    - [5.19 Security-focused tests](#519-security-focused-tests)
+    - [5.20 Validation and error-handling tests](#520-validation-and-error-handling-tests)
+    - [5.21 Build verification](#521-build-verification)
+    - [5.22 CI/CD test pipeline](#522-cicd-test-pipeline)
+    - [5.23 Testing categories not implemented](#523-testing-categories-not-implemented)
 6. [Test cases and assertions explained](#6-test-cases-and-assertions-explained)
 7. [Test infrastructure and dependencies](#7-test-infrastructure-and-dependencies)
 8. [Testing summary table](#8-testing-summary-table)
@@ -567,10 +567,10 @@ They catch logic and contract regressions immediately, without needing MongoDB, 
 4. `node:test` provides `describe`, `it`, `before`, `after`, `beforeEach`.
 5. `node:assert/strict` provides assertions.
 6. Dependencies are replaced where needed:
-   - `@LCArena/models` is module-mocked in the middleware tests (`--experimental-test-module-mocks`).
-   - Docker is replaced by fake objects in executor tests.
-   - Mongoose schema tests call `doc.validate()` in memory (no MongoDB server).
-   - Mail tests use a real `smtp-server` on a random loopback port, not a mock.
+    - `@LCArena/models` is module-mocked in the middleware tests (`--experimental-test-module-mocks`).
+    - Docker is replaced by fake objects in executor tests.
+    - Mongoose schema tests call `doc.validate()` in memory (no MongoDB server).
+    - Mail tests use a real `smtp-server` on a random loopback port, not a mock.
 7. A failing assertion fails the workspace, which fails Turbo.
 
 ```mermaid
@@ -667,13 +667,13 @@ cd packages/backend/utils && npm run test:unit
 - Historical summary: `test-artifacts/verification/backend-unit-summary.json`
 - Historical log: `test-artifacts/verification/03-unit-backend.log`
 - Representative tests:
-  - [`outputComparison.test.ts`](packages/backend/execution/test/unit/outputComparison.test.ts)
-  - [`userValidation.test.ts`](packages/backend/middlewares/test/unit/userValidation.test.ts)
-  - [`user.model.test.ts`](packages/backend/models/test/unit/user.model.test.ts)
-  - [`mailer.test.ts`](apps/apis/mail/test/unit/mailer.test.ts)
-  - [`dispatcher.test.ts`](apps/apis/mail/test/unit/dispatcher.test.ts)
-  - [`service.test.ts`](apps/apis/problem/test/unit/service.test.ts)
-  - [`validation.test.ts`](apps/apis/submission/test/unit/validation.test.ts)
+    - [`outputComparison.test.ts`](packages/backend/execution/test/unit/outputComparison.test.ts)
+    - [`userValidation.test.ts`](packages/backend/middlewares/test/unit/userValidation.test.ts)
+    - [`user.model.test.ts`](packages/backend/models/test/unit/user.model.test.ts)
+    - [`mailer.test.ts`](apps/apis/mail/test/unit/mailer.test.ts)
+    - [`dispatcher.test.ts`](apps/apis/mail/test/unit/dispatcher.test.ts)
+    - [`service.test.ts`](apps/apis/problem/test/unit/service.test.ts)
+    - [`validation.test.ts`](apps/apis/submission/test/unit/validation.test.ts)
 
 ---
 
@@ -809,11 +809,11 @@ npm --prefix apps/frontend run test:coverage
 - Setup: `apps/frontend/src/test/setup.ts`
 - Test files: `apps/frontend/src/test/components/`, `pages/`, `unit/`, `routing/`
 - Representative tests:
-  - [`Button.test.tsx`](apps/frontend/src/test/components/Button.test.tsx)
-  - [`LoginPage.test.tsx`](apps/frontend/src/test/pages/LoginPage.test.tsx)
-  - [`services.test.ts`](apps/frontend/src/test/unit/services.test.ts)
-  - [`AuthContext.test.tsx`](apps/frontend/src/test/unit/AuthContext.test.tsx)
-  - [`codeRunner.test.ts`](apps/frontend/src/test/unit/codeRunner.test.ts)
+    - [`Button.test.tsx`](apps/frontend/src/test/components/Button.test.tsx)
+    - [`LoginPage.test.tsx`](apps/frontend/src/test/pages/LoginPage.test.tsx)
+    - [`services.test.ts`](apps/frontend/src/test/unit/services.test.ts)
+    - [`AuthContext.test.tsx`](apps/frontend/src/test/unit/AuthContext.test.tsx)
+    - [`codeRunner.test.ts`](apps/frontend/src/test/unit/codeRunner.test.ts)
 - Historical log: `test-artifacts/verification/04-unit-frontend.log`
 
 ---
@@ -838,8 +838,8 @@ The backend coverage runner covers the 10 backend workspaces that have `test/uni
 2. For each workspace, the script runs Node with `--experimental-test-coverage`.
 3. Node writes an `lcov.info` report into `<workspace>/coverage/`.
 4. The script parses each `lcov.info`, normalizes paths, merges them, and writes:
-   - `coverage/lcov.info` (merged)
-   - `coverage/summary.json` (machine-readable)
+    - `coverage/lcov.info` (merged)
+    - `coverage/summary.json` (machine-readable)
 5. It prints a per-workspace table and lists modules below 60% line coverage.
 6. **No backend threshold is enforced.** The command exits non-zero only if a workspace's tests fail.
 
@@ -945,9 +945,9 @@ Coverage is generated from the same 26 Vitest files / 182 tests described in [§
 2. Vitest instruments the source with the V8 provider.
 3. It writes `text`, `json` and `html` reports into `apps/frontend/coverage/`.
 4. It compares the global percentages against the configured thresholds:
-   ```ts
-   thresholds: { statements: 80, branches: 80, functions: 80, lines: 80 }
-   ```
+    ```ts
+    thresholds: { statements: 80, branches: 80, functions: 80, lines: 80 }
+    ```
 5. If any threshold is below 80, Vitest exits non-zero.
 
 ```mermaid
@@ -986,11 +986,11 @@ npm --prefix apps/frontend run test:coverage
 **7. What were the results?**
 
 - **Fresh audit run (2026-10-17):** 26/26 files and 182/182 tests passed, but coverage **failed the gate**:
-  - Statements **86.69%**
-  - Branches **75.44%** ❌ (threshold 80%)
-  - Functions **80.25%**
-  - Lines **88.39%**
-  - Exit **1** with `ERROR: Coverage for branches (75.44%) does not meet global threshold (80%)` **[R]**.
+    - Statements **86.69%**
+    - Branches **75.44%** ❌ (threshold 80%)
+    - Functions **80.25%**
+    - Lines **88.39%**
+    - Exit **1** with `ERROR: Coverage for branches (75.44%) does not meet global threshold (80%)` **[R]**.
 - A second fresh run produced **75.73%** branches; the difference is small but shows that coverage can vary slightly between runs (likely async component paths). Both runs fail.
 - **Historical result (2026-10-14):** statements 86.76%, branches 75.44%, functions 80.58%, lines 88.39%; exit `1` **[H]**.
 - This gate failure is real and intentional: the threshold is in the repository config, not an audit invention.
@@ -1045,15 +1045,15 @@ The 4th suite (`evaluation-flow`) is the sandbox E2E described in [§5.10](#510-
 
 1. `npm run test:integration` → `node scripts/test/run-integration.mjs`.
 2. The runner starts isolated infrastructure with `docker compose -p lcarena-test -f docker-compose.test.yml up -d --wait`:
-   - MongoDB **27018**
-   - Redis **6380**
-   - RabbitMQ **5673**
-   - MinIO **9002 / 9003**
+    - MongoDB **27018**
+    - Redis **6380**
+    - RabbitMQ **5673**
+    - MinIO **9002 / 9003**
 3. It boots the real services on the host with `tsx`:
-   - submission **3102**
-   - problem **3101**
-   - execution **3104**
-   - gateway **3100**
+    - submission **3102**
+    - problem **3101**
+    - execution **3104**
+    - gateway **3100**
 4. It waits for readiness: HTTP `/health` for problem/execution, TCP for submission/gateway.
 5. It runs the selected suites with `node --test`.
 6. Tests seed users/problems directly in MongoDB and sometimes use Redis/AMQP clients.
@@ -1165,9 +1165,9 @@ The integration stage exited `1` only because the **language-matrix** suite coul
 - Runner: [`scripts/test/run-integration.mjs`](scripts/test/run-integration.mjs)
 - Infrastructure: [`docker-compose.test.yml`](docker-compose.test.yml)
 - Suites:
-  - [`problem.api.test.js`](apps/apis/problem/test/integration/problem.api.test.js)
-  - [`submission.api.test.js`](apps/apis/submission/test/integration/submission.api.test.js)
-  - [`gateway.api.test.js`](apps/apis/gateway/test/integration/gateway.api.test.js)
+    - [`problem.api.test.js`](apps/apis/problem/test/integration/problem.api.test.js)
+    - [`submission.api.test.js`](apps/apis/submission/test/integration/submission.api.test.js)
+    - [`gateway.api.test.js`](apps/apis/gateway/test/integration/gateway.api.test.js)
 - Summary: `test-artifacts/verification/integration-summary.json`
 - Full log: `test-artifacts/verification/07-integration.log`
 - Service logs: `test-artifacts/integration/*.log`
@@ -1280,10 +1280,10 @@ Test: “publishes the submission to the submission.created queue”.
 - Input: one valid submission via `POST /`.
 - Action: inspect `submission.created`.
 - Expected: exactly **1** message with:
-  - `code` equal to the submitted code,
-  - `language === "js"`,
-  - `problemId` and `userId` matching,
-  - `status.status === "PENDING"`.
+    - `code` equal to the submitted code,
+    - `language === "js"`,
+    - `problemId` and `userId` matching,
+    - `status.status === "PENDING"`.
 - Observed: passes.
 - What a failure would mean: the worker would never see the submission, or would see a different payload than the API stored.
 
@@ -1416,9 +1416,9 @@ flowchart TD
 
 ```js
 class Solution {
-  solve(points) {
-    return points.length;
-  }
+    solve(points) {
+        return points.length;
+    }
 }
 module.exports = { Solution };
 ```
@@ -1432,9 +1432,9 @@ module.exports = { Solution };
 
 ```js
 class Solution {
-  solve() {
-    return 999;
-  }
+    solve() {
+        return 999;
+    }
 }
 ```
 
@@ -1696,9 +1696,9 @@ The pattern is classic saturation: throughput grows slowly from normal to stress
 - Runner: [`scripts/load/run-load.mjs`](scripts/load/run-load.mjs)
 - Harness: `scripts/lib/harness.mjs`
 - Artifacts:
-  - `test-artifacts/load/smoke-problem+submission-2026-10-14T14-35-55-915Z.json`
-  - `test-artifacts/load/normal-problem+submission-2026-10-14T14-36-35-366Z.json`
-  - `test-artifacts/load/stress-problem+submission-2026-10-14T14-37-33-849Z.json`
+    - `test-artifacts/load/smoke-problem+submission-2026-10-14T14-35-55-915Z.json`
+    - `test-artifacts/load/normal-problem+submission-2026-10-14T14-36-35-366Z.json`
+    - `test-artifacts/load/stress-problem+submission-2026-10-14T14-37-33-849Z.json`
 - Stage logs: `test-artifacts/verification/08-load-smoke.log`, `09-load-normal.log`, `10-load-stress.log`
 - Consolidated report: `test-artifacts/reports/TEST_AND_PERFORMANCE_REPORT.md` §7.1
 
@@ -1728,12 +1728,12 @@ Each script defines `options.thresholds` from `tests/load/config/thresholds.js` 
 
 1. `suite-runner.js` seeds fixtures (users, problem, tokens) via MongoDB + Gateway login.
 2. For each scenario it runs:
-   ```bash
-   docker run --rm --network lcarena_default \
-     -v <repo>:/workspace -w /workspace/tests/load \
-     grafana/k6 run --summary-trend-stats avg,min,med,max,p(50),p(90),p(95),p(99) \
-     --summary-export /workspace/tests/load/results/<name>.json <script>
-   ```
+    ```bash
+    docker run --rm --network lcarena_default \
+      -v <repo>:/workspace -w /workspace/tests/load \
+      grafana/k6 run --summary-trend-stats avg,min,med,max,p(50),p(90),p(95),p(99) \
+      --summary-export /workspace/tests/load/results/<name>.json <script>
+    ```
 3. k6 sends requests as virtual users (VUs).
 4. `check()` records pass/fail; thresholds are evaluated at the end.
 5. k6 exits `0` if thresholds pass, `99` if a threshold is breached.
@@ -2180,11 +2180,11 @@ The gateway integration suite seeds users directly in MongoDB (bcrypt-hashed pas
 **Spoofed admin header:**
 
 ```js
-const res = await api("/api/problems", {
-  method: "POST",
-  token: ownerToken,
-  headers: { "x-user-id": admin.toString() },
-  body: problemPayload(),
+const res = await api('/api/problems', {
+    method: 'POST',
+    token: ownerToken,
+    headers: { 'x-user-id': admin.toString() },
+    body: problemPayload(),
 });
 assert.equal(res.status, 403);
 ```
@@ -2287,10 +2287,10 @@ Without validation, malformed data reaches the database; without consistent erro
 
 ```ts
 createSubmissionSchema.parse({
-  problemId: "p1",
-  code: "print(1)",
-  language: "py",
-  status: SUCCESS_VERDICT,
+    problemId: 'p1',
+    code: 'print(1)',
+    language: 'py',
+    status: SUCCESS_VERDICT,
 });
 ```
 
@@ -2672,9 +2672,9 @@ It does **not** run frontend tests, lint, integration, E2E, or load tests. No ru
 
 - `test-artifacts/verification/run-all-tests.sh` runs 11 stages in order, writes `<stage>.log`, appends `name<TAB>exit<TAB>seconds` to `stage-status.tsv`, and **always exits `0`** so a failing stage does not hide later stages.
 - `scripts/test/render-report.mjs` reads the stage ledger, unit summaries, coverage summary, integration summary, closed-loop artifacts and k6 manifest, and writes:
-  - `test-artifacts/reports/TEST_AND_PERFORMANCE_REPORT.md`
-  - `test-artifacts/reports/test-and-performance-report.json`
-  - “latest” copies with fixed names.
+    - `test-artifacts/reports/TEST_AND_PERFORMANCE_REPORT.md`
+    - `test-artifacts/reports/test-and-performance-report.json`
+    - “latest” copies with fixed names.
 - The renderer’s **hard gates** are: typecheck, backend unit, frontend unit, integration, k6 functional checks. It does **not** hard-gate lint or coverage, even though the report displays them as FAIL.
 - The renderer’s findings text is partly hard-coded (see [§4.3](#43-historical-artifacts-and-their-limits)); one finding is now stale.
 

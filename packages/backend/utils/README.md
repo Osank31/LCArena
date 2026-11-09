@@ -73,8 +73,8 @@ packages/backend/utils/
 
 ```ts
 class AppError extends Error {
-  readonly statusCode: number;
-  constructor(message, statusCode, name); // captures the stack, sets `name`
+    readonly statusCode: number;
+    constructor(message, statusCode, name); // captures the stack, sets `name`
 }
 ```
 
@@ -139,7 +139,7 @@ format `errors({ stack: true })` + `timestamp({ format: "YYYY-MM-DD HH:mm:ss" })
 - `colorize()` + a custom printf that appends `JSON.stringify(meta)`.
 
 ```ts
-logger.info("Email dispatched", { to, subject, messageId });
+logger.info('Email dispatched', { to, subject, messageId });
 // 2026-10-14 10:00:00 [info] Email dispatched {"to":"…","subject":"…"}
 ```
 
@@ -158,19 +158,19 @@ part of the security invariants in `AGENTS.md`.
 
 ```ts
 import {
-  getEnvVariable, // default export
-  logger,
-  sendSuccess,
-  sendError,
-  AppError,
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-  InternalServerError,
-  NotImplementedError,
-} from "@LCArena/utils";
+    getEnvVariable, // default export
+    logger,
+    sendSuccess,
+    sendError,
+    AppError,
+    BadRequestError,
+    UnauthorizedError,
+    ForbiddenError,
+    NotFoundError,
+    ConflictError,
+    InternalServerError,
+    NotImplementedError,
+} from '@LCArena/utils';
 ```
 
 | Signature                                                                         | Returns                                                                   |
@@ -185,8 +185,8 @@ import {
 
 ```ts
 class AppError extends Error {
-  readonly statusCode: number;
-  constructor(message: string, statusCode: number, name: string);
+    readonly statusCode: number;
+    constructor(message: string, statusCode: number, name: string);
 }
 ```
 

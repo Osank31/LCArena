@@ -1,11 +1,11 @@
-import { useSyncExternalStore } from "react";
-import { backendStatus } from "../services/backendStatus";
+import { useSyncExternalStore } from 'react';
+import { backendStatus } from '../services/backendStatus';
 
 export interface BackendStatusState {
-  status: "checking" | "online" | "offline";
-  isOnline: boolean;
-  isOffline: boolean;
-  recheck: () => Promise<boolean>;
+    status: 'checking' | 'online' | 'offline';
+    isOnline: boolean;
+    isOffline: boolean;
+    recheck: () => Promise<boolean>;
 }
 
 /**
@@ -14,16 +14,16 @@ export interface BackendStatusState {
  * backend is genuinely unreachable.
  */
 export const useBackendStatus = (): BackendStatusState => {
-  const status = useSyncExternalStore(
-    backendStatus.subscribe,
-    backendStatus.getStatus,
-    backendStatus.getStatus,
-  );
+    const status = useSyncExternalStore(
+        backendStatus.subscribe,
+        backendStatus.getStatus,
+        backendStatus.getStatus,
+    );
 
-  return {
-    status,
-    isOnline: status === "online",
-    isOffline: status === "offline",
-    recheck: backendStatus.check,
-  };
+    return {
+        status,
+        isOnline: status === 'online',
+        isOffline: status === 'offline',
+        recheck: backendStatus.check,
+    };
 };
