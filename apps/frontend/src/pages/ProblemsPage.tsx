@@ -57,7 +57,7 @@ export const ProblemsPage: React.FC = () => {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Failed to load problems. Please check your connection."
+          "Failed to load problems. Please check your connection.",
       );
     } finally {
       setIsLoading(false);
@@ -111,7 +111,9 @@ export const ProblemsPage: React.FC = () => {
       if (filters.search) {
         const query = filters.search.toLowerCase();
         const matchesTitle = p.title.toLowerCase().includes(query);
-        const matchesTag = p.tags.some((t: string) => t.toLowerCase().includes(query));
+        const matchesTag = p.tags.some((t: string) =>
+          t.toLowerCase().includes(query),
+        );
         const matchesSlug = p.slug.toLowerCase().includes(query);
         if (!matchesTitle && !matchesTag && !matchesSlug) return false;
       }
@@ -192,7 +194,10 @@ export const ProblemsPage: React.FC = () => {
               <span className="text-rule-2">•</span>
               <div className="text-ink flex items-center gap-1">
                 <CheckCircle className="w-3 h-3" />
-                <span className="font-semibold">{solvedProblemIds.size}</span> Solved
+                <span className="font-semibold">
+                  {solvedProblemIds.size}
+                </span>{" "}
+                Solved
               </div>
             </>
           )}
@@ -206,7 +211,9 @@ export const ProblemsPage: React.FC = () => {
       <div data-reveal>
         <ProblemFilters
           filters={filters}
-          onChange={(partial) => setFilters((prev: ProblemFilterState) => ({ ...prev, ...partial }))}
+          onChange={(partial) =>
+            setFilters((prev: ProblemFilterState) => ({ ...prev, ...partial }))
+          }
           onReset={() => setFilters(INITIAL_FILTERS)}
           availableTags={availableTags}
         />
@@ -281,7 +288,8 @@ export const ProblemsPage: React.FC = () => {
               <span className="font-semibold text-ink">
                 {Math.min(currentPage * filters.pageSize, totalItems)}
               </span>{" "}
-              of <span className="font-semibold text-ink">{totalItems}</span> problems
+              of <span className="font-semibold text-ink">{totalItems}</span>{" "}
+              problems
             </div>
 
             <div className="flex items-center gap-1">
@@ -290,7 +298,10 @@ export const ProblemsPage: React.FC = () => {
                 size="sm"
                 disabled={currentPage <= 1}
                 onClick={() =>
-                  setFilters((prev: ProblemFilterState) => ({ ...prev, page: prev.page - 1 }))
+                  setFilters((prev: ProblemFilterState) => ({
+                    ...prev,
+                    page: prev.page - 1,
+                  }))
                 }
                 leftIcon={<ChevronLeft className="w-4 h-4" />}
                 aria-label="Previous Page"
@@ -307,7 +318,10 @@ export const ProblemsPage: React.FC = () => {
                 size="sm"
                 disabled={currentPage >= totalPages}
                 onClick={() =>
-                  setFilters((prev: ProblemFilterState) => ({ ...prev, page: prev.page + 1 }))
+                  setFilters((prev: ProblemFilterState) => ({
+                    ...prev,
+                    page: prev.page + 1,
+                  }))
                 }
                 rightIcon={<ChevronRight className="w-4 h-4" />}
                 aria-label="Next Page"

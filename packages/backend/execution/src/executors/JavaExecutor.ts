@@ -3,14 +3,14 @@ import { logger } from "@LCArena/utils";
 import Docker from "dockerode";
 
 export class JavaExecutor extends Executor {
-	private static IMAGE_NAME = "eclipse-temurin";
+  private static IMAGE_NAME = "eclipse-temurin";
 
-	constructor(testCasesDir?: string) {
-		super(testCasesDir);
-	}
+  constructor(testCasesDir?: string) {
+    super(testCasesDir);
+  }
 
-	private getWrapperCode(): string {
-		return `
+  private getWrapperCode(): string {
+    return `
 import java.util.Scanner;
 
 public class Main {
@@ -31,69 +31,69 @@ public class Main {
     }
 }
 `;
-	}
+  }
 
-	async execute(
-		clientCode: string,
-		time_limit: number,
-		testcases_dir: string
-	): Promise<ExecutionResult> {
-		const mainJavaCode = this.getWrapperCode();
+  async execute(
+    clientCode: string,
+    time_limit: number,
+    testcases_dir: string,
+  ): Promise<ExecutionResult> {
+    const mainJavaCode = this.getWrapperCode();
 
-		const runnerScript = this.generateRunnerScript(
-			time_limit,
-			testcases_dir,
-			`javac Main.java Solution.java`,
-			`java Main`
-		);
+    const runnerScript = this.generateRunnerScript(
+      time_limit,
+      testcases_dir,
+      `javac Main.java Solution.java`,
+      `java Main`,
+    );
 
-		const mainBase64 = Buffer.from(mainJavaCode).toString("base64");
-		const solutionBase64 = Buffer.from(clientCode).toString("base64");
-		const bashBase64 = Buffer.from(runnerScript).toString("base64");
+    const mainBase64 = Buffer.from(mainJavaCode).toString("base64");
+    const solutionBase64 = Buffer.from(clientCode).toString("base64");
+    const bashBase64 = Buffer.from(runnerScript).toString("base64");
 
-		let container: Docker.Container | null = null;
+    let container: Docker.Container | null = null;
 
-		try {
-			await this.pullImage(JavaExecutor.IMAGE_NAME);
+    try {
+      await this.pullImage(JavaExecutor.IMAGE_NAME);
 
-			logger.debug("Creating fresh container for execution...");
-			container = await Executor.docker.createContainer({
-				Image: JavaExecutor.IMAGE_NAME,
-				Cmd: ["/bin/bash", "-c", "tail -f /dev/null"],
-				WorkingDir: "/workspace",
-				HostConfig: {},
-			});
+      logger.debug("Creating fresh container for execution...");
+      container = await Executor.docker.createContainer({
+        Image: JavaExecutor.IMAGE_NAME,
+        Cmd: ["/bin/bash", "-c", "tail -f /dev/null"],
+        WorkingDir: "/workspace",
+        HostConfig: {},
+      });
 
-			await container.start();
+      await container.start();
 
-			await this.copyTestCasesToContainer(container);
+      await this.copyTestCasesToContainer(container);
 
-			await this.runCommand(
-				container,
-				`echo "${mainBase64}" | base64 -d > /workspace/Main.java`
-			);
-			await this.runCommand(
-				container,
-				`echo "${solutionBase64}" | base64 -d > /workspace/Solution.java`
-			);
-			await this.runCommand(
-				container,
-				`echo "${bashBase64}" | base64 -d > /workspace/runner.sh && chmod +x /workspace/runner.sh`
-			);
+      await this.runCommand(
+        container,
+        `echo "${mainBase64}" | base64 -d > /workspace/Main.java`,
+      );
+      await this.runCommand(
+        container,
+        `echo "${solutionBase64}" | base64 -d > /workspace/Solution.java`,
+      );
+      await this.runCommand(
+        container,
+        `echo "${bashBase64}" | base64 -d > /workspace/runner.sh && chmod +x /workspace/runner.sh`,
+      );
 
-			logger.debug("Running test cases inside container...");
-			const output = await this.runCommand(container, `./runner.sh`);
+      logger.debug("Running test cases inside container...");
+      const output = await this.runCommand(container, `./runner.sh`);
 
-			return this.parseRunnerOutput(output);
-		} catch (error) {
-			logger.error(`Execution failed: ${error}`);
-			throw error;
-		} finally {
-			if (container) {
-				logger.debug("Cleaning up container...");
-				await container.stop();
-				await container.remove();
-			}
-		}
-	}
+      return this.parseRunnerOutput(output);
+    } catch (error) {
+      logger.error(`Execution failed: ${error}`);
+      throw error;
+    } finally {
+      if (container) {
+        logger.debug("Cleaning up container...");
+        await container.stop();
+        await container.remove();
+      }
+    }
+  }
 }

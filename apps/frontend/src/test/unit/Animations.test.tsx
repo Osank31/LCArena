@@ -93,9 +93,12 @@ describe("animation architecture", () => {
     expect(screen.getByText("Alpha")).toBeInTheDocument();
     expect(screen.getByText("Beta")).toBeInTheDocument();
 
-    await waitFor(() => expect(screen.getByText("Alpha").style.opacity).toBe(""), {
-      timeout: 3000,
-    });
+    await waitFor(
+      () => expect(screen.getByText("Alpha").style.opacity).toBe(""),
+      {
+        timeout: 3000,
+      },
+    );
   });
 
   it("animates a single entrance and clears styles", async () => {

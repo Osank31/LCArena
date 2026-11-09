@@ -35,7 +35,11 @@ module.exports = { Solution };
 `,
 };
 
-export const LANGUAGE_OPTIONS: { value: SupportedLanguage; label: string; monacoLang: string }[] = [
+export const LANGUAGE_OPTIONS: {
+  value: SupportedLanguage;
+  label: string;
+  monacoLang: string;
+}[] = [
   { value: "cpp", label: "C++ (GCC 13)", monacoLang: "cpp" },
   { value: "py", label: "Python 3.11", monacoLang: "python" },
   { value: "java", label: "Java 21", monacoLang: "java" },

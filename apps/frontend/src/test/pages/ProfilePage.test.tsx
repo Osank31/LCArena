@@ -73,7 +73,7 @@ describe("ProfilePage component", () => {
         <BrowserRouter>
           <ProfilePage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Profile User")).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe("ProfilePage component", () => {
         <BrowserRouter>
           <ProfilePage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Profile User")).toBeInTheDocument();
@@ -112,7 +112,7 @@ describe("ProfilePage component", () => {
     // Empty fields check
     fireEvent.submit(form);
     expect(
-      await screen.findByText(/please fill out both password fields/i)
+      await screen.findByText(/please fill out both password fields/i),
     ).toBeInTheDocument();
 
     // Short password
@@ -120,7 +120,7 @@ describe("ProfilePage component", () => {
     fireEvent.change(newPwdInput, { target: { value: "123" } });
     fireEvent.submit(form);
     expect(
-      await screen.findByText(/new password must be at least 6 characters/i)
+      await screen.findByText(/new password must be at least 6 characters/i),
     ).toBeInTheDocument();
 
     // Valid update
@@ -132,7 +132,9 @@ describe("ProfilePage component", () => {
         currentPassword: "oldsecret",
         newPassword: "newsecret123",
       });
-      expect(screen.getByText(/password changed successfully!/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/password changed successfully!/i),
+      ).toBeInTheDocument();
     });
   });
 
@@ -144,7 +146,7 @@ describe("ProfilePage component", () => {
         <BrowserRouter>
           <ProfilePage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Profile User")).toBeInTheDocument();
@@ -158,7 +160,9 @@ describe("ProfilePage component", () => {
     fireEvent.click(cancelBtn);
 
     await waitFor(() => {
-      expect(screen.queryByText("Confirm Account Deletion")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Confirm Account Deletion"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -171,7 +175,7 @@ describe("ProfilePage component", () => {
         <BrowserRouter>
           <ProfilePage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Profile User")).toBeInTheDocument();
@@ -179,7 +183,9 @@ describe("ProfilePage component", () => {
     const deleteBtn = screen.getByRole("button", { name: /delete account/i });
     fireEvent.click(deleteBtn);
 
-    const confirmPwdInput = screen.getByPlaceholderText(/enter password to confirm/i);
+    const confirmPwdInput = screen.getByPlaceholderText(
+      /enter password to confirm/i,
+    );
     fireEvent.change(confirmPwdInput, { target: { value: "mypassword" } });
 
     const confirmDeleteBtn = screen.getByRole("button", {

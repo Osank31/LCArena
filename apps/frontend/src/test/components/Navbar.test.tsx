@@ -19,7 +19,7 @@ describe("Navbar component", () => {
         <BrowserRouter>
           <Navbar />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("LCArena")).toBeInTheDocument();
@@ -44,7 +44,7 @@ describe("Navbar component", () => {
         <BrowserRouter>
           <Navbar />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Ada Lovelace")).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe("Navbar component", () => {
         <BrowserRouter>
           <Navbar />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     const toggleBtn = screen.getByLabelText("Toggle navigation menu");
@@ -80,7 +80,9 @@ describe("Navbar component", () => {
     expect(screen.getAllByText("Register").length).toBeGreaterThanOrEqual(2);
 
     // Click links inside mobile menu
-    const mobileProblems = screen.getAllByRole("link", { name: /problems/i })[1];
+    const mobileProblems = screen.getAllByRole("link", {
+      name: /problems/i,
+    })[1];
     fireEvent.click(mobileProblems);
 
     fireEvent.click(toggleBtn);
@@ -88,7 +90,9 @@ describe("Navbar component", () => {
     fireEvent.click(mobileSignIn);
 
     fireEvent.click(toggleBtn);
-    const mobileRegister = screen.getAllByRole("link", { name: /register/i })[1];
+    const mobileRegister = screen.getAllByRole("link", {
+      name: /register/i,
+    })[1];
     fireEvent.click(mobileRegister);
   });
 
@@ -107,7 +111,7 @@ describe("Navbar component", () => {
         <BrowserRouter>
           <Navbar />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Ada Lovelace")).toBeInTheDocument();

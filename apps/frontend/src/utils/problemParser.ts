@@ -1,4 +1,8 @@
-import { IProblem, ParsedProblem, ProblemExample } from "../types/problem.types";
+import {
+  IProblem,
+  ParsedProblem,
+  ProblemExample,
+} from "../types/problem.types";
 import { DEFAULT_STARTER_CODE } from "./starterCode";
 
 export function parseProblem(raw: IProblem): ParsedProblem {
@@ -40,7 +44,9 @@ export function parseProblem(raw: IProblem): ParsedProblem {
 
   // 4. Extract statement (between ## Description and ## Examples, or raw text)
   let statement = desc;
-  const descSection = desc.match(/##\s*Description([\s\S]*?)(?=##\s*Examples|$)/i);
+  const descSection = desc.match(
+    /##\s*Description([\s\S]*?)(?=##\s*Examples|$)/i,
+  );
   if (descSection) {
     statement = descSection[1].trim();
   } else {
@@ -53,7 +59,8 @@ export function parseProblem(raw: IProblem): ParsedProblem {
 
   // 5. Extract Examples
   const examples: ProblemExample[] = [];
-  const exampleRegex = /###\s*Example\s*\d*[\s\S]*?\*\*Input:\*\*\s*`?([^\n`]+)`?[\s\S]*?\*\*Output:\*\*\s*`?([^\n`]+)`?(?:[\s\S]*?\*\*Explanation:\*\*\s*([^\n\r]+))?/gi;
+  const exampleRegex =
+    /###\s*Example\s*\d*[\s\S]*?\*\*Input:\*\*\s*`?([^\n`]+)`?[\s\S]*?\*\*Output:\*\*\s*`?([^\n`]+)`?(?:[\s\S]*?\*\*Explanation:\*\*\s*([^\n\r]+))?/gi;
   let exMatch;
   while ((exMatch = exampleRegex.exec(desc)) !== null) {
     examples.push({

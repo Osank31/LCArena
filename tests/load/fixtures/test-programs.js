@@ -4,8 +4,8 @@
  */
 
 export const programs = {
-    python: {
-        accepted: `import math
+  python: {
+    accepted: `import math
 from collections import defaultdict
 
 class Solution:
@@ -31,24 +31,24 @@ class Solution:
                     max_pts = count + 1
         return max_pts
 `,
-        wrongAnswer: `class Solution:
+    wrongAnswer: `class Solution:
     def solve(self, points: list[list[int]]) -> int:
         return -9999
 `,
-        compileError: `class Solution
+    compileError: `class Solution
     def solve(self, points)
         invalid python syntax here!
 `,
-        timeLimitExceeded: `import time
+    timeLimitExceeded: `import time
 class Solution:
     def solve(self, points: list[list[int]]) -> int:
         time.sleep(10)
         return len(points)
 `,
-    },
+  },
 
-    cpp: {
-        accepted: `#include <vector>
+  cpp: {
+    accepted: `#include <vector>
 #include <map>
 #include <numeric>
 #include <algorithm>
@@ -82,7 +82,7 @@ public:
     }
 };
 `,
-        wrongAnswer: `#include <vector>
+    wrongAnswer: `#include <vector>
 using namespace std;
 
 class Solution {
@@ -92,10 +92,10 @@ public:
     }
 };
 `,
-        compileError: `class Solution {
+    compileError: `class Solution {
     int invalid cpp syntax
 `,
-        timeLimitExceeded: `#include <vector>
+    timeLimitExceeded: `#include <vector>
 #include <thread>
 #include <chrono>
 using namespace std;
@@ -108,10 +108,10 @@ public:
     }
 };
 `,
-    },
+  },
 
-    javascript: {
-        accepted: `class Solution {
+  javascript: {
+    accepted: `class Solution {
     solve(points) {
         const n = points.length;
         if (n <= 2) return n;
@@ -140,15 +140,15 @@ public:
 }
 module.exports = Solution;
 `,
-        wrongAnswer: `class Solution {
+    wrongAnswer: `class Solution {
     solve(points) {
         return -9999;
     }
 }
 module.exports = Solution;
 `,
-        compileError: `const invalid syntax = ;;;;`,
-        timeLimitExceeded: `class Solution {
+    compileError: `const invalid syntax = ;;;;`,
+    timeLimitExceeded: `class Solution {
     solve(points) {
         const start = Date.now();
         while (Date.now() - start < 10000) {}
@@ -157,5 +157,5 @@ module.exports = Solution;
 }
 module.exports = Solution;
 `,
-    },
+  },
 };

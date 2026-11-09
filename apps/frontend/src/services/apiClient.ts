@@ -63,7 +63,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Track if currently refreshing to prevent infinite loops
@@ -102,7 +102,11 @@ apiClient.interceptors.response.use(
       originalRequest.url?.includes("/auth/register") ||
       originalRequest.url?.includes("/auth/refresh");
 
-    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthRoute
+    ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -125,7 +129,7 @@ apiClient.interceptors.response.use(
         const refreshResponse = await axios.post(
           `${BASE_URL}/auth/refresh`,
           refreshToken ? { refreshToken } : {},
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         const newAccessToken = refreshResponse.data?.data?.accessToken;
@@ -158,19 +162,24 @@ apiClient.interceptors.response.use(
         error.message?.includes("Network Error"))
     ) {
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("lcarena:server-connection-error"));
+        window.dispatchEvent(
+          new CustomEvent("lcarena:server-connection-error"),
+        );
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const responseData = error.response?.data;
     if (responseData && typeof responseData === "object") {
-      if ("message" in responseData && typeof responseData.message === "string") {
+      if (
+        "message" in responseData &&
+        typeof responseData.message === "string"
+      ) {
         return responseData.message;
       }
     }

@@ -1,11 +1,11 @@
 /**
  * 50 Realistic Coding Problems for LCArena
- * 
+ *
  * Distribution:
  * - 15 Easy problems
  * - 25 Medium problems
  * - 10 Hard problems
- * 
+ *
  * Topics:
  * Arrays, Strings, Hashing, Two Pointers, Sliding Window, Binary Search,
  * Stacks, Queues, Linked Lists, Trees, Graphs, Heaps, Greedy, Backtracking, DP.
@@ -28,24 +28,24 @@ You may assume that each input would have exactly one solution, and you may not 
       {
         input: "nums = [2,7,11,15], target = 9",
         output: "[0,1]",
-        explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]."
+        explanation: "Because nums[0] + nums[1] == 9, we return [0, 1].",
       },
       {
         input: "nums = [3,2,4], target = 6",
         output: "[1,2]",
-        explanation: "nums[1] + nums[2] == 2 + 4 == 6, so return [1, 2]."
+        explanation: "nums[1] + nums[2] == 2 + 4 == 6, so return [1, 2].",
       },
       {
         input: "nums = [3,3], target = 6",
         output: "[0,1]",
-        explanation: "nums[0] + nums[1] == 3 + 3 == 6, so return [0, 1]."
-      }
+        explanation: "nums[0] + nums[1] == 3 + 3 == 6, so return [0, 1].",
+      },
     ],
     constraints: [
       "2 <= nums.length <= 10^4",
       "-10^9 <= nums[i] <= 10^9",
       "-10^9 <= target <= 10^9",
-      "Only one valid answer exists."
+      "Only one valid answer exists.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -72,8 +72,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Valid Parentheses",
@@ -91,22 +91,22 @@ An input string is valid if:
       {
         input: 's = "()"',
         output: "true",
-        explanation: "The parentheses match correctly."
+        explanation: "The parentheses match correctly.",
       },
       {
         input: 's = "()[]{}"',
         output: "true",
-        explanation: "All bracket types match and close in order."
+        explanation: "All bracket types match and close in order.",
       },
       {
         input: 's = "(]"',
         output: "false",
-        explanation: "Mismatch between '(' and ']'."
-      }
+        explanation: "Mismatch between '(' and ']'.",
+      },
     ],
     constraints: [
       "1 <= s.length <= 10^4",
-      "s consists of parentheses only '()[]{}'."
+      "s consists of parentheses only '()[]{}'.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -133,8 +133,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Merge Two Sorted Lists",
@@ -149,18 +149,18 @@ Merge the two lists into one sorted list. The list should be made by splicing to
       {
         input: "list1 = [1,2,4], list2 = [1,3,4]",
         output: "[1,1,2,3,4,4]",
-        explanation: "Merged in ascending numerical order."
+        explanation: "Merged in ascending numerical order.",
       },
       {
         input: "list1 = [], list2 = []",
         output: "[]",
-        explanation: "Both lists empty."
-      }
+        explanation: "Both lists empty.",
+      },
     ],
     constraints: [
       "The number of nodes in both lists is in the range [0, 50].",
       "-100 <= Node.val <= 100",
-      "Both list1 and list2 are sorted in non-decreasing order."
+      "Both list1 and list2 are sorted in non-decreasing order.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -183,8 +183,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Best Time to Buy and Sell Stock",
@@ -201,18 +201,17 @@ Return the maximum profit you can achieve from this transaction. If you cannot a
       {
         input: "prices = [7,1,5,3,6,4]",
         output: "5",
-        explanation: "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5."
+        explanation:
+          "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.",
       },
       {
         input: "prices = [7,6,4,3,1]",
         output: "0",
-        explanation: "In this case, no transactions are done and the max profit = 0."
-      }
+        explanation:
+          "In this case, no transactions are done and the max profit = 0.",
+      },
     ],
-    constraints: [
-      "1 <= prices.length <= 10^5",
-      "0 <= prices[i] <= 10^4"
-    ],
+    constraints: ["1 <= prices.length <= 10^5", "0 <= prices[i] <= 10^4"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -234,8 +233,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Valid Palindrome",
@@ -250,17 +249,17 @@ Given a string \`s\`, return \`true\` if it is a palindrome, or \`false\` otherw
       {
         input: 's = "A man, a plan, a canal: Panama"',
         output: "true",
-        explanation: '"amanaplanacanalpanama" is a palindrome.'
+        explanation: '"amanaplanacanalpanama" is a palindrome.',
       },
       {
         input: 's = "race a car"',
         output: "false",
-        explanation: '"raceacar" is not a palindrome.'
-      }
+        explanation: '"raceacar" is not a palindrome.',
+      },
     ],
     constraints: [
       "1 <= s.length <= 2 * 10^5",
-      "s consists only of printable ASCII characters."
+      "s consists only of printable ASCII characters.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -283,8 +282,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Invert Binary Tree",
@@ -297,17 +296,17 @@ module.exports = { Solution };`
       {
         input: "root = [4,2,7,1,3,6,9]",
         output: "[4,7,2,9,6,3,1]",
-        explanation: "Each left and right child swapped across the tree."
+        explanation: "Each left and right child swapped across the tree.",
       },
       {
         input: "root = [2,1,3]",
         output: "[2,3,1]",
-        explanation: "Children 1 and 3 swapped."
-      }
+        explanation: "Children 1 and 3 swapped.",
+      },
     ],
     constraints: [
       "The number of nodes in the tree is in the range [0, 100].",
-      "-100 <= Node.val <= 100"
+      "-100 <= Node.val <= 100",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -330,8 +329,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Binary Search",
@@ -346,19 +345,19 @@ You must write an algorithm with \`O(log n)\` runtime complexity.`,
       {
         input: "nums = [-1,0,3,5,9,12], target = 9",
         output: "4",
-        explanation: "9 exists in nums and its index is 4."
+        explanation: "9 exists in nums and its index is 4.",
       },
       {
         input: "nums = [-1,0,3,5,9,12], target = 2",
         output: "-1",
-        explanation: "2 does not exist in nums so return -1."
-      }
+        explanation: "2 does not exist in nums so return -1.",
+      },
     ],
     constraints: [
       "1 <= nums.length <= 10^4",
       "-10^4 < nums[i], target < 10^4",
       "All integers in nums are unique.",
-      "nums is sorted in ascending order."
+      "nums is sorted in ascending order.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -381,8 +380,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Maximum Subarray",
@@ -395,23 +394,20 @@ module.exports = { Solution };`
       {
         input: "nums = [-2,1,-3,4,-1,2,1,-5,4]",
         output: "6",
-        explanation: "The subarray [4,-1,2,1] has the largest sum 6."
+        explanation: "The subarray [4,-1,2,1] has the largest sum 6.",
       },
       {
         input: "nums = [1]",
         output: "1",
-        explanation: "The subarray [1] has the largest sum 1."
+        explanation: "The subarray [1] has the largest sum 1.",
       },
       {
         input: "nums = [5,4,-1,7,8]",
         output: "23",
-        explanation: "The subarray [5,4,-1,7,8] has the largest sum 23."
-      }
+        explanation: "The subarray [5,4,-1,7,8] has the largest sum 23.",
+      },
     ],
-    constraints: [
-      "1 <= nums.length <= 10^5",
-      "-10^4 <= nums[i] <= 10^4"
-    ],
+    constraints: ["1 <= nums.length <= 10^5", "-10^4 <= nums[i] <= 10^4"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -433,8 +429,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Climbing Stairs",
@@ -449,17 +445,16 @@ Each time you can either climb 1 or 2 steps. In how many distinct ways can you c
       {
         input: "n = 2",
         output: "2",
-        explanation: "There are two ways to climb to the top: 1 step + 1 step, or 2 steps."
+        explanation:
+          "There are two ways to climb to the top: 1 step + 1 step, or 2 steps.",
       },
       {
         input: "n = 3",
         output: "3",
-        explanation: "Three ways: (1+1+1), (1+2), (2+1)."
-      }
+        explanation: "Three ways: (1+1+1), (1+2), (2+1).",
+      },
     ],
-    constraints: [
-      "1 <= n <= 45"
-    ],
+    constraints: ["1 <= n <= 45"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -481,8 +476,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Reverse Linked List",
@@ -495,17 +490,17 @@ module.exports = { Solution };`
       {
         input: "head = [1,2,3,4,5]",
         output: "[5,4,3,2,1]",
-        explanation: "Pointers inverted across all nodes."
+        explanation: "Pointers inverted across all nodes.",
       },
       {
         input: "head = [1,2]",
         output: "[2,1]",
-        explanation: "Two elements reversed."
-      }
+        explanation: "Two elements reversed.",
+      },
     ],
     constraints: [
       "The number of nodes in the list is the range [0, 5000].",
-      "-5000 <= Node.val <= 5000"
+      "-5000 <= Node.val <= 5000",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -528,8 +523,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Single Number",
@@ -544,18 +539,18 @@ You must implement a solution with a linear runtime complexity and use only cons
       {
         input: "nums = [2,2,1]",
         output: "1",
-        explanation: "1 appears once."
+        explanation: "1 appears once.",
       },
       {
         input: "nums = [4,1,2,1,2]",
         output: "4",
-        explanation: "4 appears once while others appear twice."
-      }
+        explanation: "4 appears once while others appear twice.",
+      },
     ],
     constraints: [
       "1 <= nums.length <= 3 * 10^4",
       "-3 * 10^4 <= nums[i] <= 3 * 10^4",
-      "Each element in the array appears twice except for one element which appears only once."
+      "Each element in the array appears twice except for one element which appears only once.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -578,8 +573,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Contains Duplicate",
@@ -592,18 +587,15 @@ module.exports = { Solution };`
       {
         input: "nums = [1,2,3,1]",
         output: "true",
-        explanation: "1 appears at index 0 and 3."
+        explanation: "1 appears at index 0 and 3.",
       },
       {
         input: "nums = [1,2,3,4]",
         output: "false",
-        explanation: "All elements are distinct."
-      }
+        explanation: "All elements are distinct.",
+      },
     ],
-    constraints: [
-      "1 <= nums.length <= 10^5",
-      "-10^9 <= nums[i] <= 10^9"
-    ],
+    constraints: ["1 <= nums.length <= 10^5", "-10^9 <= nums[i] <= 10^9"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -625,8 +617,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Intersection of Two Arrays",
@@ -639,17 +631,17 @@ module.exports = { Solution };`
       {
         input: "nums1 = [1,2,2,1], nums2 = [2,2]",
         output: "[2]",
-        explanation: "2 is present in both arrays."
+        explanation: "2 is present in both arrays.",
       },
       {
         input: "nums1 = [4,9,5], nums2 = [9,4,9,8,4]",
         output: "[9,4]",
-        explanation: "[4,9] is also accepted."
-      }
+        explanation: "[4,9] is also accepted.",
+      },
     ],
     constraints: [
       "1 <= nums1.length, nums2.length <= 1000",
-      "0 <= nums1[i], nums2[i] <= 1000"
+      "0 <= nums1[i], nums2[i] <= 1000",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -672,8 +664,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Majority Element",
@@ -688,18 +680,18 @@ The majority element is the element that appears more than \`floor(n / 2)\` time
       {
         input: "nums = [3,2,3]",
         output: "3",
-        explanation: "3 appears 2 times, which is > 3/2 = 1."
+        explanation: "3 appears 2 times, which is > 3/2 = 1.",
       },
       {
         input: "nums = [2,2,1,1,1,2,2]",
         output: "2",
-        explanation: "2 appears 4 times, which is > 7/2 = 3."
-      }
+        explanation: "2 appears 4 times, which is > 7/2 = 3.",
+      },
     ],
     constraints: [
       "n == nums.length",
       "1 <= n <= 5 * 10^4",
-      "-10^9 <= nums[i] <= 10^9"
+      "-10^9 <= nums[i] <= 10^9",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -722,8 +714,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Valid Anagram",
@@ -738,17 +730,17 @@ An Anagram is a word or phrase formed by rearranging the letters of a different 
       {
         input: 's = "anagram", t = "nagaram"',
         output: "true",
-        explanation: "Both strings have the exact same character frequencies."
+        explanation: "Both strings have the exact same character frequencies.",
       },
       {
         input: 's = "rat", t = "car"',
         output: "false",
-        explanation: "Characters do not match."
-      }
+        explanation: "Characters do not match.",
+      },
     ],
     constraints: [
       "1 <= s.length, t.length <= 5 * 10^4",
-      "s and t consist of lowercase English letters."
+      "s and t consist of lowercase English letters.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -771,8 +763,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
 
   // ==========================================
@@ -791,18 +783,15 @@ Notice that the solution set must not contain duplicate triplets.`,
       {
         input: "nums = [-1,0,1,2,-1,-4]",
         output: "[[-1,-1,2],[-1,0,1]]",
-        explanation: "Distinct triplets summing to zero."
+        explanation: "Distinct triplets summing to zero.",
       },
       {
         input: "nums = [0,1,1]",
         output: "[]",
-        explanation: "The only possible triplet does not sum up to 0."
-      }
+        explanation: "The only possible triplet does not sum up to 0.",
+      },
     ],
-    constraints: [
-      "3 <= nums.length <= 3000",
-      "-10^5 <= nums[i] <= 10^5"
-    ],
+    constraints: ["3 <= nums.length <= 3000", "-10^5 <= nums[i] <= 10^5"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -824,8 +813,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Longest Substring Without Repeating Characters",
@@ -838,22 +827,22 @@ module.exports = { Solution };`
       {
         input: 's = "abcabcbb"',
         output: "3",
-        explanation: 'The answer is "abc", with the length of 3.'
+        explanation: 'The answer is "abc", with the length of 3.',
       },
       {
         input: 's = "bbbbb"',
         output: "1",
-        explanation: 'The answer is "b", with the length of 1.'
+        explanation: 'The answer is "b", with the length of 1.',
       },
       {
         input: 's = "pwwkew"',
         output: "3",
-        explanation: 'The answer is "wke", with the length of 3.'
-      }
+        explanation: 'The answer is "wke", with the length of 3.',
+      },
     ],
     constraints: [
       "0 <= s.length <= 5 * 10^4",
-      "s consists of English letters, digits, symbols and spaces."
+      "s consists of English letters, digits, symbols and spaces.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -876,8 +865,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Container With Most Water",
@@ -894,18 +883,19 @@ Return the maximum amount of water a container can store. Notice that you may no
       {
         input: "height = [1,8,6,2,5,4,8,3,7]",
         output: "49",
-        explanation: "Between indices 1 and 8 (heights 8 and 7, width 7), area = 7 * min(8, 7) = 49."
+        explanation:
+          "Between indices 1 and 8 (heights 8 and 7, width 7), area = 7 * min(8, 7) = 49.",
       },
       {
         input: "height = [1,1]",
         output: "1",
-        explanation: "1 * 1 = 1."
-      }
+        explanation: "1 * 1 = 1.",
+      },
     ],
     constraints: [
       "n == height.length",
       "2 <= n <= 10^5",
-      "0 <= height[i] <= 10^4"
+      "0 <= height[i] <= 10^4",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -928,8 +918,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Group Anagrams",
@@ -944,18 +934,18 @@ An Anagram is a word or phrase formed by rearranging the letters of a different 
       {
         input: 'strs = ["eat","tea","tan","ate","nat","bat"]',
         output: '[["bat"],["nat","tan"],["ate","eat","tea"]]',
-        explanation: "Grouped by identical character counts."
+        explanation: "Grouped by identical character counts.",
       },
       {
         input: 'strs = [""]',
         output: '[[""]]',
-        explanation: "Single empty string."
-      }
+        explanation: "Single empty string.",
+      },
     ],
     constraints: [
       "1 <= strs.length <= 10^4",
       "0 <= strs[i].length <= 100",
-      "strs[i] consists of lowercase English letters."
+      "strs[i] consists of lowercase English letters.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -978,8 +968,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Product of Array Except Self",
@@ -996,18 +986,18 @@ You must write an algorithm that runs in \`O(n)\` time and without using the div
       {
         input: "nums = [1,2,3,4]",
         output: "[24,12,8,6]",
-        explanation: "At index 0: 2*3*4=24. At index 1: 1*3*4=12. Etc."
+        explanation: "At index 0: 2*3*4=24. At index 1: 1*3*4=12. Etc.",
       },
       {
         input: "nums = [-1,1,0,-3,3]",
         output: "[0,0,9,0,0]",
-        explanation: "Zero handling via prefix/suffix products."
-      }
+        explanation: "Zero handling via prefix/suffix products.",
+      },
     ],
     constraints: [
       "2 <= nums.length <= 10^5",
       "-30 <= nums[i] <= 30",
-      "The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer."
+      "The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1030,8 +1020,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Search in Rotated Sorted Array",
@@ -1050,19 +1040,19 @@ You must write an algorithm with \`O(log n)\` runtime complexity.`,
       {
         input: "nums = [4,5,6,7,0,1,2], target = 0",
         output: "4",
-        explanation: "0 found at index 4."
+        explanation: "0 found at index 4.",
       },
       {
         input: "nums = [4,5,6,7,0,1,2], target = 3",
         output: "-1",
-        explanation: "3 not in nums."
-      }
+        explanation: "3 not in nums.",
+      },
     ],
     constraints: [
       "1 <= nums.length <= 5000",
       "-10^4 <= nums[i] <= 10^4",
       "All values of nums are unique.",
-      "nums is an ascending array that is possibly rotated."
+      "nums is an ascending array that is possibly rotated.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1085,8 +1075,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Combination Sum",
@@ -1101,19 +1091,20 @@ The same number may be chosen from \`candidates\` an unlimited number of times. 
       {
         input: "candidates = [2,3,6,7], target = 7",
         output: "[[2,2,3],[7]]",
-        explanation: "2 and 3 are candidates, and 2 + 2 + 3 = 7. 7 is a candidate, and 7 = 7."
+        explanation:
+          "2 and 3 are candidates, and 2 + 2 + 3 = 7. 7 is a candidate, and 7 = 7.",
       },
       {
         input: "candidates = [2,3,5], target = 8",
         output: "[[2,2,2,2],[2,3,3],[3,5]]",
-        explanation: "Three distinct valid combinations."
-      }
+        explanation: "Three distinct valid combinations.",
+      },
     ],
     constraints: [
       "1 <= candidates.length <= 30",
       "2 <= candidates[i] <= 40",
       "All elements of candidates are distinct.",
-      "1 <= target <= 40"
+      "1 <= target <= 40",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1136,8 +1127,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Permutations",
@@ -1150,18 +1141,18 @@ module.exports = { Solution };`
       {
         input: "nums = [1,2,3]",
         output: "[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]",
-        explanation: "All 6 permutations."
+        explanation: "All 6 permutations.",
       },
       {
         input: "nums = [0,1]",
         output: "[[0,1],[1,0]]",
-        explanation: "2 permutations."
-      }
+        explanation: "2 permutations.",
+      },
     ],
     constraints: [
       "1 <= nums.length <= 6",
       "-10 <= nums[i] <= 10",
-      "All the integers of nums are unique."
+      "All the integers of nums are unique.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1184,8 +1175,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Subsets",
@@ -1200,18 +1191,18 @@ The solution set must not contain duplicate subsets. Return the solution in any 
       {
         input: "nums = [1,2,3]",
         output: "[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]",
-        explanation: "2^3 = 8 subsets."
+        explanation: "2^3 = 8 subsets.",
       },
       {
         input: "nums = [0]",
         output: "[[],[0]]",
-        explanation: "2 subsets."
-      }
+        explanation: "2 subsets.",
+      },
     ],
     constraints: [
       "1 <= nums.length <= 10",
       "-10 <= nums[i] <= 10",
-      "All the numbers of nums are unique."
+      "All the numbers of nums are unique.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1234,8 +1225,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Word Search",
@@ -1248,22 +1239,24 @@ module.exports = { Solution };`
 The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.`,
     examples: [
       {
-        input: 'board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"',
+        input:
+          'board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"',
         output: "true",
-        explanation: "Found along top and center rows."
+        explanation: "Found along top and center rows.",
       },
       {
-        input: 'board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"',
+        input:
+          'board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"',
         output: "true",
-        explanation: "Found along right edge."
-      }
+        explanation: "Found along right edge.",
+      },
     ],
     constraints: [
       "m == board.length",
       "n = board[i].length",
       "1 <= m, n <= 6",
       "1 <= word.length <= 15",
-      "board and word consist of only lowercase and uppercase English letters."
+      "board and word consist of only lowercase and uppercase English letters.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1286,35 +1279,43 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Number of Islands",
     slug: "number-of-islands",
     difficulty: "Medium",
-    tags: ["Array", "Depth-First Search", "Breadth-First Search", "Union Find", "Matrix"],
+    tags: [
+      "Array",
+      "Depth-First Search",
+      "Breadth-First Search",
+      "Union Find",
+      "Matrix",
+    ],
     time_limit: 3000,
     statement: `Given an \`m x n\` 2D binary grid \`grid\` which represents a map of '1's (land) and '0's (water), return the number of islands.
 
 An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.`,
     examples: [
       {
-        input: 'grid = [["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]',
+        input:
+          'grid = [["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]',
         output: "1",
-        explanation: "Single connected component of land."
+        explanation: "Single connected component of land.",
       },
       {
-        input: 'grid = [["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]',
+        input:
+          'grid = [["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]',
         output: "3",
-        explanation: "Three separate island clusters."
-      }
+        explanation: "Three separate island clusters.",
+      },
     ],
     constraints: [
       "m == grid.length",
       "n == grid[i].length",
       "1 <= m, n <= 300",
-      "grid[i][j] is '0' or '1'."
+      "grid[i][j] is '0' or '1'.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1337,14 +1338,19 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Course Schedule",
     slug: "course-schedule",
     difficulty: "Medium",
-    tags: ["Depth-First Search", "Breadth-First Search", "Graph", "Topological Sort"],
+    tags: [
+      "Depth-First Search",
+      "Breadth-First Search",
+      "Graph",
+      "Topological Sort",
+    ],
     time_limit: 3000,
     statement: `There are a total of \`numCourses\` courses you have to take, labeled from \`0\` to \`numCourses - 1\`. You are given an array \`prerequisites\` where \`prerequisites[i] = [ai, bi]\` indicates that you must take course \`bi\` first if you want to take course \`ai\`.
 
@@ -1353,20 +1359,20 @@ Return \`true\` if you can finish all courses. Otherwise, return \`false\`.`,
       {
         input: "numCourses = 2, prerequisites = [[1,0]]",
         output: "true",
-        explanation: "Take course 0 then course 1."
+        explanation: "Take course 0 then course 1.",
       },
       {
         input: "numCourses = 2, prerequisites = [[1,0],[0,1]]",
         output: "false",
-        explanation: "Cyclic dependency between 0 and 1."
-      }
+        explanation: "Cyclic dependency between 0 and 1.",
+      },
     ],
     constraints: [
       "1 <= numCourses <= 2000",
       "0 <= prerequisites.length <= 5000",
       "prerequisites[i].length == 2",
       "0 <= ai, bi < numCourses",
-      "All prerequisite pairs are unique."
+      "All prerequisite pairs are unique.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1389,8 +1395,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Pacific Atlantic Water Flow",
@@ -1403,16 +1409,17 @@ module.exports = { Solution };`
 Return a 2D list of grid coordinates \`result\` where \`result[i] = [ri, ci]\` denotes that rain water can flow from cell \`(ri, ci)\` to both the Pacific and Atlantic oceans.`,
     examples: [
       {
-        input: "heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]",
+        input:
+          "heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]",
         output: "[[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]",
-        explanation: "Coordinates where water reaches both oceans."
-      }
+        explanation: "Coordinates where water reaches both oceans.",
+      },
     ],
     constraints: [
       "m == heights.length",
       "n == heights[r].length",
       "1 <= m, n <= 200",
-      "0 <= heights[r][c] <= 10^5"
+      "0 <= heights[r][c] <= 10^5",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1435,8 +1442,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Coin Change",
@@ -1453,23 +1460,23 @@ You may assume that you have an infinite number of each kind of coin.`,
       {
         input: "coins = [1,2,5], amount = 11",
         output: "3",
-        explanation: "11 = 5 + 5 + 1 (3 coins)."
+        explanation: "11 = 5 + 5 + 1 (3 coins).",
       },
       {
         input: "coins = [2], amount = 3",
         output: "-1",
-        explanation: "Cannot make 3 with only 2s."
+        explanation: "Cannot make 3 with only 2s.",
       },
       {
         input: "coins = [1], amount = 0",
         output: "0",
-        explanation: "0 coins needed for 0 amount."
-      }
+        explanation: "0 coins needed for 0 amount.",
+      },
     ],
     constraints: [
       "1 <= coins.length <= 12",
       "1 <= coins[i] <= 2^31 - 1",
-      "0 <= amount <= 10^4"
+      "0 <= amount <= 10^4",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1492,8 +1499,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Longest Increasing Subsequence",
@@ -1506,18 +1513,16 @@ module.exports = { Solution };`
       {
         input: "nums = [10,9,2,5,3,7,101,18]",
         output: "4",
-        explanation: "The longest increasing subsequence is [2,3,7,101], length 4."
+        explanation:
+          "The longest increasing subsequence is [2,3,7,101], length 4.",
       },
       {
         input: "nums = [0,1,0,3,2,3]",
         output: "4",
-        explanation: "Subsequence [0,1,2,3], length 4."
-      }
+        explanation: "Subsequence [0,1,2,3], length 4.",
+      },
     ],
-    constraints: [
-      "1 <= nums.length <= 2500",
-      "-10^4 <= nums[i] <= 10^4"
-    ],
+    constraints: ["1 <= nums.length <= 2500", "-10^4 <= nums[i] <= 10^4"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -1539,14 +1544,21 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Word Break",
     slug: "word-break",
     difficulty: "Medium",
-    tags: ["Array", "Hash Table", "String", "Dynamic Programming", "Trie", "Memoization"],
+    tags: [
+      "Array",
+      "Hash Table",
+      "String",
+      "Dynamic Programming",
+      "Trie",
+      "Memoization",
+    ],
     time_limit: 3000,
     statement: `Given a string \`s\` and a dictionary of strings \`wordDict\`, return \`true\` if \`s\` can be segmented into a space-separated sequence of one or more dictionary words.
 
@@ -1555,19 +1567,20 @@ Note that the same word in the dictionary may be reused multiple times in the se
       {
         input: 's = "leetcode", wordDict = ["leet","code"]',
         output: "true",
-        explanation: 'Return true because "leetcode" can be segmented as "leet code".'
+        explanation:
+          'Return true because "leetcode" can be segmented as "leet code".',
       },
       {
         input: 's = "applepenapple", wordDict = ["apple","pen"]',
         output: "true",
-        explanation: 'Segmented as "apple pen apple".'
-      }
+        explanation: 'Segmented as "apple pen apple".',
+      },
     ],
     constraints: [
       "1 <= s.length <= 300",
       "1 <= wordDict.length <= 1000",
       "1 <= wordDict[i].length <= 20",
-      "s and wordDict[i] consist of only lowercase English letters."
+      "s and wordDict[i] consist of only lowercase English letters.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1590,8 +1603,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Decode Ways",
@@ -1606,17 +1619,18 @@ To decode an encoded message, all the digits must be grouped then mapped back in
       {
         input: 's = "12"',
         output: "2",
-        explanation: '"12" could be decoded as "AB" (1 2) or "L" (12).'
+        explanation: '"12" could be decoded as "AB" (1 2) or "L" (12).',
       },
       {
         input: 's = "226"',
         output: "3",
-        explanation: '"226" could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6).'
-      }
+        explanation:
+          '"226" could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6).',
+      },
     ],
     constraints: [
       "1 <= s.length <= 100",
-      "s contains only digits and may contain leading zero(s)."
+      "s contains only digits and may contain leading zero(s).",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1639,8 +1653,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Unique Paths",
@@ -1655,17 +1669,15 @@ Given the two integers \`m\` and \`n\`, return the number of possible unique pat
       {
         input: "m = 3, n = 7",
         output: "28",
-        explanation: "28 unique paths from top-left to bottom-right."
+        explanation: "28 unique paths from top-left to bottom-right.",
       },
       {
         input: "m = 3, n = 2",
         output: "3",
-        explanation: "Right->Down->Down, Down->Right->Down, Down->Down->Right."
-      }
+        explanation: "Right->Down->Down, Down->Right->Down, Down->Down->Right.",
+      },
     ],
-    constraints: [
-      "1 <= m, n <= 100"
-    ],
+    constraints: ["1 <= m, n <= 100"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -1687,8 +1699,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "House Robber",
@@ -1703,18 +1715,17 @@ Given an integer array \`nums\` representing the amount of money of each house, 
       {
         input: "nums = [1,2,3,1]",
         output: "4",
-        explanation: "Rob house 1 (money = 1) and then rob house 3 (money = 3). Total = 1 + 3 = 4."
+        explanation:
+          "Rob house 1 (money = 1) and then rob house 3 (money = 3). Total = 1 + 3 = 4.",
       },
       {
         input: "nums = [2,7,9,3,1]",
         output: "12",
-        explanation: "Rob house 1 (2), house 3 (9), house 5 (1). Total = 2 + 9 + 1 = 12."
-      }
+        explanation:
+          "Rob house 1 (2), house 3 (9), house 5 (1). Total = 2 + 9 + 1 = 12.",
+      },
     ],
-    constraints: [
-      "1 <= nums.length <= 100",
-      "0 <= nums[i] <= 400"
-    ],
+    constraints: ["1 <= nums.length <= 100", "0 <= nums[i] <= 400"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -1736,8 +1747,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Rotate Image",
@@ -1752,13 +1763,13 @@ You have to rotate the image in-place, which means you have to modify the input 
       {
         input: "matrix = [[1,2,3],[4,5,6],[7,8,9]]",
         output: "[[7,4,1],[8,5,2],[9,6,3]]",
-        explanation: "Rotated 90 degrees clockwise."
-      }
+        explanation: "Rotated 90 degrees clockwise.",
+      },
     ],
     constraints: [
       "n == matrix.length == matrix[i].length",
       "1 <= n <= 20",
-      "-1000 <= matrix[i][j] <= 1000"
+      "-1000 <= matrix[i][j] <= 1000",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1782,8 +1793,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Spiral Matrix",
@@ -1796,14 +1807,14 @@ module.exports = { Solution };`
       {
         input: "matrix = [[1,2,3],[4,5,6],[7,8,9]]",
         output: "[1,2,3,6,9,8,7,4,5]",
-        explanation: "Clockwise spiral traversal."
-      }
+        explanation: "Clockwise spiral traversal.",
+      },
     ],
     constraints: [
       "m == matrix.length",
       "n == matrix[i].length",
       "1 <= m, n <= 10",
-      "-100 <= matrix[i][j] <= 100"
+      "-100 <= matrix[i][j] <= 100",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1826,33 +1837,42 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Top K Frequent Elements",
     slug: "top-k-frequent-elements",
     difficulty: "Medium",
-    tags: ["Array", "Hash Table", "Divide and Conquer", "Sorting", "Heap (Priority Queue)", "Bucket Sort", "Counting", "Quickselect"],
+    tags: [
+      "Array",
+      "Hash Table",
+      "Divide and Conquer",
+      "Sorting",
+      "Heap (Priority Queue)",
+      "Bucket Sort",
+      "Counting",
+      "Quickselect",
+    ],
     time_limit: 3000,
     statement: `Given an integer array \`nums\` and an integer \`k\`, return the \`k\` most frequent elements. You may return the answer in any order.`,
     examples: [
       {
         input: "nums = [1,1,1,2,2,3], k = 2",
         output: "[1,2]",
-        explanation: "1 appears 3 times, 2 appears 2 times."
+        explanation: "1 appears 3 times, 2 appears 2 times.",
       },
       {
         input: "nums = [1], k = 1",
         output: "[1]",
-        explanation: "1 appears once."
-      }
+        explanation: "1 appears once.",
+      },
     ],
     constraints: [
       "1 <= nums.length <= 10^5",
       "-10^4 <= nums[i] <= 10^4",
       "k is in the range [1, the number of unique elements in the array].",
-      "It is guaranteed that the answer is unique."
+      "It is guaranteed that the answer is unique.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1875,14 +1895,20 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Kth Largest Element in an Array",
     slug: "kth-largest-element-in-an-array",
     difficulty: "Medium",
-    tags: ["Array", "Divide and Conquer", "Sorting", "Heap (Priority Queue)", "Quickselect"],
+    tags: [
+      "Array",
+      "Divide and Conquer",
+      "Sorting",
+      "Heap (Priority Queue)",
+      "Quickselect",
+    ],
     time_limit: 3000,
     statement: `Given an integer array \`nums\` and an integer \`k\`, return the \`k\`th largest element in the array.
 
@@ -1893,18 +1919,15 @@ Can you solve it without sorting?`,
       {
         input: "nums = [3,2,1,5,6,4], k = 2",
         output: "5",
-        explanation: "The sorted array is [1,2,3,4,5,6], second largest is 5."
+        explanation: "The sorted array is [1,2,3,4,5,6], second largest is 5.",
       },
       {
         input: "nums = [3,2,3,1,2,4,5,5,6], k = 4",
         output: "4",
-        explanation: "4th largest element is 4."
-      }
+        explanation: "4th largest element is 4.",
+      },
     ],
-    constraints: [
-      "1 <= k <= nums.length <= 10^5",
-      "-10^4 <= nums[i] <= 10^4"
-    ],
+    constraints: ["1 <= k <= nums.length <= 10^5", "-10^4 <= nums[i] <= 10^4"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -1926,8 +1949,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Find Minimum in Rotated Sorted Array",
@@ -1944,19 +1967,19 @@ You must write an algorithm that runs in \`O(log n)\` time.`,
       {
         input: "nums = [3,4,5,1,2]",
         output: "1",
-        explanation: "Original was [1,2,3,4,5] rotated 3 times."
+        explanation: "Original was [1,2,3,4,5] rotated 3 times.",
       },
       {
         input: "nums = [4,5,6,7,0,1,2]",
         output: "0",
-        explanation: "Min value is 0."
-      }
+        explanation: "Min value is 0.",
+      },
     ],
     constraints: [
       "n == nums.length",
       "1 <= n <= 5000",
       "-5000 <= nums[i] <= 5000",
-      "All the integers of nums are unique."
+      "All the integers of nums are unique.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -1979,8 +2002,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Valid Sudoku",
@@ -1995,15 +2018,16 @@ module.exports = { Solution };`
 3. Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.`,
     examples: [
       {
-        input: 'board = [["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],...]',
+        input:
+          'board = [["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],...]',
         output: "true",
-        explanation: "No duplicates in any row, column, or 3x3 box."
-      }
+        explanation: "No duplicates in any row, column, or 3x3 box.",
+      },
     ],
     constraints: [
       "board.length == 9",
       "board[i].length == 9",
-      "board[i][j] is a digit '1'-'9' or '.'."
+      "board[i][j] is a digit '1'-'9' or '.'.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2026,8 +2050,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
 
   // ==========================================
@@ -2037,25 +2061,31 @@ module.exports = { Solution };`
     title: "Trapping Rain Water",
     slug: "trapping-rain-water",
     difficulty: "Hard",
-    tags: ["Array", "Two Pointers", "Dynamic Programming", "Stack", "Monotonic Stack"],
+    tags: [
+      "Array",
+      "Two Pointers",
+      "Dynamic Programming",
+      "Stack",
+      "Monotonic Stack",
+    ],
     time_limit: 4000,
     statement: `Given \`n\` non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.`,
     examples: [
       {
         input: "height = [0,1,0,2,1,0,1,3,2,1,2,1]",
         output: "6",
-        explanation: "The above elevation map can trap 6 units of rain water."
+        explanation: "The above elevation map can trap 6 units of rain water.",
       },
       {
         input: "height = [4,2,0,3,2,5]",
         output: "9",
-        explanation: "Water trapped between elevation boundaries."
-      }
+        explanation: "Water trapped between elevation boundaries.",
+      },
     ],
     constraints: [
       "n == height.length",
       "1 <= n <= 2 * 10^4",
-      "0 <= height[i] <= 10^5"
+      "0 <= height[i] <= 10^5",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2078,8 +2108,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Median of Two Sorted Arrays",
@@ -2094,13 +2124,14 @@ The overall run time complexity should be \`O(log (m+n))\`.`,
       {
         input: "nums1 = [1,3], nums2 = [2]",
         output: "2.00000",
-        explanation: "merged array = [1,2,3] and median is 2."
+        explanation: "merged array = [1,2,3] and median is 2.",
       },
       {
         input: "nums1 = [1,2], nums2 = [3,4]",
         output: "2.50000",
-        explanation: "merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5."
-      }
+        explanation:
+          "merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.",
+      },
     ],
     constraints: [
       "nums1.length == m",
@@ -2108,7 +2139,7 @@ The overall run time complexity should be \`O(log (m+n))\`.`,
       "0 <= m <= 1000",
       "0 <= n <= 1000",
       "1 <= m + n <= 2000",
-      "-10^6 <= nums1[i], nums2[i] <= 10^6"
+      "-10^6 <= nums1[i], nums2[i] <= 10^6",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2131,14 +2162,19 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Merge k Sorted Lists",
     slug: "merge-k-sorted-lists",
     difficulty: "Hard",
-    tags: ["Linked List", "Divide and Conquer", "Heap (Priority Queue)", "Merge Sort"],
+    tags: [
+      "Linked List",
+      "Divide and Conquer",
+      "Heap (Priority Queue)",
+      "Merge Sort",
+    ],
     time_limit: 4000,
     statement: `You are given an array of \`k\` linked-lists \`lists\`, each linked-list is sorted in ascending order.
 
@@ -2147,20 +2183,20 @@ Merge all the linked-lists into one sorted linked-list and return it.`,
       {
         input: "lists = [[1,4,5],[1,3,4],[2,6]]",
         output: "[1,1,2,3,4,4,5,6]",
-        explanation: "Merged together into a single sorted list."
+        explanation: "Merged together into a single sorted list.",
       },
       {
         input: "lists = []",
         output: "[]",
-        explanation: "No lists to merge."
-      }
+        explanation: "No lists to merge.",
+      },
     ],
     constraints: [
       "k == lists.length",
       "0 <= k <= 10^4",
       "0 <= lists[i].length <= 500",
       "-10^4 <= lists[i][j] <= 10^4",
-      "lists[i] is sorted in ascending order."
+      "lists[i] is sorted in ascending order.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2183,8 +2219,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Longest Valid Parentheses",
@@ -2197,18 +2233,15 @@ module.exports = { Solution };`
       {
         input: 's = "(()"',
         output: "2",
-        explanation: 'The longest valid parentheses substring is "()".'
+        explanation: 'The longest valid parentheses substring is "()".',
       },
       {
         input: 's = ")()())"',
         output: "4",
-        explanation: 'The longest valid parentheses substring is "()()".'
-      }
+        explanation: 'The longest valid parentheses substring is "()()".',
+      },
     ],
-    constraints: [
-      "0 <= s.length <= 3 * 10^4",
-      "s[i] is '(' or ')'."
-    ],
+    constraints: ["0 <= s.length <= 3 * 10^4", "s[i] is '(' or ')'."],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -2230,8 +2263,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Edit Distance",
@@ -2249,17 +2282,18 @@ You have the following three operations permitted on a word:
       {
         input: 'word1 = "horse", word2 = "ros"',
         output: "3",
-        explanation: 'horse -> rorse (replace "h" with "r") -> rose (remove "r") -> ros (remove "e").'
+        explanation:
+          'horse -> rorse (replace "h" with "r") -> rose (remove "r") -> ros (remove "e").',
       },
       {
         input: 'word1 = "intention", word2 = "execution"',
         output: "5",
-        explanation: "5 minimum edits required."
-      }
+        explanation: "5 minimum edits required.",
+      },
     ],
     constraints: [
       "0 <= word1.length, word2.length <= 500",
-      "word1 and word2 consist of lowercase English letters."
+      "word1 and word2 consist of lowercase English letters.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2282,8 +2316,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Minimum Window Substring",
@@ -2298,19 +2332,20 @@ The testcases will be generated such that the answer is unique.`,
       {
         input: 's = "ADOBECODEBANC", t = "ABC"',
         output: '"BANC"',
-        explanation: 'The minimum window substring "BANC" includes \'A\', \'B\', and \'C\' from string t.'
+        explanation:
+          "The minimum window substring \"BANC\" includes 'A', 'B', and 'C' from string t.",
       },
       {
         input: 's = "a", t = "a"',
         output: '"a"',
-        explanation: "Entire string is the minimum window."
-      }
+        explanation: "Entire string is the minimum window.",
+      },
     ],
     constraints: [
       "m == s.length",
       "n == t.length",
       "1 <= m, n <= 10^5",
-      "s and t consist of uppercase and lowercase English letters."
+      "s and t consist of uppercase and lowercase English letters.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2333,8 +2368,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Word Ladder",
@@ -2350,15 +2385,19 @@ module.exports = { Solution };`
 Given two words, \`beginWord\` and \`endWord\`, and a dictionary \`wordList\`, return the number of words in the shortest transformation sequence from \`beginWord\` to \`endWord\`, or 0 if no such sequence exists.`,
     examples: [
       {
-        input: 'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]',
+        input:
+          'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]',
         output: "5",
-        explanation: 'One shortest transformation sequence is "hit" -> "hot" -> "dot" -> "dog" -> "cog", which is 5 words long.'
+        explanation:
+          'One shortest transformation sequence is "hit" -> "hot" -> "dot" -> "dog" -> "cog", which is 5 words long.',
       },
       {
-        input: 'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]',
+        input:
+          'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]',
         output: "0",
-        explanation: 'The endWord "cog" is not in wordList, therefore there is no valid transformation sequence.'
-      }
+        explanation:
+          'The endWord "cog" is not in wordList, therefore there is no valid transformation sequence.',
+      },
     ],
     constraints: [
       "1 <= beginWord.length <= 10",
@@ -2367,7 +2406,7 @@ Given two words, \`beginWord\` and \`endWord\`, and a dictionary \`wordList\`, r
       "wordList[i].length == beginWord.length",
       "beginWord, endWord, and wordList[i] consist of lowercase English letters.",
       "beginWord != endWord",
-      "All words in wordList are unique."
+      "All words in wordList are unique.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2390,8 +2429,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Regular Expression Matching",
@@ -2408,25 +2447,26 @@ The matching should cover the entire input string (not partial).`,
       {
         input: 's = "aa", p = "a"',
         output: "false",
-        explanation: '"a" does not match the entire string "aa".'
+        explanation: '"a" does not match the entire string "aa".',
       },
       {
         input: 's = "aa", p = "a*"',
         output: "true",
-        explanation: '\'*\' means zero or more of the preceding element, \'a\'. Therefore, by repeating \'a\' once, it becomes "aa".'
+        explanation:
+          "'*' means zero or more of the preceding element, 'a'. Therefore, by repeating 'a' once, it becomes \"aa\".",
       },
       {
         input: 's = "ab", p = ".*"',
         output: "true",
-        explanation: '".*" means "zero or more (*) of any character (.)".'
-      }
+        explanation: '".*" means "zero or more (*) of any character (.)".',
+      },
     ],
     constraints: [
       "1 <= s.length <= 20",
       "1 <= p.length <= 20",
       "s contains only lowercase English letters.",
       "p contains only lowercase English letters, '.', and '*'.",
-      "It is guaranteed for each appearance of the character '*', there will be a previous valid character to match."
+      "It is guaranteed for each appearance of the character '*', there will be a previous valid character to match.",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2449,8 +2489,8 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Largest Rectangle in Histogram",
@@ -2463,18 +2503,16 @@ module.exports = { Solution };`
       {
         input: "heights = [2,1,5,6,2,3]",
         output: "10",
-        explanation: "The largest rectangle has area = 10 units (between bars of height 5 and 6, width 2)."
+        explanation:
+          "The largest rectangle has area = 10 units (between bars of height 5 and 6, width 2).",
       },
       {
         input: "heights = [2,4]",
         output: "4",
-        explanation: "Area 4 (height 4, width 1)."
-      }
+        explanation: "Area 4 (height 4, width 1).",
+      },
     ],
-    constraints: [
-      "1 <= heights.length <= 10^5",
-      "0 <= heights[i] <= 10^4"
-    ],
+    constraints: ["1 <= heights.length <= 10^5", "0 <= heights[i] <= 10^4"],
     starterTemplates: {
       cpp: `class Solution {
 public:
@@ -2496,14 +2534,20 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
+module.exports = { Solution };`,
+    },
   },
   {
     title: "Sliding Window Maximum",
     slug: "sliding-window-maximum",
     difficulty: "Hard",
-    tags: ["Array", "Queue", "Sliding Window", "Heap (Priority Queue)", "Monotonic Queue"],
+    tags: [
+      "Array",
+      "Queue",
+      "Sliding Window",
+      "Heap (Priority Queue)",
+      "Monotonic Queue",
+    ],
     time_limit: 4000,
     statement: `You are given an array of integers \`nums\`, there is a sliding window of size \`k\` which is moving from the very left of the array to the very right. You can only see the \`k\` numbers in the window. Each time the sliding window moves right by one position.
 
@@ -2519,18 +2563,18 @@ Return the max sliding window.`,
  1  3 [-1  -3  5] 3  6  7       5
  1  3  -1 [-3  5  3] 6  7       5
  1  3  -1  -3 [5  3  6] 7       6
- 1  3  -1  -3  5 [3  6  7]      7`
+ 1  3  -1  -3  5 [3  6  7]      7`,
       },
       {
         input: "nums = [1], k = 1",
         output: "[1]",
-        explanation: "Single element window."
-      }
+        explanation: "Single element window.",
+      },
     ],
     constraints: [
       "1 <= nums.length <= 10^5",
       "-10^4 <= nums[i] <= 10^4",
-      "1 <= k <= nums.length"
+      "1 <= k <= nums.length",
     ],
     starterTemplates: {
       cpp: `class Solution {
@@ -2553,23 +2597,29 @@ public:
     }
 }
 
-module.exports = { Solution };`
-    }
-  }
+module.exports = { Solution };`,
+    },
+  },
 ];
 
 export const formatProblemDescription = (problem) => {
-  const examplesMarkdown = problem.examples.map((ex, i) => `### Example ${i + 1}
+  const examplesMarkdown = problem.examples
+    .map(
+      (ex, i) => `### Example ${i + 1}
 **Input:** \`${ex.input}\`  
 **Output:** \`${ex.output}\`  
-${ex.explanation ? `**Explanation:** ${ex.explanation}` : ''}
-`).join('\n');
+${ex.explanation ? `**Explanation:** ${ex.explanation}` : ""}
+`,
+    )
+    .join("\n");
 
-  const constraintsMarkdown = problem.constraints.map((c) => `- ${c}`).join('\n');
+  const constraintsMarkdown = problem.constraints
+    .map((c) => `- ${c}`)
+    .join("\n");
 
   return `# ${problem.title}
 
-**Difficulty:** ${problem.difficulty} | **Topics:** ${problem.tags.join(', ')}
+**Difficulty:** ${problem.difficulty} | **Topics:** ${problem.tags.join(", ")}
 
 ## Description
 ${problem.statement}

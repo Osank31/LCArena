@@ -59,7 +59,8 @@ describe("apiClient and token storage", () => {
       setStoredToken("bearer_jwt_token");
       const config: any = { headers: {} };
       // Invoke the request interceptor handler directly
-      const requestHandler = (apiClient.interceptors.request as any).handlers[0].fulfilled;
+      const requestHandler = (apiClient.interceptors.request as any).handlers[0]
+        .fulfilled;
       const modified = requestHandler(config);
 
       expect(modified.headers.Authorization).toBe("Bearer bearer_jwt_token");
@@ -68,7 +69,8 @@ describe("apiClient and token storage", () => {
     it("does not attach Authorization header when no token exists", () => {
       setStoredToken(null);
       const config: any = { headers: {} };
-      const requestHandler = (apiClient.interceptors.request as any).handlers[0].fulfilled;
+      const requestHandler = (apiClient.interceptors.request as any).handlers[0]
+        .fulfilled;
       const modified = requestHandler(config);
 
       expect(modified.headers.Authorization).toBeUndefined();
@@ -77,13 +79,15 @@ describe("apiClient and token storage", () => {
 
   describe("response interceptor 401 handling", () => {
     it("passes through successful responses", () => {
-      const responseHandler = (apiClient.interceptors.response as any).handlers[0].fulfilled;
+      const responseHandler = (apiClient.interceptors.response as any)
+        .handlers[0].fulfilled;
       const fakeResponse = { data: { success: true }, status: 200 };
       expect(responseHandler(fakeResponse)).toBe(fakeResponse);
     });
 
     it("rejects immediately if error has no config or is auth route", async () => {
-      const errorHandler = (apiClient.interceptors.response as any).handlers[0].rejected;
+      const errorHandler = (apiClient.interceptors.response as any).handlers[0]
+        .rejected;
 
       const noConfigErr: any = new Error("No config");
       await expect(errorHandler(noConfigErr)).rejects.toThrow("No config");
@@ -95,7 +99,8 @@ describe("apiClient and token storage", () => {
     });
 
     it("refreshes token on 401 and replays request", async () => {
-      const errorHandler = (apiClient.interceptors.response as any).handlers[0].rejected;
+      const errorHandler = (apiClient.interceptors.response as any).handlers[0]
+        .rejected;
 
       setStoredRefreshToken("valid_refresh_token");
 
@@ -130,12 +135,15 @@ describe("apiClient and token storage", () => {
     });
 
     it("clears tokens when token refresh fails on 401", async () => {
-      const errorHandler = (apiClient.interceptors.response as any).handlers[0].rejected;
+      const errorHandler = (apiClient.interceptors.response as any).handlers[0]
+        .rejected;
 
       setStoredToken("stale_access");
       setStoredRefreshToken("stale_refresh");
 
-      vi.spyOn(axios, "post").mockRejectedValueOnce(new Error("Refresh expired"));
+      vi.spyOn(axios, "post").mockRejectedValueOnce(
+        new Error("Refresh expired"),
+      );
 
       const err: any = new AxiosError("401 error");
       err.config = { url: "/api/problems", headers: {} };

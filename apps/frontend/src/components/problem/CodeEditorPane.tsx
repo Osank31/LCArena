@@ -123,7 +123,7 @@ export const definePaperEditorTheme: BeforeMount = (monaco) => {
       "menu.border": "#D8CBB5",
       "menu.separatorBackground": "#D8CBB5",
       // Find / replace widget
-      "editorFindMatchHighlight": "#D8CBB5",
+      editorFindMatchHighlight: "#D8CBB5",
       "editor.findMatchBackground": "#C6B79C",
       "editor.findMatchBorder": "#211E19",
       // Minimap & scrollbar
@@ -156,7 +156,11 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
       const saved = localStorage.getItem(FONT_SIZE_STORAGE_KEY);
       if (saved) {
         const parsed = parseInt(saved, 10);
-        if (!isNaN(parsed) && parsed >= MIN_FONT_SIZE && parsed <= MAX_FONT_SIZE) {
+        if (
+          !isNaN(parsed) &&
+          parsed >= MIN_FONT_SIZE &&
+          parsed <= MAX_FONT_SIZE
+        ) {
           return parsed;
         }
       }
@@ -214,7 +218,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
             language_id: monacoLang,
             cursor_position: { row: 1, col: 1 },
           },
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
       } catch (err) {
         if (!axios.isCancel(err)) {
@@ -222,7 +226,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
         }
       }
     },
-    [aiEnabled, monacoLang]
+    [aiEnabled, monacoLang],
   );
 
   const handleEditorMount: OnMount = (editor) => {

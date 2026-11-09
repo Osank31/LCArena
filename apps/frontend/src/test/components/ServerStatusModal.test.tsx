@@ -24,23 +24,30 @@ describe("ServerStatusModal component", () => {
 
     expect(screen.getByText(MODAL_TITLE)).toBeInTheDocument();
     expect(
-      screen.getByText(/Sorry, I haven't deployed the backend yet! T-T/i)
+      screen.getByText(/Sorry, I haven't deployed the backend yet! T-T/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/running the code execution servers and supporting infrastructure gets pretty expensive/i)
+      screen.getByText(
+        /running the code execution servers and supporting infrastructure gets pretty expensive/i,
+      ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/LCArena is available as a frontend demo/i)
+      screen.getByText(/LCArena is available as a frontend demo/i),
     ).toBeInTheDocument();
     expect(screen.getByText(RUN_COMMAND)).toBeInTheDocument();
     expect(screen.getByText(REPO_URL)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /copy run command/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /copy repository url/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /retry connection/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /gitHub repository/i })).toHaveAttribute(
-      "href",
-      REPO_URL
-    );
+    expect(
+      screen.getByRole("button", { name: /copy run command/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /copy repository url/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /retry connection/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /gitHub repository/i }),
+    ).toHaveAttribute("href", REPO_URL);
   });
 
   it("copies run command to clipboard when Copy Command button is clicked", async () => {
@@ -53,7 +60,9 @@ describe("ServerStatusModal component", () => {
 
     render(<ServerStatusModal initialOpen={true} />);
 
-    const copyCmdBtn = screen.getByRole("button", { name: /copy run command/i });
+    const copyCmdBtn = screen.getByRole("button", {
+      name: /copy run command/i,
+    });
     fireEvent.click(copyCmdBtn);
 
     expect(writeTextMock).toHaveBeenCalledWith(RUN_COMMAND);
@@ -70,7 +79,9 @@ describe("ServerStatusModal component", () => {
 
     render(<ServerStatusModal initialOpen={true} />);
 
-    const copyUrlBtn = screen.getByRole("button", { name: /copy repository url/i });
+    const copyUrlBtn = screen.getByRole("button", {
+      name: /copy repository url/i,
+    });
     fireEvent.click(copyUrlBtn);
 
     expect(writeTextMock).toHaveBeenCalledWith(REPO_URL);
@@ -89,7 +100,9 @@ describe("ServerStatusModal component", () => {
   });
 
   it("handles retry connection successfully when health check passes", async () => {
-    vi.spyOn(apiClient, "get").mockResolvedValueOnce({ data: { message: "Healthy" } });
+    vi.spyOn(apiClient, "get").mockResolvedValueOnce({
+      data: { message: "Healthy" },
+    });
     const handleDismiss = vi.fn();
 
     render(<ServerStatusModal initialOpen={true} onDismiss={handleDismiss} />);
@@ -104,7 +117,9 @@ describe("ServerStatusModal component", () => {
   });
 
   it("displays error message when retry connection fails", async () => {
-    vi.spyOn(apiClient, "get").mockRejectedValueOnce(new Error("Connection refused"));
+    vi.spyOn(apiClient, "get").mockRejectedValueOnce(
+      new Error("Connection refused"),
+    );
 
     render(<ServerStatusModal initialOpen={true} />);
 
@@ -112,7 +127,7 @@ describe("ServerStatusModal component", () => {
     fireEvent.click(retryBtn);
 
     expect(
-      await screen.findByText(/server is still unreachable/i)
+      await screen.findByText(/server is still unreachable/i),
     ).toBeInTheDocument();
   });
 });

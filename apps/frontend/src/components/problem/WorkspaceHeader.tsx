@@ -1,12 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  ChevronLeft,
-  Play,
-  RotateCcw,
-  Send,
-  Sparkles,
-} from "lucide-react";
+import { ChevronLeft, Play, RotateCcw, Send, Sparkles } from "lucide-react";
 import { useBackendStatus } from "../../hooks/useBackendStatus";
 import { ParsedProblem } from "../../types/problem.types";
 import { SupportedLanguage } from "../../types/submission.types";
@@ -71,7 +65,9 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
         )}
         {isOffline && (
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"))}
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"))
+            }
             className="hidden lg:inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-sm border border-rule-2 text-ink-3 hover:text-ink hover:border-ink-3 bg-paper transition-colors cursor-pointer"
             title="Frontend Demo Mode — View Developer Apology Note"
           >
@@ -85,7 +81,9 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
         {/* Language selector */}
         <select
           value={selectedLanguage}
-          onChange={(e) => onLanguageChange(e.target.value as SupportedLanguage)}
+          onChange={(e) =>
+            onLanguageChange(e.target.value as SupportedLanguage)
+          }
           aria-label="Select programming language"
           className="bg-paper border border-rule-2 rounded-sm px-2.5 py-1 text-xs text-ink-2 font-mono focus:outline-none focus:border-ink cursor-pointer"
         >

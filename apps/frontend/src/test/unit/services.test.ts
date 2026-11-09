@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authService } from "../../services/authService";
 import { problemService } from "../../services/problemService";
 import { submissionService } from "../../services/submissionService";
-import { apiClient, getStoredToken, setStoredToken } from "../../services/apiClient";
+import {
+  apiClient,
+  getStoredToken,
+  setStoredToken,
+} from "../../services/apiClient";
 import { backendStatus } from "../../services/backendStatus";
 import { IProblem } from "../../types/problem.types";
 import { ISubmission } from "../../types/submission.types";
@@ -151,7 +155,9 @@ describe("authService", () => {
   });
 
   it("deleteAccount deletes account and clears storage", async () => {
-    (apiClient.delete as any).mockResolvedValueOnce({ data: { success: true } });
+    (apiClient.delete as any).mockResolvedValueOnce({
+      data: { success: true },
+    });
     await authService.deleteAccount("confirm_pw");
     expect(apiClient.delete).toHaveBeenCalledWith("/auth/account", {
       data: { password: "confirm_pw" },
@@ -196,7 +202,9 @@ describe("problemService", () => {
   });
 
   it("getProblemById throws if problem is not found", async () => {
-    await expect(problemService.getProblemById("unknown-problem-id")).rejects.toThrow("Problem not found");
+    await expect(
+      problemService.getProblemById("unknown-problem-id"),
+    ).rejects.toThrow("Problem not found");
   });
 
   it("fetchRemoteProblems fetches and parses problems from backend API", async () => {
@@ -227,7 +235,9 @@ describe("problemService", () => {
       data: { success: true, data: null },
     });
 
-    await expect(problemService.fetchRemoteProblemById("p1")).rejects.toThrow("Problem not found");
+    await expect(problemService.fetchRemoteProblemById("p1")).rejects.toThrow(
+      "Problem not found",
+    );
   });
 });
 
@@ -272,7 +282,10 @@ describe("submissionService", () => {
   });
 
   it("pollVerdict polls until verdict is SUCCESS", async () => {
-    const pendingSub = { ...sampleSubmission, status: { status: "PENDING" as const } };
+    const pendingSub = {
+      ...sampleSubmission,
+      status: { status: "PENDING" as const },
+    };
     const finishedSub = {
       ...sampleSubmission,
       status: {
@@ -293,7 +306,7 @@ describe("submissionService", () => {
       "sub_99",
       (update) => progressUpdates.push(update),
       5,
-      50 // fast 50ms interval for tests
+      50, // fast 50ms interval for tests
     );
 
     expect(result.status.status).toBe("SUCCESS");
@@ -343,7 +356,8 @@ describe("submissionService", () => {
       userId: "anonymous",
     });
 
-    const userSubs = submissionService.getLocalSubmissions("user_authenticated");
+    const userSubs =
+      submissionService.getLocalSubmissions("user_authenticated");
     expect(userSubs.some((s) => s._id === "sub_anon_1")).toBe(true);
   });
 });

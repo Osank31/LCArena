@@ -52,7 +52,7 @@ describe("WorkspaceHeader component", () => {
           aiEnabled={false}
           onToggleAi={() => {}}
         />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("Valid Parentheses")).toBeInTheDocument();
@@ -82,10 +82,14 @@ describe("ProblemDescription component", () => {
     expect(screen.getByText("Valid Parentheses")).toBeInTheDocument();
     expect(screen.getByText("2000ms")).toBeInTheDocument();
     expect(screen.getByText("Stack")).toBeInTheDocument();
-    expect(screen.getByText(/Given string s containing parentheses/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Given string s containing parentheses/),
+    ).toBeInTheDocument();
     expect(screen.getByText('s = "()"')).toBeInTheDocument();
     expect(screen.getByText("true")).toBeInTheDocument();
-    expect(screen.getByText("Parentheses match perfectly.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Parentheses match perfectly."),
+    ).toBeInTheDocument();
     expect(screen.getByText("1 <= s.length <= 10^4")).toBeInTheDocument();
   });
 });
@@ -93,11 +97,7 @@ describe("ProblemDescription component", () => {
 describe("OutputConsole component", () => {
   it("renders execution evaluation spinner when isEvaluating is true", () => {
     render(
-      <OutputConsole
-        problem={mockProblem}
-        isEvaluating={true}
-        result={null}
-      />
+      <OutputConsole problem={mockProblem} isEvaluating={true} result={null} />,
     );
 
     expect(screen.getByText(/running evaluation/i)).toBeInTheDocument();
@@ -115,7 +115,7 @@ describe("OutputConsole component", () => {
           failedCases: { tle: [], re: [], wa: [] },
           executionTimeMs: { tc_01: 25 },
         }}
-      />
+      />,
     );
 
     expect(screen.getByText("Accepted")).toBeInTheDocument();
@@ -132,11 +132,13 @@ describe("OutputConsole component", () => {
           status: "COMPILE_ERROR",
           compileError: "error: syntax error near unexpected token",
         }}
-      />
+      />,
     );
 
     expect(screen.getByText("Compilation Error")).toBeInTheDocument();
-    expect(screen.getByText(/syntax error near unexpected token/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/syntax error near unexpected token/),
+    ).toBeInTheDocument();
   });
 
   it("renders sample test case when Sample Testcase tab is clicked", () => {
@@ -145,7 +147,7 @@ describe("OutputConsole component", () => {
         problem={mockProblem}
         isEvaluating={false}
         result={null}
-      />
+      />,
     );
 
     fireEvent.click(screen.getByText("Sample Testcase"));
@@ -201,7 +203,7 @@ describe("CodeEditorPane component", () => {
         onChange={handleChange}
         language="js"
         aiEnabled={true}
-      />
+      />,
     );
 
     expect(screen.getByTestId("code-editor-container")).toBeInTheDocument();
@@ -216,11 +218,7 @@ describe("CodeEditorPane component", () => {
     const handleChange = vi.fn();
 
     const { rerender } = render(
-      <CodeEditorPane
-        value="# Python"
-        onChange={handleChange}
-        language="py"
-      />
+      <CodeEditorPane value="# Python" onChange={handleChange} language="py" />,
     );
     expect(screen.getByTestId("code-editor-textarea")).toHaveValue("# Python");
 
@@ -229,7 +227,7 @@ describe("CodeEditorPane component", () => {
         value="// Java"
         onChange={handleChange}
         language="java"
-      />
+      />,
     );
     expect(screen.getByTestId("code-editor-textarea")).toHaveValue("// Java");
   });
@@ -244,14 +242,18 @@ describe("CodeEditorPane component", () => {
         onChange={handleChange}
         language="js"
         onFontSizeChange={handleFontSizeChange}
-      />
+      />,
     );
 
     expect(screen.getByTestId("editor-font-size-controls")).toBeInTheDocument();
     expect(screen.getByText("13px")).toBeInTheDocument();
 
-    const increaseBtn = screen.getByRole("button", { name: /increase font size/i });
-    const decreaseBtn = screen.getByRole("button", { name: /decrease font size/i });
+    const increaseBtn = screen.getByRole("button", {
+      name: /increase font size/i,
+    });
+    const decreaseBtn = screen.getByRole("button", {
+      name: /decrease font size/i,
+    });
     const resetBtn = screen.getByRole("button", { name: /reset font size/i });
 
     // Increase font size

@@ -8,7 +8,7 @@ describe("Resizable and Panel components", () => {
     render(
       <Panel className="custom-panel" style={{ color: "red" }}>
         <span>Panel Content</span>
-      </Panel>
+      </Panel>,
     );
 
     expect(screen.getByText("Panel Content")).toBeInTheDocument();
@@ -18,16 +18,22 @@ describe("Resizable and Panel components", () => {
     const onResizeMock = vi.fn();
 
     const { container } = render(
-      <Resizable direction="horizontal" initialSize={40} onResize={onResizeMock}>
+      <Resizable
+        direction="horizontal"
+        initialSize={40}
+        onResize={onResizeMock}
+      >
         <div>Left Child</div>
         <div>Right Child</div>
-      </Resizable>
+      </Resizable>,
     );
 
     expect(screen.getByText("Left Child")).toBeInTheDocument();
     expect(screen.getByText("Right Child")).toBeInTheDocument();
 
-    const divider = container.querySelector('[style*="col-resize"]') as HTMLElement;
+    const divider = container.querySelector(
+      '[style*="col-resize"]',
+    ) as HTMLElement;
     expect(divider).toBeInTheDocument();
 
     // Hover events
@@ -40,13 +46,15 @@ describe("Resizable and Panel components", () => {
       <Resizable direction="vertical" initialSize={60}>
         <div>Top Child</div>
         <div>Bottom Child</div>
-      </Resizable>
+      </Resizable>,
     );
 
     expect(screen.getByText("Top Child")).toBeInTheDocument();
     expect(screen.getByText("Bottom Child")).toBeInTheDocument();
 
-    const divider = container.querySelector('[style*="row-resize"]') as HTMLElement;
+    const divider = container.querySelector(
+      '[style*="row-resize"]',
+    ) as HTMLElement;
     expect(divider).toBeInTheDocument();
   });
 
@@ -54,7 +62,8 @@ describe("Resizable and Panel components", () => {
     const onResizeMock = vi.fn();
 
     // Mock getBoundingClientRect on container
-    const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+    const originalGetBoundingClientRect =
+      Element.prototype.getBoundingClientRect;
     Element.prototype.getBoundingClientRect = vi.fn(() => ({
       width: 1000,
       height: 600,
@@ -77,10 +86,12 @@ describe("Resizable and Panel components", () => {
       >
         <div>Left Pane</div>
         <div>Right Pane</div>
-      </Resizable>
+      </Resizable>,
     );
 
-    const divider = container.querySelector('[style*="col-resize"]') as HTMLElement;
+    const divider = container.querySelector(
+      '[style*="col-resize"]',
+    ) as HTMLElement;
 
     // Simulate pointer down (left click)
     fireEvent.pointerDown(divider, {
@@ -110,7 +121,8 @@ describe("Resizable and Panel components", () => {
   it("handles vertical pointer drag", () => {
     const onResizeMock = vi.fn();
 
-    const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+    const originalGetBoundingClientRect =
+      Element.prototype.getBoundingClientRect;
     Element.prototype.getBoundingClientRect = vi.fn(() => ({
       width: 800,
       height: 1000,
@@ -132,10 +144,12 @@ describe("Resizable and Panel components", () => {
       >
         <div>Top Pane</div>
         <div>Bottom Pane</div>
-      </Resizable>
+      </Resizable>,
     );
 
-    const divider = container.querySelector('[style*="row-resize"]') as HTMLElement;
+    const divider = container.querySelector(
+      '[style*="row-resize"]',
+    ) as HTMLElement;
 
     fireEvent.pointerDown(divider, {
       button: 0,

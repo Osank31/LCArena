@@ -8,26 +8,26 @@
 
 ## Audit metadata
 
-| Item | Value |
-| :--- | :--- |
-| Audit date | **2026-10-17** |
-| Repository | LCArena monorepo |
-| Branch / commit | `main` · `51b00c6` (“Added performance visulization”) |
-| Working tree at audit start/end | Clean (`git status --short` produced no output) |
-| Host | Windows 11 AMD64 · Node.js **v24.16.0** · npm **11.15.0** |
-| Docker CLI | **29.5.2** installed, but the Docker daemon was **not running** on 2026-10-17 |
-| Historical test window | 2026-10-11 → 2026-10-14 (archived artifacts) |
-| Fresh re-runs | 2026-10-17: typecheck, backend build, backend unit tests, frontend unit tests, backend coverage, frontend coverage, lint |
+| Item                            | Value                                                                                                                    |
+| :------------------------------ | :----------------------------------------------------------------------------------------------------------------------- |
+| Audit date                      | **2026-10-17**                                                                                                           |
+| Repository                      | LCArena monorepo                                                                                                         |
+| Branch / commit                 | `main` · `51b00c6` (“Added performance visulization”)                                                                    |
+| Working tree at audit start/end | Clean (`git status --short` produced no output)                                                                          |
+| Host                            | Windows 11 AMD64 · Node.js **v24.16.0** · npm **11.15.0**                                                                |
+| Docker CLI                      | **29.5.2** installed, but the Docker daemon was **not running** on 2026-10-17                                            |
+| Historical test window          | 2026-10-11 → 2026-10-14 (archived artifacts)                                                                             |
+| Fresh re-runs                   | 2026-10-17: typecheck, backend build, backend unit tests, frontend unit tests, backend coverage, frontend coverage, lint |
 
 ### Evidence legend used throughout
 
-| Tag | Meaning |
-| :--- | :--- |
-| **[V]** | Verified directly in source/configuration during this audit. |
+| Tag     | Meaning                                                                                         |
+| :------ | :---------------------------------------------------------------------------------------------- |
+| **[V]** | Verified directly in source/configuration during this audit.                                    |
 | **[H]** | Historical execution evidence found in `test-artifacts/`, `coverage/` or `tests/load/results/`. |
-| **[R]** | Re-run by this audit on 2026-10-17; results are reported separately from history. |
-| **[U]** | Configured or claimed, but execution cannot be verified. |
-| **[N]** | Not implemented, or the target does not exist in the repository. |
+| **[R]** | Re-run by this audit on 2026-10-17; results are reported separately from history.               |
+| **[U]** | Configured or claimed, but execution cannot be verified.                                        |
+| **[N]** | Not implemented, or the target does not exist in the repository.                                |
 
 **Important rule used in this report:** a test file existing does **not** mean the test ran, and a wrapper script exiting `0` does **not** mean every assertion passed. Both distinctions matter in this repository.
 
@@ -88,27 +88,27 @@ LCArena has a genuinely broad automated test story for a project of this size: *
 
 ### 1.3 Status at a glance
 
-| Area | Status | Short reason |
-| :--- | :--- | :--- |
-| TypeScript typecheck | **Executed — Passed** | 15/15 Turbo tasks (10 check-types + 5 dependency builds), 0 errors, fresh on 2026-10-17 |
-| Backend build | **Executed — Passed** | 10/10 workspaces, fresh on 2026-10-17 |
-| ESLint | **Executed — Failed (tool crash)** | `ts-api-utils` crashes before any file is linted |
-| Backend unit tests | **Executed — Passed** | 199/199 tests, fresh on 2026-10-17 |
-| Frontend unit/component tests | **Executed — Passed** | 182/182 tests in 26 files, fresh on 2026-10-17 |
-| Backend coverage | **Executed — Passed (no gate)** | 88.64% lines / 86.43% branches / 86.90% functions |
-| Frontend coverage | **Executed — Failed** | 75.44% branches < configured 80% threshold |
-| API integration | **Executed — Passed** | 69 individual tests across problem/submission/gateway, 0 failures |
-| Database persistence | **Executed — Passed** | Real MongoDB read-back assertions |
-| Queue / async | **Executed — Passed** | Publish exactly once, consume, idempotency |
-| JavaScript sandbox E2E | **Executed — Passed** | AC/WA/CE/RE/TLE + concurrency + cleanup |
-| C++/Java/Python E2E | **Configured — Execution failed to start** | Target `languages.e2e.ts` does not exist |
-| Closed-loop load | **Executed — Passed** | Smoke/normal/stress, 0% errors |
-| k6 load suite | **Executed — Completed with failures; wrapper exit 0** | 29 tests, 113,494 checks, 845 failed |
-| Security assertions | **Executed — Passed** | Auth, RBAC, IDOR, token revocation, spoofing |
-| CI workflow | **Configured — Execution unverified** | No GitHub Actions run log or artifact in repo |
-| Browser E2E / accessibility / visual | **Not Implemented** | No Playwright/Cypress or equivalent |
-| AI suggestion service tests | **Not Implemented** | No Python test suite |
-| Sockets/notification tests | **Not Implemented** | The service itself is absent |
+| Area                                 | Status                                                 | Short reason                                                                            |
+| :----------------------------------- | :----------------------------------------------------- | :-------------------------------------------------------------------------------------- |
+| TypeScript typecheck                 | **Executed — Passed**                                  | 15/15 Turbo tasks (10 check-types + 5 dependency builds), 0 errors, fresh on 2026-10-17 |
+| Backend build                        | **Executed — Passed**                                  | 10/10 workspaces, fresh on 2026-10-17                                                   |
+| ESLint                               | **Executed — Failed (tool crash)**                     | `ts-api-utils` crashes before any file is linted                                        |
+| Backend unit tests                   | **Executed — Passed**                                  | 199/199 tests, fresh on 2026-10-17                                                      |
+| Frontend unit/component tests        | **Executed — Passed**                                  | 182/182 tests in 26 files, fresh on 2026-10-17                                          |
+| Backend coverage                     | **Executed — Passed (no gate)**                        | 88.64% lines / 86.43% branches / 86.90% functions                                       |
+| Frontend coverage                    | **Executed — Failed**                                  | 75.44% branches < configured 80% threshold                                              |
+| API integration                      | **Executed — Passed**                                  | 69 individual tests across problem/submission/gateway, 0 failures                       |
+| Database persistence                 | **Executed — Passed**                                  | Real MongoDB read-back assertions                                                       |
+| Queue / async                        | **Executed — Passed**                                  | Publish exactly once, consume, idempotency                                              |
+| JavaScript sandbox E2E               | **Executed — Passed**                                  | AC/WA/CE/RE/TLE + concurrency + cleanup                                                 |
+| C++/Java/Python E2E                  | **Configured — Execution failed to start**             | Target `languages.e2e.ts` does not exist                                                |
+| Closed-loop load                     | **Executed — Passed**                                  | Smoke/normal/stress, 0% errors                                                          |
+| k6 load suite                        | **Executed — Completed with failures; wrapper exit 0** | 29 tests, 113,494 checks, 845 failed                                                    |
+| Security assertions                  | **Executed — Passed**                                  | Auth, RBAC, IDOR, token revocation, spoofing                                            |
+| CI workflow                          | **Configured — Execution unverified**                  | No GitHub Actions run log or artifact in repo                                           |
+| Browser E2E / accessibility / visual | **Not Implemented**                                    | No Playwright/Cypress or equivalent                                                     |
+| AI suggestion service tests          | **Not Implemented**                                    | No Python test suite                                                                    |
+| Sockets/notification tests           | **Not Implemented**                                    | The service itself is absent                                                            |
 
 ### 1.4 What I could and could not verify
 
@@ -134,58 +134,58 @@ LCArena has a genuinely broad automated test story for a project of this size: *
 
 LCArena is a Turborepo monorepo with npm workspaces. The test-relevant services are:
 
-| Component | Path | Dev port | Role |
-| :--- | :--- | ---: | :--- |
-| API Gateway | `apps/apis/gateway` | 3000 | Auth, sessions, OTP, RBAC, reverse proxy |
-| Problem service | `apps/apis/problem` | 3001 | Problem CRUD and test-case upload |
-| Submission service | `apps/apis/submission` | 3002 | Submission intake and queue publish |
-| Mail service | `apps/apis/mail` | 3003 | OTP email delivery (queued; `POST /otp` answers `202` before SMTP runs) |
-| Execution worker | `apps/apis/execution` | 3004 (`/health`) | RabbitMQ consumer + Docker sandbox orchestration |
-| AI suggestion service | `apps/apis/ai-suggestion-service` | 8000 | Python/FastAPI code completion |
-| Frontend | `apps/frontend` | 5173 | React/Vite SPA |
-| MongoDB | Docker | 27017 | Users, problems, submissions |
-| Redis | Docker | 6379 | Sessions, JTI blacklist, OTPs |
-| RabbitMQ | Docker | 5672 / 15672 | `submission.created`, `submission.completed`, dead-letter queue |
-| MinIO / S3 | Docker | 9000 / 9001 | Test-case object storage |
+| Component             | Path                              |         Dev port | Role                                                                    |
+| :-------------------- | :-------------------------------- | ---------------: | :---------------------------------------------------------------------- |
+| API Gateway           | `apps/apis/gateway`               |             3000 | Auth, sessions, OTP, RBAC, reverse proxy                                |
+| Problem service       | `apps/apis/problem`               |             3001 | Problem CRUD and test-case upload                                       |
+| Submission service    | `apps/apis/submission`            |             3002 | Submission intake and queue publish                                     |
+| Mail service          | `apps/apis/mail`                  |             3003 | OTP email delivery (queued; `POST /otp` answers `202` before SMTP runs) |
+| Execution worker      | `apps/apis/execution`             | 3004 (`/health`) | RabbitMQ consumer + Docker sandbox orchestration                        |
+| AI suggestion service | `apps/apis/ai-suggestion-service` |             8000 | Python/FastAPI code completion                                          |
+| Frontend              | `apps/frontend`                   |             5173 | React/Vite SPA                                                          |
+| MongoDB               | Docker                            |            27017 | Users, problems, submissions                                            |
+| Redis                 | Docker                            |             6379 | Sessions, JTI blacklist, OTPs                                           |
+| RabbitMQ              | Docker                            |     5672 / 15672 | `submission.created`, `submission.completed`, dead-letter queue         |
+| MinIO / S3            | Docker                            |      9000 / 9001 | Test-case object storage                                                |
 
 **Sockets service:** `AGENTS.md` describes `apps/apis/sockets` on port 3007, but the directory has no files and `docs/BACKEND.md` explicitly calls it “not implemented in this repository”. The `submission.completed` queue therefore has **no production consumer**; the frontend polls `GET /api/submissions/:id` instead. `apps/apis/socket` and `apps/apis/payment` exist only as empty directories and are not npm workspaces.
 
 ### 2.2 Test surfaces map
 
-| Surface | Where it lives | What it drives |
-| :--- | :--- | :--- |
-| Backend unit | Each workspace's `test/unit/` | Pure functions, schemas, middleware, consumer logic, executor script generation |
-| Frontend unit/component | `apps/frontend/src/test/` | React components, pages, routing, services, utilities |
-| API integration | `apps/apis/*/test/integration/*.api.test.js` | Real HTTP services + real Mongo/Redis/RabbitMQ/MinIO |
-| Sandbox E2E | `apps/apis/execution/test/integration/full-flow.e2e.ts` | Full HTTP → queue → worker → Docker → MongoDB → completed queue path |
-| Closed-loop load | `scripts/load/run-load.mjs` | Happy-path Problem GET and Submission POST with a fixed worker pool |
-| k6 load/stress | `tests/load/` | 29 scenarios: profiles, 12 endpoints, 4 isolated services, 2 workflows |
-| Static analysis | Root and workspace scripts | `tsc --noEmit`, ESLint |
-| Coverage | `scripts/test/coverage.mjs`, Vitest config | Node V8 and Vitest v8 coverage |
-| Reporting | `test-artifacts/verification/run-all-tests.sh`, `scripts/test/render-report.mjs` | Per-stage logs, exit codes, consolidated report |
+| Surface                 | Where it lives                                                                   | What it drives                                                                  |
+| :---------------------- | :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| Backend unit            | Each workspace's `test/unit/`                                                    | Pure functions, schemas, middleware, consumer logic, executor script generation |
+| Frontend unit/component | `apps/frontend/src/test/`                                                        | React components, pages, routing, services, utilities                           |
+| API integration         | `apps/apis/*/test/integration/*.api.test.js`                                     | Real HTTP services + real Mongo/Redis/RabbitMQ/MinIO                            |
+| Sandbox E2E             | `apps/apis/execution/test/integration/full-flow.e2e.ts`                          | Full HTTP → queue → worker → Docker → MongoDB → completed queue path            |
+| Closed-loop load        | `scripts/load/run-load.mjs`                                                      | Happy-path Problem GET and Submission POST with a fixed worker pool             |
+| k6 load/stress          | `tests/load/`                                                                    | 29 scenarios: profiles, 12 endpoints, 4 isolated services, 2 workflows          |
+| Static analysis         | Root and workspace scripts                                                       | `tsc --noEmit`, ESLint                                                          |
+| Coverage                | `scripts/test/coverage.mjs`, Vitest config                                       | Node V8 and Vitest v8 coverage                                                  |
+| Reporting               | `test-artifacts/verification/run-all-tests.sh`, `scripts/test/render-report.mjs` | Per-stage logs, exit codes, consolidated report                                 |
 
 ### 2.3 Inter-service paths: tested or not?
 
-| Path | Test evidence | Status |
-| :--- | :--- | :--- |
-| Browser-like client → Gateway | `gateway.api.test.js` (real HTTP) | **Tested** |
-| Gateway → Problem service | Gateway proxy tests + admin CRUD | **Tested** |
-| Gateway → Submission service | Gateway submission routing tests | **Tested** |
-| Gateway → Redis (sessions, JTI, OTP) | Gateway auth/refresh/logout/OTP tests | **Tested** |
-| Gateway → MongoDB (users) | Gateway login/role/delete tests | **Tested** |
-| Gateway → Mail service | Unit tests with recording client (including the un-awaited `dispatchOtp`); integration sets mail URL to a dead port to prove best-effort behaviour | **Partially tested** |
-| Problem service → MongoDB | Integration tests read back with the MongoDB driver | **Tested** |
-| Problem service → MinIO/S3 | `full-flow.e2e.ts` verifies key hierarchy and contents | **Tested (E2E)** |
-| Submission service → MongoDB | Integration tests read back directly | **Tested** |
-| Submission service → RabbitMQ | Integration test inspects the queue | **Tested** |
-| Worker → RabbitMQ | E2E consumes `submission.created` and listens on `submission.completed` | **Tested** |
-| Worker → MongoDB | E2E asserts persisted verdicts | **Tested** |
-| Worker → MinIO/S3 | E2E downloads test cases | **Tested** |
-| Worker → Docker sandbox | E2E runs JavaScript in real containers | **Tested for JS only** |
-| Worker → C++/Java/Python sandbox | Language matrix target is missing | **Not tested end to end** |
-| Worker → `submission.completed` consumer | No consumer exists | **Not implemented** |
-| Frontend → Gateway | Frontend tests mock all services; no real browser E2E | **Not tested against a real backend** |
-| Frontend → AI suggestion service | No frontend test drives a real AI service | **Not tested** |
+| Path                                     | Test evidence                                                                                                                                      | Status                                |
+| :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
+| Browser-like client → Gateway            | `gateway.api.test.js` (real HTTP)                                                                                                                  | **Tested**                            |
+| Gateway → Problem service                | Gateway proxy tests + admin CRUD                                                                                                                   | **Tested**                            |
+| Gateway → Submission service             | Gateway submission routing tests                                                                                                                   | **Tested**                            |
+| Gateway → Redis (sessions, JTI, OTP)     | Gateway auth/refresh/logout/OTP tests                                                                                                              | **Tested**                            |
+| Gateway → MongoDB (users)                | Gateway login/role/delete tests                                                                                                                    | **Tested**                            |
+| Gateway → Mail service                   | Unit tests with recording client (including the un-awaited `dispatchOtp`); integration sets mail URL to a dead port to prove best-effort behaviour | **Partially tested**                  |
+| Problem service → MongoDB                | Integration tests read back with the MongoDB driver                                                                                                | **Tested**                            |
+| Problem service → MinIO/S3               | `full-flow.e2e.ts` verifies key hierarchy and contents                                                                                             | **Tested (E2E)**                      |
+| Submission service → MongoDB             | Integration tests read back directly                                                                                                               | **Tested**                            |
+| Submission service → RabbitMQ            | Integration test inspects the queue                                                                                                                | **Tested**                            |
+| Worker → RabbitMQ                        | E2E consumes `submission.created` and listens on `submission.completed`                                                                            | **Tested**                            |
+| Worker → MongoDB                         | E2E asserts persisted verdicts                                                                                                                     | **Tested**                            |
+| Worker → MinIO/S3                        | E2E downloads test cases                                                                                                                           | **Tested**                            |
+| Worker → Docker sandbox                  | E2E runs JavaScript in real containers                                                                                                             | **Tested for JS only**                |
+| Worker → C++/Java/Python sandbox         | Language matrix target is missing                                                                                                                  | **Not tested end to end**             |
+| Worker → `submission.completed` consumer | No consumer exists                                                                                                                                 | **Not implemented**                   |
+| Frontend → Gateway                       | Frontend tests mock all services; no real browser E2E                                                                                              | **Not tested against a real backend** |
+| Frontend → AI suggestion service         | No frontend test drives a real AI service                                                                                                          | **Not tested**                        |
 
 ---
 
@@ -280,17 +280,17 @@ flowchart TD
 
 ### 3.2 Dependency notes
 
-| Stage | Depends on | Why |
-| :--- | :--- | :--- |
-| Backend unit | Nothing (no DB/broker/Docker) | Mocks/fakes are used where needed |
-| Frontend unit | Nothing external | Services are mocked |
-| Backend coverage | Backend unit tests | Runs the same suites with V8 coverage |
-| Frontend coverage | Frontend unit tests | Runs the same Vitest suites with coverage |
-| Integration API | Docker Compose test infra + real services | Real Mongo/Redis/RabbitMQ/MinIO |
-| Sandbox E2E | Integration infra + Docker daemon + sandbox images | Real containers |
-| Closed-loop load | Docker Compose test infra; host `tsx` services | Isolated stack, happy-path only |
-| k6 load | The **main** `lcarena` Compose stack + Docker | k6 runs in a container on `lcarena_default` |
-| CI | GitHub-hosted runner | Only typecheck/build/unit/coverage |
+| Stage             | Depends on                                         | Why                                         |
+| :---------------- | :------------------------------------------------- | :------------------------------------------ |
+| Backend unit      | Nothing (no DB/broker/Docker)                      | Mocks/fakes are used where needed           |
+| Frontend unit     | Nothing external                                   | Services are mocked                         |
+| Backend coverage  | Backend unit tests                                 | Runs the same suites with V8 coverage       |
+| Frontend coverage | Frontend unit tests                                | Runs the same Vitest suites with coverage   |
+| Integration API   | Docker Compose test infra + real services          | Real Mongo/Redis/RabbitMQ/MinIO             |
+| Sandbox E2E       | Integration infra + Docker daemon + sandbox images | Real containers                             |
+| Closed-loop load  | Docker Compose test infra; host `tsx` services     | Isolated stack, happy-path only             |
+| k6 load           | The **main** `lcarena` Compose stack + Docker      | k6 runs in a container on `lcarena_default` |
+| CI                | GitHub-hosted runner                               | Only typecheck/build/unit/coverage          |
 
 ### 3.3 Where failures are detected
 
@@ -326,15 +326,15 @@ flowchart TD
 
 All re-runs were safe, local, read-only with respect to source code, and did not touch production services.
 
-| Command | Result | Time | Notes |
-| :--- | :--- | ---: | :--- |
-| `npm run check-types -- --force` | **PASS**, 15/15 Turbo tasks (10 check-types + 5 dependency builds), 0 cached | 6.1 s | Fresh TypeScript check |
-| `npm run build:backend -- --force` | **PASS**, 10/10 tasks, 0 cached | 4.7 s | Fresh backend build |
-| `npm run test:backend -- --force` | **PASS**, 199/199 tests, 0 fail/skip | 12.6 s turbo wall clock | Fresh backend unit run |
-| `npm --prefix apps/frontend test` | **PASS**, 26/26 files, 182/182 tests | 24.2 s | Fresh frontend unit run |
-| `npm run test:coverage -- --keep-going` | **PASS**, 88.64% lines / 86.43% branches | ~30 s | Reproduced the archived backend numbers exactly |
-| `npm --prefix apps/frontend run test:coverage` | **FAIL**, branches 75.44% < 80% | ~25 s | Two runs produced 75.73% and 75.44% branches; both fail |
-| `npm run lint` | **FAIL**, exit 2 | 1.7 s | ESLint crashes before analysing files |
+| Command                                        | Result                                                                       |                    Time | Notes                                                   |
+| :--------------------------------------------- | :--------------------------------------------------------------------------- | ----------------------: | :------------------------------------------------------ |
+| `npm run check-types -- --force`               | **PASS**, 15/15 Turbo tasks (10 check-types + 5 dependency builds), 0 cached |                   6.1 s | Fresh TypeScript check                                  |
+| `npm run build:backend -- --force`             | **PASS**, 10/10 tasks, 0 cached                                              |                   4.7 s | Fresh backend build                                     |
+| `npm run test:backend -- --force`              | **PASS**, 199/199 tests, 0 fail/skip                                         | 12.6 s turbo wall clock | Fresh backend unit run                                  |
+| `npm --prefix apps/frontend test`              | **PASS**, 26/26 files, 182/182 tests                                         |                  24.2 s | Fresh frontend unit run                                 |
+| `npm run test:coverage -- --keep-going`        | **PASS**, 88.64% lines / 86.43% branches                                     |                   ~30 s | Reproduced the archived backend numbers exactly         |
+| `npm --prefix apps/frontend run test:coverage` | **FAIL**, branches 75.44% < 80%                                              |                   ~25 s | Two runs produced 75.73% and 75.44% branches; both fail |
+| `npm run lint`                                 | **FAIL**, exit 2                                                             |                   1.7 s | ESLint crashes before analysing files                   |
 
 **Not re-run:** integration, sandbox E2E, k6, closed-loop load. Docker daemon was unavailable. Historical results for those are reported separately and labelled **[H]**.
 
@@ -354,27 +354,27 @@ The strongest historical evidence is the 2026-10-14 verification battery. Its ar
 
 ### 4.4 Current environment vs historical environment
 
-| Item | Historical (artifacts) | Audit (2026-10-17) |
-| :--- | :--- | :--- |
-| OS | Windows 11 AMD64 | Windows 11 AMD64 |
-| Node | v24.16.0 | v24.16.0 |
-| npm | 11.15.0 | 11.15.0 |
-| Docker | Compose v2, 11-container `lcarena` stack | CLI 29.5.2, **daemon not running** |
-| k6 | Grafana k6 **v2.3.0** in an ephemeral container | Not run |
-| MongoDB / Redis / RabbitMQ / MinIO | Real containers | Not started |
-| Host CPU/RAM | **Not recorded** in the historical report | Not measured |
-| Browser | Not used for tests | Not used |
+| Item                               | Historical (artifacts)                          | Audit (2026-10-17)                 |
+| :--------------------------------- | :---------------------------------------------- | :--------------------------------- |
+| OS                                 | Windows 11 AMD64                                | Windows 11 AMD64                   |
+| Node                               | v24.16.0                                        | v24.16.0                           |
+| npm                                | 11.15.0                                         | 11.15.0                            |
+| Docker                             | Compose v2, 11-container `lcarena` stack        | CLI 29.5.2, **daemon not running** |
+| k6                                 | Grafana k6 **v2.3.0** in an ephemeral container | Not run                            |
+| MongoDB / Redis / RabbitMQ / MinIO | Real containers                                 | Not started                        |
+| Host CPU/RAM                       | **Not recorded** in the historical report       | Not measured                       |
+| Browser                            | Not used for tests                              | Not used                           |
 
 ### 4.5 Status vocabulary
 
-| Status | Exact meaning in this report |
-| :--- | :--- |
-| **Executed — Passed** | A command ran in the stated context and every reported assertion/gate passed. |
-| **Executed — Failed** | A command ran and a real assertion, threshold or tool failure occurred. |
-| **Partially Executed** | Some scenarios ran and passed; others failed, were skipped or could not start. |
+| Status                                | Exact meaning in this report                                                       |
+| :------------------------------------ | :--------------------------------------------------------------------------------- |
+| **Executed — Passed**                 | A command ran in the stated context and every reported assertion/gate passed.      |
+| **Executed — Failed**                 | A command ran and a real assertion, threshold or tool failure occurred.            |
+| **Partially Executed**                | Some scenarios ran and passed; others failed, were skipped or could not start.     |
 | **Configured — Execution Unverified** | The test/CI configuration exists, but no trustworthy execution evidence was found. |
-| **Not Implemented** | No test of this kind exists in the repository. |
-| **Unknown** | Evidence is insufficient even to classify. (Rare; used explicitly where needed.) |
+| **Not Implemented**                   | No test of this kind exists in the repository.                                     |
+| **Unknown**                           | Evidence is insufficient even to classify. (Rare; used explicitly where needed.)   |
 
 ---
 
@@ -546,18 +546,18 @@ They catch logic and contract regressions immediately, without needing MongoDB, 
 
 10 backend workspaces, **199 tests across 49 suites**:
 
-| Workspace | Tests | What is covered |
-| :--- | ---: | :--- |
-| `@LCArena/config` | 11 | Redis accessor failure mode, queue names/topology, storage key formatting, S3/MinIO/R2 config resolution |
-| `@LCArena/evaluator` (`apps/apis/execution`) | 41 | RabbitMQ consumer, executor factory, S3 test-case acquisition, submission service logic, test-case validation, message schema |
-| `@LCArena/execution` (`packages/backend/execution`) | 32 | Base `Executor` runner-script generation, tar packaging, path safety, output comparison policy |
-| `@LCArena/gateway` | 7 | Mail client request shape, timeout, token header, failure propagation/best-effort notify, fire-and-forget dispatch |
-| `@LCArena/mail` | 20 | Express app routes (202/503 contract), background dispatcher, OTP templates, validation, real local SMTP delivery |
-| `@LCArena/middlewares` | 18 | `appErrorHandler` mappings, `roleValidation`, `userValidation` |
-| `@LCArena/models` | 20 | User/Problem/Submission schema validation, defaults, enums, indexes, password compare |
-| `@LCArena/problem` | 30 | Problem Zod schemas, id guards, controller error forwarding |
-| `@LCArena/submission` | 9 | Submission create/update schemas, status-stripping, language enum |
-| `@LCArena/utils` | 21 | `AppError` taxonomy, env variable helper, logger table, response helpers |
+| Workspace                                           | Tests | What is covered                                                                                                               |
+| :-------------------------------------------------- | ----: | :---------------------------------------------------------------------------------------------------------------------------- |
+| `@LCArena/config`                                   |    11 | Redis accessor failure mode, queue names/topology, storage key formatting, S3/MinIO/R2 config resolution                      |
+| `@LCArena/evaluator` (`apps/apis/execution`)        |    41 | RabbitMQ consumer, executor factory, S3 test-case acquisition, submission service logic, test-case validation, message schema |
+| `@LCArena/execution` (`packages/backend/execution`) |    32 | Base `Executor` runner-script generation, tar packaging, path safety, output comparison policy                                |
+| `@LCArena/gateway`                                  |     7 | Mail client request shape, timeout, token header, failure propagation/best-effort notify, fire-and-forget dispatch            |
+| `@LCArena/mail`                                     |    20 | Express app routes (202/503 contract), background dispatcher, OTP templates, validation, real local SMTP delivery             |
+| `@LCArena/middlewares`                              |    18 | `appErrorHandler` mappings, `roleValidation`, `userValidation`                                                                |
+| `@LCArena/models`                                   |    20 | User/Problem/Submission schema validation, defaults, enums, indexes, password compare                                         |
+| `@LCArena/problem`                                  |    30 | Problem Zod schemas, id guards, controller error forwarding                                                                   |
+| `@LCArena/submission`                               |     9 | Submission create/update schemas, status-stripping, language enum                                                             |
+| `@LCArena/utils`                                    |    21 | `AppError` taxonomy, env variable helper, logger table, response helpers                                                      |
 
 **4. How does it work?**
 
@@ -691,14 +691,15 @@ They catch broken rendering, missing labels, wrong button behaviour, bad form va
 
 **26 test files, 182 tests**, organized as:
 
-| Area | Files | Examples of what is checked |
-| :--- | ---: | :--- |
-| Common components | 11 | Button rendering/click/loading, Input label/error/helper, Modal open/close/Escape, Badge variants, Tabs, Navbar dropdown/mobile menu, Resizable drag, Alert, EmptyState, ServerStatusModal, workspace panels |
-| Pages | 8 | Login (password + OTP tabs), Register, Problems list, Problem detail (load, language switch, reset, Run), Submissions, Profile, NotFound, offline demo mode |
-| Services/context/utilities | 6 | `apiClient` token storage/interceptors, `authService`/`problemService`/`submissionService`, `AuthContext`, `codeRunner`, `problemParser`, `verdictHelper`, starter code |
-| Routing | 1 | App route rendering/protected routes |
+| Area                       | Files | Examples of what is checked                                                                                                                                                                                  |
+| :------------------------- | ----: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Common components          |    11 | Button rendering/click/loading, Input label/error/helper, Modal open/close/Escape, Badge variants, Tabs, Navbar dropdown/mobile menu, Resizable drag, Alert, EmptyState, ServerStatusModal, workspace panels |
+| Pages                      |     8 | Login (password + OTP tabs), Register, Problems list, Problem detail (load, language switch, reset, Run), Submissions, Profile, NotFound, offline demo mode                                                  |
+| Services/context/utilities |     6 | `apiClient` token storage/interceptors, `authService`/`problemService`/`submissionService`, `AuthContext`, `codeRunner`, `problemParser`, `verdictHelper`, starter code                                      |
+| Routing                    |     1 | App route rendering/protected routes                                                                                                                                                                         |
 
 The tests use:
+
 - `@testing-library/react` (`render`, `screen`, `fireEvent`, `waitFor`),
 - `@testing-library/jest-dom` matchers (`toBeInTheDocument`, `toBeDisabled`, `toHaveClass`),
 - `@testing-library/user-event` where realistic typing/clicking is needed,
@@ -874,19 +875,19 @@ npm run test:coverage -- --keep-going
 
 **Fresh audit run (2026-10-17)** reproduced the archived numbers exactly **[R]**:
 
-| Workspace | Files | Lines | Branches | Functions |
-| :--- | ---: | ---: | ---: | ---: |
-| `packages/backend/utils` | 4 | 96.91% | 100.00% | 97.06% |
-| `packages/backend/models` | 3 | 97.87% | 100.00% | 75.00% |
-| `packages/backend/config` | 5 | 72.13% | 83.33% | 50.00% |
-| `packages/backend/execution` | 4 | 94.43% | 94.23% | 88.00% |
-| `packages/backend/middlewares` | 3 | 100.00% | 97.14% | 100.00% |
-| `apps/apis/gateway` | 1 | 100.00% | 82.35% | 100.00% |
-| `apps/apis/problem` | 3 | 75.63% | 78.87% | 74.51% |
-| `apps/apis/submission` | 1 | 98.80% | 83.33% | 87.50% |
-| `apps/apis/execution` | 5 | 90.17% | 82.74% | 91.09% |
-| `apps/apis/mail` | 5 | 99.44% | 87.65% | 97.92% |
-| **All backend** | **34** | **88.64%** | **86.43%** | **86.90%** |
+| Workspace                      |  Files |      Lines |   Branches |  Functions |
+| :----------------------------- | -----: | ---------: | ---------: | ---------: |
+| `packages/backend/utils`       |      4 |     96.91% |    100.00% |     97.06% |
+| `packages/backend/models`      |      3 |     97.87% |    100.00% |     75.00% |
+| `packages/backend/config`      |      5 |     72.13% |     83.33% |     50.00% |
+| `packages/backend/execution`   |      4 |     94.43% |     94.23% |     88.00% |
+| `packages/backend/middlewares` |      3 |    100.00% |     97.14% |    100.00% |
+| `apps/apis/gateway`            |      1 |    100.00% |     82.35% |    100.00% |
+| `apps/apis/problem`            |      3 |     75.63% |     78.87% |     74.51% |
+| `apps/apis/submission`         |      1 |     98.80% |     83.33% |     87.50% |
+| `apps/apis/execution`          |      5 |     90.17% |     82.74% |     91.09% |
+| `apps/apis/mail`               |      5 |     99.44% |     87.65% |     97.92% |
+| **All backend**                | **34** | **88.64%** | **86.43%** | **86.90%** |
 
 Exact totals: lines `2864/3231`, branches `497/575`, functions `272/313`. Exit `0`.
 
@@ -930,6 +931,7 @@ The frontend has many branches (loading/error/empty/success, role-dependent UI, 
 **3. What exactly was tested in my codebase?**
 
 All frontend source files except:
+
 - `src/main.tsx`
 - `src/test/**`
 - `*.d.ts`, `src/vite-env.d.ts`
@@ -968,6 +970,7 @@ flowchart TD
 **5. Example from my application**
 
 The lowest branch-coverage files in the archived report include:
+
 - `src/utils/codeRunner.ts` — 64.13% branches
 - `src/context/AuthContext.tsx` — 67.85% branches
 - `src/services/apiClient.ts` — 66.1% branches
@@ -1029,12 +1032,12 @@ Unit tests cannot catch a wrong route, a missing `x-user-id` injection, a Mongoo
 
 Three HTTP suites:
 
-| Suite | File | Individual tests | What it covers |
-| :--- | :--- | ---: | :--- |
-| Problem service | `apps/apis/problem/test/integration/problem.api.test.js` | 19 | Health, create/list/get/update/delete, validation, malformed JSON, unknown/malformed IDs, Mongo persistence, unknown-field stripping |
-| Submission service | `apps/apis/submission/test/integration/submission.api.test.js` | 14 | Missing/invalid user, create PENDING, Mongo persistence, RabbitMQ publish exactly once, payload validation, language enum, get/update, 404/400 |
-| Gateway | `apps/apis/gateway/test/integration/gateway.api.test.js` | 36 | Login, refresh rotation/replay, logout/JTI revocation, OTP, registration, password change, role management, account deletion, problem proxy + RBAC, spoofed header rejection, unmapped-route 404, submission ownership, admin access |
-| **Total** | | **69** | Plus 3 group nodes + 4 suite nodes = **84 passing entries** |
+| Suite              | File                                                           | Individual tests | What it covers                                                                                                                                                                                                                       |
+| :----------------- | :------------------------------------------------------------- | ---------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Problem service    | `apps/apis/problem/test/integration/problem.api.test.js`       |               19 | Health, create/list/get/update/delete, validation, malformed JSON, unknown/malformed IDs, Mongo persistence, unknown-field stripping                                                                                                 |
+| Submission service | `apps/apis/submission/test/integration/submission.api.test.js` |               14 | Missing/invalid user, create PENDING, Mongo persistence, RabbitMQ publish exactly once, payload validation, language enum, get/update, 404/400                                                                                       |
+| Gateway            | `apps/apis/gateway/test/integration/gateway.api.test.js`       |               36 | Login, refresh rotation/replay, logout/JTI revocation, OTP, registration, password change, role management, account deletion, problem proxy + RBAC, spoofed header rejection, unmapped-route 404, submission ownership, admin access |
+| **Total**          |                                                                |           **69** | Plus 3 group nodes + 4 suite nodes = **84 passing entries**                                                                                                                                                                          |
 
 The 4th suite (`evaluation-flow`) is the sandbox E2E described in [§5.10](#510-end-to-end-sandboxed-evaluation-tests).
 
@@ -1133,13 +1136,13 @@ bash test-artifacts/verification/run-all-tests.sh
 
 **Historical run (2026-10-14)** **[H]**:
 
-| Suite | Pass | Fail | Skipped |
-| :--- | ---: | ---: | ---: |
-| `problem-service` | 20 entries (19 tests) | 0 | 0 |
-| `submission-service` | 15 entries (14 tests) | 0 | 0 |
-| `gateway` | 40 entries (36 tests + 3 groups) | 0 | 0 |
-| `evaluation-flow` | 9 entries (8 tests) | 0 | 0 |
-| **Total** | **84 entries** | **0** | **0** |
+| Suite                |                             Pass |  Fail | Skipped |
+| :------------------- | -------------------------------: | ----: | ------: |
+| `problem-service`    |            20 entries (19 tests) |     0 |       0 |
+| `submission-service` |            15 entries (14 tests) |     0 |       0 |
+| `gateway`            | 40 entries (36 tests + 3 groups) |     0 |       0 |
+| `evaluation-flow`    |              9 entries (8 tests) |     0 |       0 |
+| **Total**            |                   **84 entries** | **0** |   **0** |
 
 The integration stage exited `1` only because the **language-matrix** suite could not start (see [§5.11](#511-language-matrix-e2e-tests-not-run)); the four suites above all passed. The stage took 80s in the battery ledger. Service logs are in `test-artifacts/integration/`.
 
@@ -1413,7 +1416,9 @@ flowchart TD
 
 ```js
 class Solution {
-  solve(points) { return points.length; }
+  solve(points) {
+    return points.length;
+  }
 }
 module.exports = { Solution };
 ```
@@ -1426,7 +1431,11 @@ module.exports = { Solution };
 **Wrong answer:**
 
 ```js
-class Solution { solve() { return 999; } }
+class Solution {
+  solve() {
+    return 999;
+  }
+}
 ```
 
 - Expected: `SUCCESS` with `failedCases.wa.length === 2`, `passed === 0`, completion event `failedTestCase === "test_case_001"`.
@@ -1588,11 +1597,11 @@ Functional tests prove one request works; load tests show how the system behaves
 
 Profiles:
 
-| Profile | Concurrency | Max requests | Notes |
-| :--- | ---: | ---: | :--- |
-| `smoke` | 10 | 100 per target | Fast sanity check |
-| `normal` | 50 | 1,000 per target | “Production-ish” load |
-| `stress` | 200 | 5,000 per target | Find the breaking point |
+| Profile  | Concurrency |     Max requests | Notes                   |
+| :------- | ----------: | ---------------: | :---------------------- |
+| `smoke`  |          10 |   100 per target | Fast sanity check       |
+| `normal` |          50 | 1,000 per target | “Production-ish” load   |
+| `stress` |         200 | 5,000 per target | Find the breaking point |
 
 The runner boots the **isolated test infrastructure** and the Problem/Submission services **on the host with `tsx`** (uncompiled development mode). The evaluation worker is deliberately excluded, so the submission measurement is ingestion only.
 
@@ -1657,14 +1666,14 @@ TEST_USER_ID=<id> TEST_PROBLEM_ID=<id> npm run test:load -- \
 
 Archived on 2026-10-14, all three stages exited `0` **[H]**:
 
-| Profile | Target | Requests | Throughput | p50 | p95 | p99 | Errors |
-| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| smoke | problem | 100 | 330.96 req/s | 26.7ms | 56.18ms | 78.06ms | 0% |
-| smoke | submission | 100 | 143.67 req/s | 56.16ms | 157.42ms | 182.63ms | 0% |
-| normal | problem | 1,000 | 420.60 req/s | 103.53ms | 242.84ms | 322.29ms | 0% |
-| normal | submission | 1,000 | 280.71 req/s | 144.74ms | 397.94ms | 520.25ms | 0% |
-| stress | problem | 5,000 | 501.96 req/s | 366.64ms | 621.31ms | 897.46ms | 0% |
-| stress | submission | 5,000 | 302.91 req/s | 612.41ms | 903.08ms | 1,629.22ms | 0% |
+| Profile | Target     | Requests |   Throughput |      p50 |      p95 |        p99 | Errors |
+| :------ | :--------- | -------: | -----------: | -------: | -------: | ---------: | -----: |
+| smoke   | problem    |      100 | 330.96 req/s |   26.7ms |  56.18ms |    78.06ms |     0% |
+| smoke   | submission |      100 | 143.67 req/s |  56.16ms | 157.42ms |   182.63ms |     0% |
+| normal  | problem    |    1,000 | 420.60 req/s | 103.53ms | 242.84ms |   322.29ms |     0% |
+| normal  | submission |    1,000 | 280.71 req/s | 144.74ms | 397.94ms |   520.25ms |     0% |
+| stress  | problem    |    5,000 | 501.96 req/s | 366.64ms | 621.31ms |   897.46ms |     0% |
+| stress  | submission |    5,000 | 302.91 req/s | 612.41ms | 903.08ms | 1,629.22ms |     0% |
 
 The pattern is classic saturation: throughput grows slowly from normal to stress while latency grows much faster. The archived report computes a “latency growth per throughput” ratio above 1 for both targets at stress.
 
@@ -1763,7 +1772,7 @@ flowchart TD
 - **Wrong password** (10% of iterations): expects `401`.
 - **Missing password** (10% of iterations): expects `400`.
 
-The script deliberately produces non-2xx responses. k6 counts every non-2xx in `http_req_failed`, so the *error rate* metric is not the same as a functional failure. The `checks` column is the meaningful functional signal.
+The script deliberately produces non-2xx responses. k6 counts every non-2xx in `http_req_failed`, so the _error rate_ metric is not the same as a functional failure. The `checks` column is the meaningful functional signal.
 
 **6. How was it executed?**
 
@@ -1787,20 +1796,20 @@ The suite needs the main `lcarena` Compose stack running (`docker compose up -d 
 
 Archived 2026-10-14 **[H]** — selected results:
 
-| Test | Requests | Req/s | non-2xx | Checks passed | Checks failed | p50 | p95 | Result |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
-| `endpoint_gateway_health` | 23,220 | 1,934.23 | 0% | 46,440 | 0 | 8.52ms | 21.19ms | Pass |
-| `endpoint_auth_login` | 390 | 30.63 | 19.23% | 705 | 0 | 521.09ms | 695.31ms | Checks pass; thresholds breach |
-| `endpoint_auth_me` | 2,823 | 232.13 | 4.96% | 5,504 | 0 | 75.12ms | 184.6ms | Checks pass; threshold breach |
-| `endpoint_auth_refresh` | 894 | 72.47 | 41.95% | 740 | **154** | 15.28ms | 545.98ms | **Functional fail** |
-| `endpoint_problem_list` | 2,789 | 231.15 | 0% | 5,578 | 0 | 95.36ms | 192.15ms | Pass |
-| `endpoint_problem_get` | 4,266 | 353.92 | 9.35% | 8,133 | 0 | 61.18ms | 132.88ms | Checks pass |
-| `endpoint_problem_create` | 2,832 | 231.2 | 28.64% | 4,849 | 0 | 17.14ms | 48.05ms | Checks pass; threshold breach |
-| `endpoint_submission_create` | 2,326 | 188.75 | 9.8% | 4,422 | 0 | 88.78ms | 245.84ms | Checks pass |
-| `endpoint_submission_get` | 2,778 | 225.54 | 4.61% | 5,174 | 0 | 75.97ms | 172.95ms | Checks pass |
-| `endpoint_mail_otp` | 60 | 3.12 | 31.67% | 97 | **8** | 4,639.09ms | 7,732.1ms | **Functional fail** |
-| `endpoint_ai_suggestions` | 1,327 | 109.79 | 91.94% | 1,327 | 0 | 109.01ms | 222.4ms | Checks pass; threshold breach |
-| `service_mail_isolated` | 73 | 3.25 | 43.84% | 41 | **32** | 4,523.06ms | 8,469.74ms | **Functional fail** |
+| Test                         | Requests |    Req/s | non-2xx | Checks passed | Checks failed |        p50 |        p95 | Result                         |
+| :--------------------------- | -------: | -------: | ------: | ------------: | ------------: | ---------: | ---------: | :----------------------------- |
+| `endpoint_gateway_health`    |   23,220 | 1,934.23 |      0% |        46,440 |             0 |     8.52ms |    21.19ms | Pass                           |
+| `endpoint_auth_login`        |      390 |    30.63 |  19.23% |           705 |             0 |   521.09ms |   695.31ms | Checks pass; thresholds breach |
+| `endpoint_auth_me`           |    2,823 |   232.13 |   4.96% |         5,504 |             0 |    75.12ms |    184.6ms | Checks pass; threshold breach  |
+| `endpoint_auth_refresh`      |      894 |    72.47 |  41.95% |           740 |       **154** |    15.28ms |   545.98ms | **Functional fail**            |
+| `endpoint_problem_list`      |    2,789 |   231.15 |      0% |         5,578 |             0 |    95.36ms |   192.15ms | Pass                           |
+| `endpoint_problem_get`       |    4,266 |   353.92 |   9.35% |         8,133 |             0 |    61.18ms |   132.88ms | Checks pass                    |
+| `endpoint_problem_create`    |    2,832 |    231.2 |  28.64% |         4,849 |             0 |    17.14ms |    48.05ms | Checks pass; threshold breach  |
+| `endpoint_submission_create` |    2,326 |   188.75 |    9.8% |         4,422 |             0 |    88.78ms |   245.84ms | Checks pass                    |
+| `endpoint_submission_get`    |    2,778 |   225.54 |   4.61% |         5,174 |             0 |    75.97ms |   172.95ms | Checks pass                    |
+| `endpoint_mail_otp`          |       60 |     3.12 |  31.67% |            97 |         **8** | 4,639.09ms |  7,732.1ms | **Functional fail**            |
+| `endpoint_ai_suggestions`    |    1,327 |   109.79 |  91.94% |         1,327 |             0 |   109.01ms |    222.4ms | Checks pass; threshold breach  |
+| `service_mail_isolated`      |       73 |     3.25 |  43.84% |            41 |        **32** | 4,523.06ms | 8,469.74ms | **Functional fail**            |
 
 Important interpretation:
 
@@ -1877,10 +1886,10 @@ node tests/load/runners/suite-runner.js --type=lifecycle
 
 **7. What were the results?**
 
-| Workflow | Requests | Checks passed | Checks failed | p95 | Result |
-| :--- | ---: | ---: | ---: | ---: | :--- |
-| `workflow_browse_problems` | 541 | 540 | 0 | 1,220.97ms | Pass |
-| `workflow_submission_execution` | 161 | 10 | **10** | 65.13ms | **Functional fail** |
+| Workflow                        | Requests | Checks passed | Checks failed |        p95 | Result              |
+| :------------------------------ | -------: | ------------: | ------------: | ---------: | :------------------ |
+| `workflow_browse_problems`      |      541 |           540 |             0 | 1,220.97ms | Pass                |
+| `workflow_submission_execution` |      161 |            10 |        **10** |    65.13ms | **Functional fail** |
 
 The submission workflow’s k6 process exited `0` because its `evaluationWorkflow` threshold (`http_req_failed < 0.05`, p95 < 5000ms) was satisfied — the checks failed, but k6 does not fail a run on checks alone. This is why the suite-level `success` flag can be `true` while functional checks failed.
 
@@ -2403,6 +2412,7 @@ One workflow: `.github/workflows/backend-ci.yml`.
 Triggers: `push` to `main`/`master`, and `pull_request`.
 
 Steps:
+
 1. `actions/checkout@v4`
 2. `actions/setup-node@v4` with Node 24 and npm cache
 3. `npm ci`
@@ -2478,28 +2488,28 @@ Automatically on push/PR, according to the workflow. **No execution evidence is 
 
 These are **not** tests that ran and failed; they are testing capabilities that do not exist in the repository. They are listed so the absence is explicit.
 
-| Category | Status | Evidence / consequence |
-| :--- | :--- | :--- |
-| Browser E2E (Playwright/Cypress) | **Not Implemented** | No dependency, config or test directory. Frontend tests use jsdom and mocks. |
-| Frontend TypeScript build check | **Not Implemented in the gates** | Frontend has no `check-types` script; `tsc -b` runs only in `vite build`, which neither the battery nor CI runs. |
-| Real backend integration from the frontend | **Not Implemented** | Frontend tests mock all services; no test drives the SPA against a live gateway. |
-| AI suggestion service tests | **Not Implemented** | `apps/apis/ai-suggestion-service` has no `tests/` and is excluded from all TypeScript test commands. |
-| Sockets/notification tests | **Not Implemented** | `apps/apis/sockets` does not exist; `submission.completed` has no consumer. |
-| Accessibility tests | **Not Implemented** | No axe/jest-axe or similar. |
-| Visual regression tests | **Not Implemented** | No screenshot comparison tooling. |
-| Contract tests / OpenAPI schema validation | **Not Implemented** | No Pact/OpenAPI validation. |
-| Fuzz/property-based tests | **Not Implemented** | No fast-check or fuzzing. |
-| Mutation testing | **Not Implemented** | No Stryker. |
-| Chaos/failure injection | **Not Implemented** | No Toxiproxy, fault injection, or dependency-outage tests. |
-| Dependency vulnerability scanning | **Not Implemented** | No `npm audit`/Dependabot/Snyk config in CI. |
-| Secret scanning | **Not Implemented** | No gitleaks/trufflehog; generated tokens are committed in `tests/load/fixtures/test-context.json`. |
-| SAST (static application security testing) | **Not Implemented** | Only ESLint (which is broken). |
-| Frontend performance (LCP/INP/bundle) | **Not Implemented** | No Lighthouse/Web Vitals measurement. |
-| Memory/CPU limits in sandbox tests | **Not Implemented** | Only time limits are enforced; no memory accounting. |
-| Multi-language matrix | **Not Implemented** | Target file missing; only JS E2E exists. |
-| Production smoke tests | **Not Implemented** | No post-deploy smoke suite. |
-| Email delivery E2E | **Not Implemented** | Mail unit tests use a local SMTP server; integration intentionally points at a dead port. |
-| Payment tests | **Not Implemented** | `apps/apis/payment` is empty. |
+| Category                                   | Status                           | Evidence / consequence                                                                                           |
+| :----------------------------------------- | :------------------------------- | :--------------------------------------------------------------------------------------------------------------- |
+| Browser E2E (Playwright/Cypress)           | **Not Implemented**              | No dependency, config or test directory. Frontend tests use jsdom and mocks.                                     |
+| Frontend TypeScript build check            | **Not Implemented in the gates** | Frontend has no `check-types` script; `tsc -b` runs only in `vite build`, which neither the battery nor CI runs. |
+| Real backend integration from the frontend | **Not Implemented**              | Frontend tests mock all services; no test drives the SPA against a live gateway.                                 |
+| AI suggestion service tests                | **Not Implemented**              | `apps/apis/ai-suggestion-service` has no `tests/` and is excluded from all TypeScript test commands.             |
+| Sockets/notification tests                 | **Not Implemented**              | `apps/apis/sockets` does not exist; `submission.completed` has no consumer.                                      |
+| Accessibility tests                        | **Not Implemented**              | No axe/jest-axe or similar.                                                                                      |
+| Visual regression tests                    | **Not Implemented**              | No screenshot comparison tooling.                                                                                |
+| Contract tests / OpenAPI schema validation | **Not Implemented**              | No Pact/OpenAPI validation.                                                                                      |
+| Fuzz/property-based tests                  | **Not Implemented**              | No fast-check or fuzzing.                                                                                        |
+| Mutation testing                           | **Not Implemented**              | No Stryker.                                                                                                      |
+| Chaos/failure injection                    | **Not Implemented**              | No Toxiproxy, fault injection, or dependency-outage tests.                                                       |
+| Dependency vulnerability scanning          | **Not Implemented**              | No `npm audit`/Dependabot/Snyk config in CI.                                                                     |
+| Secret scanning                            | **Not Implemented**              | No gitleaks/trufflehog; generated tokens are committed in `tests/load/fixtures/test-context.json`.               |
+| SAST (static application security testing) | **Not Implemented**              | Only ESLint (which is broken).                                                                                   |
+| Frontend performance (LCP/INP/bundle)      | **Not Implemented**              | No Lighthouse/Web Vitals measurement.                                                                            |
+| Memory/CPU limits in sandbox tests         | **Not Implemented**              | Only time limits are enforced; no memory accounting.                                                             |
+| Multi-language matrix                      | **Not Implemented**              | Target file missing; only JS E2E exists.                                                                         |
+| Production smoke tests                     | **Not Implemented**              | No post-deploy smoke suite.                                                                                      |
+| Email delivery E2E                         | **Not Implemented**              | Mail unit tests use a local SMTP server; integration intentionally points at a dead port.                        |
+| Payment tests                              | **Not Implemented**              | `apps/apis/payment` is empty.                                                                                    |
 
 ---
 
@@ -2507,73 +2517,73 @@ These are **not** tests that ran and failed; they are testing capabilities that 
 
 ### 6.1 Testing terminology
 
-| Term | Plain-English meaning | Example in this repo |
-| :--- | :--- | :--- |
-| **Assertion** | A statement that must be true for the test to pass. | `assert.equal(res.status, 201)` |
-| **Fixture** | Pre-built data or state a test needs. | Seeded users/problems in `gateway.api.test.js`; `mockProblem` in frontend tests |
-| **Setup** | Code that runs before a test. | `before()` starts SMTP/Mongo; `beforeEach()` clears mocks |
-| **Teardown** | Code that runs after a test to clean up. | `after()` removes DB rows/S3 objects; `afterEach(cleanup)` clears the DOM |
-| **Test isolation** | Tests do not depend on each other's state. | Separate `lcarena_test` DB/ports; temp workspace per submission |
-| **Mock** | A fake dependency that records calls or returns a canned response. | `vi.mock("../../services/apiClient")` |
-| **Stub** | A replacement that returns a fixed value. | `mockResolvedValueOnce({ data: ... })` |
-| **Spy** | A wrapper that records calls to a real function. | `vi.spyOn(authService, "login")` |
-| **Fake** | A working but simplified implementation. | Fake Docker objects in executor unit tests |
-| **Test double** | Umbrella term for mocks, stubs, spies and fakes. | All of the above |
-| **Coverage** | The share of code executed by tests. | 88.64% backend lines; 75.44% frontend branches |
-| **Flaky test** | A test that sometimes passes and sometimes fails without code changes. | Frontend coverage varied 75.73% ↔ 75.44%; k6 submission workflow depends on queue backlog |
-| **Smoke test** | A quick sanity check that the basics work. | k6 `profile_smoke`; closed-loop `smoke` |
-| **Load test** | Many requests at expected concurrency. | closed-loop `normal`; k6 baseline |
-| **Stress test** | Load beyond expected capacity. | k6 `profile_stress`; closed-loop `stress` |
-| **Soak test** | Long-running moderate load. | k6 `profile_soak` (but only 45s in the suite) |
-| **Spike test** | Sudden burst then drop. | k6 `profile_spike` |
-| **Recovery test** | Measure return to normal after overload. | k6 `profile_recovery` |
-| **E2E test** | Full system from the user's entry point to the final result. | `full-flow.e2e.ts` |
-| **Integration test** | Several real components wired together. | API suites with real Mongo/Redis/RabbitMQ |
-| **Unit test** | One small piece in isolation. | `outputComparison.test.ts` |
-| **Contract test** | Verifies two components agree on an interface. | Not implemented; API assertions are the closest thing |
-| **Idempotency** | Repeating an operation does not change the result. | Duplicate queue delivery test |
-| **Race condition** | Outcome depends on timing. | Concurrent refresh, concurrent evaluations |
-| **Threshold** | An aggregate SLA limit. | k6 `p(95)<400`; frontend branch coverage 80% |
-| **Check** | A functional assertion inside a k6 script. | `check(res, { 'valid login status is 200': ... })` |
-| **Percentile (p95)** | 95% of requests were faster than this value. | Load reports use p50/p90/p95/p99 |
+| Term                 | Plain-English meaning                                                  | Example in this repo                                                                      |
+| :------------------- | :--------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| **Assertion**        | A statement that must be true for the test to pass.                    | `assert.equal(res.status, 201)`                                                           |
+| **Fixture**          | Pre-built data or state a test needs.                                  | Seeded users/problems in `gateway.api.test.js`; `mockProblem` in frontend tests           |
+| **Setup**            | Code that runs before a test.                                          | `before()` starts SMTP/Mongo; `beforeEach()` clears mocks                                 |
+| **Teardown**         | Code that runs after a test to clean up.                               | `after()` removes DB rows/S3 objects; `afterEach(cleanup)` clears the DOM                 |
+| **Test isolation**   | Tests do not depend on each other's state.                             | Separate `lcarena_test` DB/ports; temp workspace per submission                           |
+| **Mock**             | A fake dependency that records calls or returns a canned response.     | `vi.mock("../../services/apiClient")`                                                     |
+| **Stub**             | A replacement that returns a fixed value.                              | `mockResolvedValueOnce({ data: ... })`                                                    |
+| **Spy**              | A wrapper that records calls to a real function.                       | `vi.spyOn(authService, "login")`                                                          |
+| **Fake**             | A working but simplified implementation.                               | Fake Docker objects in executor unit tests                                                |
+| **Test double**      | Umbrella term for mocks, stubs, spies and fakes.                       | All of the above                                                                          |
+| **Coverage**         | The share of code executed by tests.                                   | 88.64% backend lines; 75.44% frontend branches                                            |
+| **Flaky test**       | A test that sometimes passes and sometimes fails without code changes. | Frontend coverage varied 75.73% ↔ 75.44%; k6 submission workflow depends on queue backlog |
+| **Smoke test**       | A quick sanity check that the basics work.                             | k6 `profile_smoke`; closed-loop `smoke`                                                   |
+| **Load test**        | Many requests at expected concurrency.                                 | closed-loop `normal`; k6 baseline                                                         |
+| **Stress test**      | Load beyond expected capacity.                                         | k6 `profile_stress`; closed-loop `stress`                                                 |
+| **Soak test**        | Long-running moderate load.                                            | k6 `profile_soak` (but only 45s in the suite)                                             |
+| **Spike test**       | Sudden burst then drop.                                                | k6 `profile_spike`                                                                        |
+| **Recovery test**    | Measure return to normal after overload.                               | k6 `profile_recovery`                                                                     |
+| **E2E test**         | Full system from the user's entry point to the final result.           | `full-flow.e2e.ts`                                                                        |
+| **Integration test** | Several real components wired together.                                | API suites with real Mongo/Redis/RabbitMQ                                                 |
+| **Unit test**        | One small piece in isolation.                                          | `outputComparison.test.ts`                                                                |
+| **Contract test**    | Verifies two components agree on an interface.                         | Not implemented; API assertions are the closest thing                                     |
+| **Idempotency**      | Repeating an operation does not change the result.                     | Duplicate queue delivery test                                                             |
+| **Race condition**   | Outcome depends on timing.                                             | Concurrent refresh, concurrent evaluations                                                |
+| **Threshold**        | An aggregate SLA limit.                                                | k6 `p(95)<400`; frontend branch coverage 80%                                              |
+| **Check**            | A functional assertion inside a k6 script.                             | `check(res, { 'valid login status is 200': ... })`                                        |
+| **Percentile (p95)** | 95% of requests were faster than this value.                           | Load reports use p50/p90/p95/p99                                                          |
 
 ### 6.2 Important test cases explained
 
 The table below is a study guide: input → action → expected → how it is checked → what a failure would mean.
 
-| # | Test | Input / initial state | Action | Expected | Check | If it fails |
-| ---: | :--- | :--- | :--- | :--- | :--- | :--- |
-| 1 | `outputComparison` CRLF normalization | `"hello world\r\n42\r\n"` vs `"hello world\n42\n"` | `compareOutputs(actual, expected)` | matched | `assert.equal(result.matched, true)` | Windows submissions get false WA |
-| 2 | `outputComparison` wrong number | `"43\n"` vs `"42\n"` | `compareOutputs` | not matched, diff line 1 | `assert.equal(matched, false)`, `diffLine === 1` | Wrong answers accepted |
-| 3 | `userValidation` missing header | Request with no `x-user-id` | Call middleware | 401 `{ message: "Missing user header" }` | `assert.equal(statusCode, 401)`, `deepEqual(body)` | Unauthenticated requests reach services |
-| 4 | `userValidation` unknown user | Header `"ghost"`, DB returns null | Call middleware | `NotFoundError` passed to `next` | `assert.ok(errors[0] instanceof NotFoundError)` | Unknown identities accepted |
-| 5 | `user.model` defaults | `{ name: "  Ada Lovelace  ", email: "  Ada@Example.COM  ", password: "..." }` | `new User(...)`, validate | trimmed name/email, default `Regular`, `/default-url`, `roleExpiry: null` | `assert.equal` on each field | Wrong defaults/leaks |
-| 6 | `mailer` real SMTP | Local `smtp-server` on random port | `mailer.send(...)` | Raw message contains To/From/Subject/OTP | `assert.match(raw, /To: .../)` | OTP emails malformed or not delivered |
-| 7 | Frontend Button click | `<Button onClick={fn}>` | `fireEvent.click` | `fn` called once | `expect(fn).toHaveBeenCalledTimes(1)` | Button dead or double-fires |
-| 8 | Frontend empty login | Empty email/password | Submit form | Validation message shown | `findByText(/please fill in both.../)` | Users can submit empty form |
-| 9 | Problem POST validation | `description: "short"` | `POST /` | 400, `"Validation Error"`, error path includes `description` | status/body assertions | Invalid problems persisted |
-| 10 | Problem persistence | Valid problem payload | `POST /`, then Mongo `findOne` | Document exists with matching fields | Direct MongoDB driver read | API reports success but nothing stored |
-| 11 | Unknown-field stripping | `{ hacker: "x", __v: 99, _id: "forged" }` | `POST /`, then read | `hacker` undefined, `__v` 0 | `assert.equal(stored.hacker, undefined)` | Field injection / forged IDs |
-| 12 | Gateway spoofed header | Normal user's token + `x-user-id: admin` | `POST /api/problems` | 403 | `assert.equal(res.status, 403)` | Privilege escalation |
-| 13 | Gateway refresh replay | Old refresh cookie after rotation | `POST /auth/refresh` | 401 `"Session is no longer active"` | status/body | Stolen refresh token reusable |
-| 14 | Submission queue publish | Valid submission | `POST /`, scan queue | Exactly 1 message with PENDING and matching fields | `matches.length === 1` + field assertions | Lost/duplicated evaluation |
-| 15 | E2E correct JS | `solve(points) => points.length` | Full pipeline | `SUCCESS`, 2/2 | Mongo verdict + completion event | Judge rejects correct code |
-| 16 | E2E wrong JS | `solve() => 999` | Full pipeline | `SUCCESS`, `failedCases.wa` length 2 | Mongo verdict + `failedTestCase` | Wrong code accepted |
-| 17 | E2E syntax error | `return syntax error !;` | Full pipeline | `COMPILE_ERROR` + `compileError` | status field | Compile errors misclassified |
-| 18 | E2E runtime error | `throw new Error(...)` | Full pipeline | `failedCases.re` | failed case array | Runtime errors reported as WA/AC |
-| 19 | E2E TLE | `while (true) {}` | Full pipeline | `failedCases.tle` | failed case array | Infinite loops hang the judge |
-| 20 | E2E duplicate delivery | Publish same message twice | Consume twice | No recomputation; verdict stable | Mongo status + event count | Double evaluation |
-| 21 | E2E concurrency | Two submissions at once | Run both | Each gets its own verdict | status/passed counts | Cross-contamination |
-| 22 | k6 auth login | Valid, wrong-password, missing-password payloads | `POST /auth/login` | 200+token, 401, 400 | `check()` per scenario | Auth regression under load |
-| 23 | k6 submission lifecycle | Submit Python code | POST then poll every 1s ×15 | Non-PENDING verdict | `check()` on poll | Async workflow broken/backlogged |
+|   # | Test                                  | Input / initial state                                                         | Action                             | Expected                                                                  | Check                                              | If it fails                             |
+| --: | :------------------------------------ | :---------------------------------------------------------------------------- | :--------------------------------- | :------------------------------------------------------------------------ | :------------------------------------------------- | :-------------------------------------- |
+|   1 | `outputComparison` CRLF normalization | `"hello world\r\n42\r\n"` vs `"hello world\n42\n"`                            | `compareOutputs(actual, expected)` | matched                                                                   | `assert.equal(result.matched, true)`               | Windows submissions get false WA        |
+|   2 | `outputComparison` wrong number       | `"43\n"` vs `"42\n"`                                                          | `compareOutputs`                   | not matched, diff line 1                                                  | `assert.equal(matched, false)`, `diffLine === 1`   | Wrong answers accepted                  |
+|   3 | `userValidation` missing header       | Request with no `x-user-id`                                                   | Call middleware                    | 401 `{ message: "Missing user header" }`                                  | `assert.equal(statusCode, 401)`, `deepEqual(body)` | Unauthenticated requests reach services |
+|   4 | `userValidation` unknown user         | Header `"ghost"`, DB returns null                                             | Call middleware                    | `NotFoundError` passed to `next`                                          | `assert.ok(errors[0] instanceof NotFoundError)`    | Unknown identities accepted             |
+|   5 | `user.model` defaults                 | `{ name: "  Ada Lovelace  ", email: "  Ada@Example.COM  ", password: "..." }` | `new User(...)`, validate          | trimmed name/email, default `Regular`, `/default-url`, `roleExpiry: null` | `assert.equal` on each field                       | Wrong defaults/leaks                    |
+|   6 | `mailer` real SMTP                    | Local `smtp-server` on random port                                            | `mailer.send(...)`                 | Raw message contains To/From/Subject/OTP                                  | `assert.match(raw, /To: .../)`                     | OTP emails malformed or not delivered   |
+|   7 | Frontend Button click                 | `<Button onClick={fn}>`                                                       | `fireEvent.click`                  | `fn` called once                                                          | `expect(fn).toHaveBeenCalledTimes(1)`              | Button dead or double-fires             |
+|   8 | Frontend empty login                  | Empty email/password                                                          | Submit form                        | Validation message shown                                                  | `findByText(/please fill in both.../)`             | Users can submit empty form             |
+|   9 | Problem POST validation               | `description: "short"`                                                        | `POST /`                           | 400, `"Validation Error"`, error path includes `description`              | status/body assertions                             | Invalid problems persisted              |
+|  10 | Problem persistence                   | Valid problem payload                                                         | `POST /`, then Mongo `findOne`     | Document exists with matching fields                                      | Direct MongoDB driver read                         | API reports success but nothing stored  |
+|  11 | Unknown-field stripping               | `{ hacker: "x", __v: 99, _id: "forged" }`                                     | `POST /`, then read                | `hacker` undefined, `__v` 0                                               | `assert.equal(stored.hacker, undefined)`           | Field injection / forged IDs            |
+|  12 | Gateway spoofed header                | Normal user's token + `x-user-id: admin`                                      | `POST /api/problems`               | 403                                                                       | `assert.equal(res.status, 403)`                    | Privilege escalation                    |
+|  13 | Gateway refresh replay                | Old refresh cookie after rotation                                             | `POST /auth/refresh`               | 401 `"Session is no longer active"`                                       | status/body                                        | Stolen refresh token reusable           |
+|  14 | Submission queue publish              | Valid submission                                                              | `POST /`, scan queue               | Exactly 1 message with PENDING and matching fields                        | `matches.length === 1` + field assertions          | Lost/duplicated evaluation              |
+|  15 | E2E correct JS                        | `solve(points) => points.length`                                              | Full pipeline                      | `SUCCESS`, 2/2                                                            | Mongo verdict + completion event                   | Judge rejects correct code              |
+|  16 | E2E wrong JS                          | `solve() => 999`                                                              | Full pipeline                      | `SUCCESS`, `failedCases.wa` length 2                                      | Mongo verdict + `failedTestCase`                   | Wrong code accepted                     |
+|  17 | E2E syntax error                      | `return syntax error !;`                                                      | Full pipeline                      | `COMPILE_ERROR` + `compileError`                                          | status field                                       | Compile errors misclassified            |
+|  18 | E2E runtime error                     | `throw new Error(...)`                                                        | Full pipeline                      | `failedCases.re`                                                          | failed case array                                  | Runtime errors reported as WA/AC        |
+|  19 | E2E TLE                               | `while (true) {}`                                                             | Full pipeline                      | `failedCases.tle`                                                         | failed case array                                  | Infinite loops hang the judge           |
+|  20 | E2E duplicate delivery                | Publish same message twice                                                    | Consume twice                      | No recomputation; verdict stable                                          | Mongo status + event count                         | Double evaluation                       |
+|  21 | E2E concurrency                       | Two submissions at once                                                       | Run both                           | Each gets its own verdict                                                 | status/passed counts                               | Cross-contamination                     |
+|  22 | k6 auth login                         | Valid, wrong-password, missing-password payloads                              | `POST /auth/login`                 | 200+token, 401, 400                                                       | `check()` per scenario                             | Auth regression under load              |
+|  23 | k6 submission lifecycle               | Submit Python code                                                            | POST then poll every 1s ×15        | Non-PENDING verdict                                                       | `check()` on poll                                  | Async workflow broken/backlogged        |
 
 ### 6.3 How the three assertion styles differ
 
-| Style | Used by | Example | Failure behaviour |
-| :--- | :--- | :--- | :--- |
-| `node:assert/strict` | Backend unit and integration tests | `assert.equal(res.status, 201)` | Throws; `node:test` marks the test failed |
-| Vitest `expect` | Frontend tests | `expect(handleClick).toHaveBeenCalledTimes(1)` | Throws; Vitest marks the test failed |
-| k6 `check()` | Load tests | `check(res, { "valid login status is 200": r => r.status === 200 })` | Records a failed check but does **not** fail the k6 process unless a threshold uses it |
+| Style                | Used by                            | Example                                                              | Failure behaviour                                                                      |
+| :------------------- | :--------------------------------- | :------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
+| `node:assert/strict` | Backend unit and integration tests | `assert.equal(res.status, 201)`                                      | Throws; `node:test` marks the test failed                                              |
+| Vitest `expect`      | Frontend tests                     | `expect(handleClick).toHaveBeenCalledTimes(1)`                       | Throws; Vitest marks the test failed                                                   |
+| k6 `check()`         | Load tests                         | `check(res, { "valid login status is 200": r => r.status === 200 })` | Records a failed check but does **not** fail the k6 process unless a threshold uses it |
 
 This last point is the single most important subtlety in the load-test results: **845 failed checks did not stop the suite runner from exiting `0`.**
 
@@ -2583,41 +2593,41 @@ This last point is the single most important subtlety in the load-test results: 
 
 ### 7.1 Tools used
 
-| Tool | What it is | Why it is used here | Which tests depend on it | Real or mocked? |
-| :--- | :--- | :--- | :--- | :--- |
-| **Node.js `node:test`** | Built-in test runner | Backend unit and integration tests | All `test/unit/*.test.ts`, `*.api.test.js`, `full-flow.e2e.ts` | Real |
-| **`node:assert/strict`** | Built-in assertion library | Backend assertions | Backend unit/integration | Real |
-| **`tsx`** | TypeScript execution loader | Run `.ts` tests/source without a build | Backend tests, integration service boot | Real |
-| **Turborepo** | Monorepo task runner/cache | Run tests across workspaces, cache results | `test:backend`, `check-types`, `build:backend` | Real; can replay cache |
-| **Vitest** | Frontend test runner | Component/unit tests | 26 frontend files, 182 tests | Real |
-| **jsdom** | Simulated DOM | Browser-like environment in Node | Frontend tests | Simulated (not a real browser) |
-| **Testing Library** (`@testing-library/react`, `jest-dom`, `user-event`) | UI testing helpers | Render/query/interact with React | Frontend component/page tests | Real helpers, mocked app services |
-| **V8 coverage** (Node `--experimental-test-coverage`, Vitest v8 provider) | Coverage instrumentation | Line/branch/function coverage | Backend and frontend coverage | Real |
-| **MongoDB 7** | Database | Persistence, auth users, submissions | Integration, gateway, E2E | Real in integration; **mocked/in-memory** in model unit tests |
-| **Redis 7** | Session/JTI/OTP store | Gateway auth/session tests | Gateway integration | Real |
-| **RabbitMQ 3.13** | Message broker | Submission pipeline | Submission integration, E2E, worker unit (fake channel) | Real in integration/E2E; **fake channel** in unit |
-| **MinIO** | S3-compatible object storage | Test-case storage | E2E | Real |
-| **Docker Engine / Dockerode** | Container runtime | Sandbox execution | E2E | Real in E2E; **fake objects** in executor unit tests |
-| **`smtp-server`** | Local SMTP server | Test real mail transport | Mail unit tests | Real local server, no external provider |
-| **`mongodb` driver** | Direct DB client | Independent read-back verification | Integration tests | Real |
-| **`amqplib`** | RabbitMQ client | Queue inspection/publish | Integration tests | Real |
-| **`redis` client** | Redis client | Session/JTI verification | Gateway integration | Real |
-| **Grafana k6** | Load-testing tool | Endpoint/profile/service/workflow load | 29 k6 scenarios | Real, in a Docker container |
-| **`docker stats`** | Container resource sampler | CPU/memory envelope | k6 suite | Real |
-| **GitHub Actions** | CI runner | Automated backend checks | `.github/workflows/backend-ci.yml` | Configured, unverified |
-| **Mermaid** | Diagram renderer | This document’s flowcharts | N/A | Documentation only |
+| Tool                                                                      | What it is                   | Why it is used here                        | Which tests depend on it                                       | Real or mocked?                                               |
+| :------------------------------------------------------------------------ | :--------------------------- | :----------------------------------------- | :------------------------------------------------------------- | :------------------------------------------------------------ |
+| **Node.js `node:test`**                                                   | Built-in test runner         | Backend unit and integration tests         | All `test/unit/*.test.ts`, `*.api.test.js`, `full-flow.e2e.ts` | Real                                                          |
+| **`node:assert/strict`**                                                  | Built-in assertion library   | Backend assertions                         | Backend unit/integration                                       | Real                                                          |
+| **`tsx`**                                                                 | TypeScript execution loader  | Run `.ts` tests/source without a build     | Backend tests, integration service boot                        | Real                                                          |
+| **Turborepo**                                                             | Monorepo task runner/cache   | Run tests across workspaces, cache results | `test:backend`, `check-types`, `build:backend`                 | Real; can replay cache                                        |
+| **Vitest**                                                                | Frontend test runner         | Component/unit tests                       | 26 frontend files, 182 tests                                   | Real                                                          |
+| **jsdom**                                                                 | Simulated DOM                | Browser-like environment in Node           | Frontend tests                                                 | Simulated (not a real browser)                                |
+| **Testing Library** (`@testing-library/react`, `jest-dom`, `user-event`)  | UI testing helpers           | Render/query/interact with React           | Frontend component/page tests                                  | Real helpers, mocked app services                             |
+| **V8 coverage** (Node `--experimental-test-coverage`, Vitest v8 provider) | Coverage instrumentation     | Line/branch/function coverage              | Backend and frontend coverage                                  | Real                                                          |
+| **MongoDB 7**                                                             | Database                     | Persistence, auth users, submissions       | Integration, gateway, E2E                                      | Real in integration; **mocked/in-memory** in model unit tests |
+| **Redis 7**                                                               | Session/JTI/OTP store        | Gateway auth/session tests                 | Gateway integration                                            | Real                                                          |
+| **RabbitMQ 3.13**                                                         | Message broker               | Submission pipeline                        | Submission integration, E2E, worker unit (fake channel)        | Real in integration/E2E; **fake channel** in unit             |
+| **MinIO**                                                                 | S3-compatible object storage | Test-case storage                          | E2E                                                            | Real                                                          |
+| **Docker Engine / Dockerode**                                             | Container runtime            | Sandbox execution                          | E2E                                                            | Real in E2E; **fake objects** in executor unit tests          |
+| **`smtp-server`**                                                         | Local SMTP server            | Test real mail transport                   | Mail unit tests                                                | Real local server, no external provider                       |
+| **`mongodb` driver**                                                      | Direct DB client             | Independent read-back verification         | Integration tests                                              | Real                                                          |
+| **`amqplib`**                                                             | RabbitMQ client              | Queue inspection/publish                   | Integration tests                                              | Real                                                          |
+| **`redis` client**                                                        | Redis client                 | Session/JTI verification                   | Gateway integration                                            | Real                                                          |
+| **Grafana k6**                                                            | Load-testing tool            | Endpoint/profile/service/workflow load     | 29 k6 scenarios                                                | Real, in a Docker container                                   |
+| **`docker stats`**                                                        | Container resource sampler   | CPU/memory envelope                        | k6 suite                                                       | Real                                                          |
+| **GitHub Actions**                                                        | CI runner                    | Automated backend checks                   | `.github/workflows/backend-ci.yml`                             | Configured, unverified                                        |
+| **Mermaid**                                                               | Diagram renderer             | This document’s flowcharts                 | N/A                                                            | Documentation only                                            |
 
 ### 7.2 Real vs mocked dependency matrix
 
-| Test area | MongoDB | Redis | RabbitMQ | Docker | SMTP | HTTP services |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Backend unit | In-memory Mongoose validation; model module mocked | Mocked/none | Fake channel | Fake objects | Real local SMTP for mail tests | None |
-| Frontend unit | None | None | None | None | None | Mocked (`vi.mock`/`spyOn`) |
-| API integration | **Real** (27018) | **Real** (6380) | **Real** (5673) | Not used for API suites | Mail URL intentionally dead (3999) | **Real** (3100–3104) |
-| Sandbox E2E | **Real** | Not used | **Real** | **Real** | None | **Real** |
-| Closed-loop load | **Real** (test infra) | Not used | **Real** (publish path) | Not used | None | **Real** host services |
-| k6 load | **Real** (main stack) | **Real** | **Real** | **Real** | **Real** (external Gmail for mail test) | **Real** (main stack) |
-| CI | None | None | None | None | None | None |
+| Test area        | MongoDB                                            | Redis           | RabbitMQ                | Docker                  | SMTP                                    | HTTP services              |
+| :--------------- | :------------------------------------------------- | :-------------- | :---------------------- | :---------------------- | :-------------------------------------- | :------------------------- |
+| Backend unit     | In-memory Mongoose validation; model module mocked | Mocked/none     | Fake channel            | Fake objects            | Real local SMTP for mail tests          | None                       |
+| Frontend unit    | None                                               | None            | None                    | None                    | None                                    | Mocked (`vi.mock`/`spyOn`) |
+| API integration  | **Real** (27018)                                   | **Real** (6380) | **Real** (5673)         | Not used for API suites | Mail URL intentionally dead (3999)      | **Real** (3100–3104)       |
+| Sandbox E2E      | **Real**                                           | Not used        | **Real**                | **Real**                | None                                    | **Real**                   |
+| Closed-loop load | **Real** (test infra)                              | Not used        | **Real** (publish path) | Not used                | None                                    | **Real** host services     |
+| k6 load          | **Real** (main stack)                              | **Real**        | **Real**                | **Real**                | **Real** (external Gmail for mail test) | **Real** (main stack)      |
+| CI               | None                                               | None            | None                    | None                    | None                                    | None                       |
 
 ### 7.3 Setup, teardown and isolation
 
@@ -2674,45 +2684,45 @@ It does **not** run frontend tests, lint, integration, E2E, or load tests. No ru
 
 Statuses use the vocabulary from [§4.5](#45-status-vocabulary). “Executed” means evidence exists; the result column says whether it passed.
 
-| Testing Type | Component/Service | Test Files or Commands | Execution Status | Result | Main Purpose |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| Static type checking | 10 backend TS workspaces | `npm run check-types` / `--force` | **Executed — Passed** | 15/15 Turbo tasks, 0 errors, 6.1s fresh; frontend not included | Catch type/import errors |
-| Linting | Frontend | `npm run lint` | **Executed — Failed** | Exit 2; `ts-api-utils` crash; 0 files analysed | Style/risk patterns |
-| Backend unit | 10 backend workspaces | `npm run test:backend -- --force` | **Executed — Passed** | 199/199 tests, 0 fail/skip | Isolated logic/schema contracts |
-| Frontend unit/component | `apps/frontend` | `npm --prefix apps/frontend test` | **Executed — Passed** | 182/182 tests in 26 files | UI behaviour with mocks |
-| Backend coverage | 10 backend workspaces | `npm run test:coverage` | **Executed — Passed (no gate)** | 88.64% lines / 86.43% branches / 86.90% functions | Find untested backend code |
-| Frontend coverage | `apps/frontend` | `npm --prefix apps/frontend run test:coverage` | **Executed — Failed** | 75.44% branches < 80% | Enforce UI coverage budget |
-| API integration — problem | Problem service | `npm run test:integration -- --suites=api` | **Executed — Passed** | 19 tests, 0 fail | HTTP + Mongo persistence |
-| API integration — submission | Submission service | same | **Executed — Passed** | 14 tests, 0 fail | HTTP + Mongo + RabbitMQ |
-| API integration — gateway | Gateway | same | **Executed — Passed** | 36 tests + groups, 0 fail | Auth, RBAC, proxy, security |
-| Database persistence | MongoDB via integration | same | **Executed — Passed** | Direct driver read-back assertions | Verify real writes |
-| Message queue / async | RabbitMQ | submission integration + E2E + consumer unit | **Executed — Passed** | Publish once, consume, idempotency | Async pipeline correctness |
-| Sandbox E2E — JavaScript | Execution worker + Docker | `E2E=1 ... full-flow.e2e.ts` | **Executed — Passed** | 8 tests, 0 fail; AC/WA/CE/RE/TLE | Prove full judge pipeline |
-| Language matrix — C++/Java/Python/JS | Execution worker | `--suites=language-execution` | **Configured — Execution failed to start** | Target `languages.e2e.ts` missing; 0 tests | Per-language E2E |
-| Closed-loop load — smoke | Problem + Submission | `run-load.mjs --infra --profile=smoke` | **Executed — Passed** | 100+100 requests, 0 errors | Fast sanity/throughput check |
-| Closed-loop load — normal | Problem + Submission | `--profile=normal` | **Executed — Passed** | 1,000+1,000 requests, 0 errors | Expected-load latency |
-| Closed-loop load — stress | Problem + Submission | `--profile=stress` | **Executed — Passed** | 5,000+5,000 requests, 0 errors | Saturation behaviour |
-| k6 smoke/baseline | Full stack | `suite-runner --type=smoke/baseline` | **Executed — Passed** | 0 failed checks; 419 / 2,632 requests | Baseline latency |
-| k6 endpoints (12) | Gateway/services | `--type=endpoints` | **Partially Executed** | 2 tests with failed checks; many threshold breaches | Endpoint SLA + checks |
-| k6 isolated services (4) | Problem/Submission/Mail/Gateway | `--type=services` | **Partially Executed** | Mail 32 failed; others threshold breaches | Raw service capacity |
-| k6 lifecycle/workflow | Full stack | `--type=lifecycle` | **Partially Executed** | Browse pass; submission 10/10 checks fail | Multi-step journeys |
-| k6 stepped load (10–200 VUs) | Full stack | `--type=stepped` | **Partially Executed** | 1 / 27 / 95 failed checks at 50/100/200 VUs | Find failure onset |
-| k6 stress | Full stack | `--type=stress` | **Executed — Failed** | 331 failed checks, 14.63% non-2xx | Breaking point |
-| k6 spike | Full stack | `--type=spike` | **Executed — Failed** | 105 failed checks, 36.21% non-2xx | Burst absorption |
-| k6 soak | Full stack | `--type=soak` | **Executed — Passed functionally; failed thresholds** | 0 failed checks, 0% non-2xx; thresholds breach; 45s only | Endurance (not a true soak) |
-| k6 recovery | Full stack | `--type=recovery` | **Executed — Failed** | 82 failed checks, 6.9% non-2xx | Post-overload recovery |
-| Security assertions | Gateway/Submission | Gateway + submission integration | **Executed — Passed** | 0 failures across auth/RBAC/IDOR/spoofing | Identity boundary |
-| Validation/error handling | All HTTP services | Unit + integration | **Executed — Passed** | 0 failures | Reject bad input safely |
-| Build verification | 10 backend workspaces | `npm run build:backend -- --force` | **Executed — Passed** | 10/10 tasks, 4.7s fresh | Emit production JS |
-| CI/CD pipeline | Backend | `.github/workflows/backend-ci.yml` | **Configured — Execution Unverified** | No run logs/artifacts | Automated gate |
-| Browser E2E | Frontend + backend | — | **Not Implemented** | No Playwright/Cypress | Real user journey |
-| AI service tests | Python FastAPI | — | **Not Implemented** | No Python tests | Completion service correctness |
-| Sockets/notification | — | — | **Not Implemented** | Service absent; no consumer | Real-time verdict push |
-| Accessibility/visual regression | Frontend | — | **Not Implemented** | No tooling | Inclusive/stable UI |
-| Contract/fuzz/mutation/chaos | All | — | **Not Implemented** | No tooling | Deeper defect detection |
-| Dependency/secret/SAST scanning | All | — | **Not Implemented** | No CI tooling | Supply-chain security |
-| Frontend performance | Frontend | — | **Not Implemented** | No Lighthouse/Web Vitals | User-perceived speed |
-| Memory/CPU sandbox limits | Execution | — | **Not Implemented** | Only time limits exist | Resource-abuse resistance |
+| Testing Type                         | Component/Service               | Test Files or Commands                         | Execution Status                                      | Result                                                         | Main Purpose                    |
+| :----------------------------------- | :------------------------------ | :--------------------------------------------- | :---------------------------------------------------- | :------------------------------------------------------------- | :------------------------------ |
+| Static type checking                 | 10 backend TS workspaces        | `npm run check-types` / `--force`              | **Executed — Passed**                                 | 15/15 Turbo tasks, 0 errors, 6.1s fresh; frontend not included | Catch type/import errors        |
+| Linting                              | Frontend                        | `npm run lint`                                 | **Executed — Failed**                                 | Exit 2; `ts-api-utils` crash; 0 files analysed                 | Style/risk patterns             |
+| Backend unit                         | 10 backend workspaces           | `npm run test:backend -- --force`              | **Executed — Passed**                                 | 199/199 tests, 0 fail/skip                                     | Isolated logic/schema contracts |
+| Frontend unit/component              | `apps/frontend`                 | `npm --prefix apps/frontend test`              | **Executed — Passed**                                 | 182/182 tests in 26 files                                      | UI behaviour with mocks         |
+| Backend coverage                     | 10 backend workspaces           | `npm run test:coverage`                        | **Executed — Passed (no gate)**                       | 88.64% lines / 86.43% branches / 86.90% functions              | Find untested backend code      |
+| Frontend coverage                    | `apps/frontend`                 | `npm --prefix apps/frontend run test:coverage` | **Executed — Failed**                                 | 75.44% branches < 80%                                          | Enforce UI coverage budget      |
+| API integration — problem            | Problem service                 | `npm run test:integration -- --suites=api`     | **Executed — Passed**                                 | 19 tests, 0 fail                                               | HTTP + Mongo persistence        |
+| API integration — submission         | Submission service              | same                                           | **Executed — Passed**                                 | 14 tests, 0 fail                                               | HTTP + Mongo + RabbitMQ         |
+| API integration — gateway            | Gateway                         | same                                           | **Executed — Passed**                                 | 36 tests + groups, 0 fail                                      | Auth, RBAC, proxy, security     |
+| Database persistence                 | MongoDB via integration         | same                                           | **Executed — Passed**                                 | Direct driver read-back assertions                             | Verify real writes              |
+| Message queue / async                | RabbitMQ                        | submission integration + E2E + consumer unit   | **Executed — Passed**                                 | Publish once, consume, idempotency                             | Async pipeline correctness      |
+| Sandbox E2E — JavaScript             | Execution worker + Docker       | `E2E=1 ... full-flow.e2e.ts`                   | **Executed — Passed**                                 | 8 tests, 0 fail; AC/WA/CE/RE/TLE                               | Prove full judge pipeline       |
+| Language matrix — C++/Java/Python/JS | Execution worker                | `--suites=language-execution`                  | **Configured — Execution failed to start**            | Target `languages.e2e.ts` missing; 0 tests                     | Per-language E2E                |
+| Closed-loop load — smoke             | Problem + Submission            | `run-load.mjs --infra --profile=smoke`         | **Executed — Passed**                                 | 100+100 requests, 0 errors                                     | Fast sanity/throughput check    |
+| Closed-loop load — normal            | Problem + Submission            | `--profile=normal`                             | **Executed — Passed**                                 | 1,000+1,000 requests, 0 errors                                 | Expected-load latency           |
+| Closed-loop load — stress            | Problem + Submission            | `--profile=stress`                             | **Executed — Passed**                                 | 5,000+5,000 requests, 0 errors                                 | Saturation behaviour            |
+| k6 smoke/baseline                    | Full stack                      | `suite-runner --type=smoke/baseline`           | **Executed — Passed**                                 | 0 failed checks; 419 / 2,632 requests                          | Baseline latency                |
+| k6 endpoints (12)                    | Gateway/services                | `--type=endpoints`                             | **Partially Executed**                                | 2 tests with failed checks; many threshold breaches            | Endpoint SLA + checks           |
+| k6 isolated services (4)             | Problem/Submission/Mail/Gateway | `--type=services`                              | **Partially Executed**                                | Mail 32 failed; others threshold breaches                      | Raw service capacity            |
+| k6 lifecycle/workflow                | Full stack                      | `--type=lifecycle`                             | **Partially Executed**                                | Browse pass; submission 10/10 checks fail                      | Multi-step journeys             |
+| k6 stepped load (10–200 VUs)         | Full stack                      | `--type=stepped`                               | **Partially Executed**                                | 1 / 27 / 95 failed checks at 50/100/200 VUs                    | Find failure onset              |
+| k6 stress                            | Full stack                      | `--type=stress`                                | **Executed — Failed**                                 | 331 failed checks, 14.63% non-2xx                              | Breaking point                  |
+| k6 spike                             | Full stack                      | `--type=spike`                                 | **Executed — Failed**                                 | 105 failed checks, 36.21% non-2xx                              | Burst absorption                |
+| k6 soak                              | Full stack                      | `--type=soak`                                  | **Executed — Passed functionally; failed thresholds** | 0 failed checks, 0% non-2xx; thresholds breach; 45s only       | Endurance (not a true soak)     |
+| k6 recovery                          | Full stack                      | `--type=recovery`                              | **Executed — Failed**                                 | 82 failed checks, 6.9% non-2xx                                 | Post-overload recovery          |
+| Security assertions                  | Gateway/Submission              | Gateway + submission integration               | **Executed — Passed**                                 | 0 failures across auth/RBAC/IDOR/spoofing                      | Identity boundary               |
+| Validation/error handling            | All HTTP services               | Unit + integration                             | **Executed — Passed**                                 | 0 failures                                                     | Reject bad input safely         |
+| Build verification                   | 10 backend workspaces           | `npm run build:backend -- --force`             | **Executed — Passed**                                 | 10/10 tasks, 4.7s fresh                                        | Emit production JS              |
+| CI/CD pipeline                       | Backend                         | `.github/workflows/backend-ci.yml`             | **Configured — Execution Unverified**                 | No run logs/artifacts                                          | Automated gate                  |
+| Browser E2E                          | Frontend + backend              | —                                              | **Not Implemented**                                   | No Playwright/Cypress                                          | Real user journey               |
+| AI service tests                     | Python FastAPI                  | —                                              | **Not Implemented**                                   | No Python tests                                                | Completion service correctness  |
+| Sockets/notification                 | —                               | —                                              | **Not Implemented**                                   | Service absent; no consumer                                    | Real-time verdict push          |
+| Accessibility/visual regression      | Frontend                        | —                                              | **Not Implemented**                                   | No tooling                                                     | Inclusive/stable UI             |
+| Contract/fuzz/mutation/chaos         | All                             | —                                              | **Not Implemented**                                   | No tooling                                                     | Deeper defect detection         |
+| Dependency/secret/SAST scanning      | All                             | —                                              | **Not Implemented**                                   | No CI tooling                                                  | Supply-chain security           |
+| Frontend performance                 | Frontend                        | —                                              | **Not Implemented**                                   | No Lighthouse/Web Vitals                                       | User-perceived speed            |
+| Memory/CPU sandbox limits            | Execution                       | —                                              | **Not Implemented**                                   | Only time limits exist                                         | Resource-abuse resistance       |
 
 ---
 
@@ -2930,60 +2940,60 @@ npm run test:all                   # test:all:fast + integration
 
 ### 10.3 Historical artifact index
 
-| Artifact | What it contains |
-| :--- | :--- |
-| `test-artifacts/verification/stage-status.tsv` | Per-stage exit code and seconds |
-| `test-artifacts/verification/battery.log` | Whole-battery log (start, stage results, 1299s total) |
-| `test-artifacts/verification/01-static-check-types.log` | Typecheck output |
-| `test-artifacts/verification/02-static-lint.log` | ESLint crash |
-| `test-artifacts/verification/03-unit-backend.log` | Backend unit output |
-| `test-artifacts/verification/04-unit-frontend.log` | Frontend unit output |
-| `test-artifacts/verification/05-coverage-backend.log` | Backend coverage table |
-| `test-artifacts/verification/06-coverage-frontend.log` | Frontend coverage + threshold error |
-| `test-artifacts/verification/07-integration.log` | Integration/E2E output + verdict timings |
-| `test-artifacts/verification/08-load-smoke.log` | Closed-loop smoke |
-| `test-artifacts/verification/09-load-normal.log` | Closed-loop normal |
-| `test-artifacts/verification/10-load-stress.log` | Closed-loop stress |
-| `test-artifacts/verification/11-k6-suite.log` | Full k6 suite |
-| `test-artifacts/verification/backend-unit-summary.json` | 199 tests, per-workspace counts |
-| `test-artifacts/verification/integration-summary.json` | 84 entries, per-suite test names |
-| `test-artifacts/verification/load-runs.csv` | Exit code + seconds per closed-loop profile |
-| `coverage/summary.json` | Merged backend coverage |
-| `coverage/lcov.info` | Merged lcov |
-| `apps/frontend/coverage/coverage-final.json` | Frontend coverage data |
-| `test-artifacts/load/*.json` | Closed-loop raw results |
-| `test-artifacts/load/PERFORMANCE_REPORT_*.md` | Generated k6 report |
-| `test-artifacts/reports/TEST_AND_PERFORMANCE_REPORT.md` | Consolidated report |
-| `tests/load/results/suite_manifest_1791990095497.json` | 29-test k6 manifest |
+| Artifact                                                | What it contains                                      |
+| :------------------------------------------------------ | :---------------------------------------------------- |
+| `test-artifacts/verification/stage-status.tsv`          | Per-stage exit code and seconds                       |
+| `test-artifacts/verification/battery.log`               | Whole-battery log (start, stage results, 1299s total) |
+| `test-artifacts/verification/01-static-check-types.log` | Typecheck output                                      |
+| `test-artifacts/verification/02-static-lint.log`        | ESLint crash                                          |
+| `test-artifacts/verification/03-unit-backend.log`       | Backend unit output                                   |
+| `test-artifacts/verification/04-unit-frontend.log`      | Frontend unit output                                  |
+| `test-artifacts/verification/05-coverage-backend.log`   | Backend coverage table                                |
+| `test-artifacts/verification/06-coverage-frontend.log`  | Frontend coverage + threshold error                   |
+| `test-artifacts/verification/07-integration.log`        | Integration/E2E output + verdict timings              |
+| `test-artifacts/verification/08-load-smoke.log`         | Closed-loop smoke                                     |
+| `test-artifacts/verification/09-load-normal.log`        | Closed-loop normal                                    |
+| `test-artifacts/verification/10-load-stress.log`        | Closed-loop stress                                    |
+| `test-artifacts/verification/11-k6-suite.log`           | Full k6 suite                                         |
+| `test-artifacts/verification/backend-unit-summary.json` | 199 tests, per-workspace counts                       |
+| `test-artifacts/verification/integration-summary.json`  | 84 entries, per-suite test names                      |
+| `test-artifacts/verification/load-runs.csv`             | Exit code + seconds per closed-loop profile           |
+| `coverage/summary.json`                                 | Merged backend coverage                               |
+| `coverage/lcov.info`                                    | Merged lcov                                           |
+| `apps/frontend/coverage/coverage-final.json`            | Frontend coverage data                                |
+| `test-artifacts/load/*.json`                            | Closed-loop raw results                               |
+| `test-artifacts/load/PERFORMANCE_REPORT_*.md`           | Generated k6 report                                   |
+| `test-artifacts/reports/TEST_AND_PERFORMANCE_REPORT.md` | Consolidated report                                   |
+| `tests/load/results/suite_manifest_1791990095497.json`  | 29-test k6 manifest                                   |
 
 > **Note:** `test-artifacts/` and `coverage/` are listed in `.gitignore`; they exist in this checkout but will not be present in a fresh clone. `tests/load/results/` is tracked.
 
 ### 10.4 Glossary
 
-| Term | Definition |
-| :--- | :--- |
-| **AC / Accepted** | Submission passed all test cases. |
-| **WA / Wrong Answer** | Output did not match expected output. |
-| **TLE / Time Limit Exceeded** | Program ran longer than the per-case limit. |
-| **RE / Runtime Error** | Program exited non-zero or crashed. |
-| **CE / Compilation Error** | Code failed to compile or syntax-check. |
-| **INTERNAL_ERROR** | Infrastructure-side failure during evaluation. |
-| **JTI** | JWT ID; used to blacklist a specific access token. |
-| **RBAC** | Role-Based Access Control. |
-| **IDOR** | Insecure Direct Object Reference; accessing another user's record by ID. |
-| **FIM** | Fill-In-The-Middle; the AI completion technique used by the AI service. |
-| **VU** | Virtual User; a simulated concurrent client in k6. |
-| **p95** | 95th percentile latency. |
-| **Fixture** | Predefined data/state for a test. |
-| **Mock/Stub/Spy/Fake** | Test doubles replacing real dependencies. |
-| **Assertion** | A condition that must hold for a test to pass. |
-| **Coverage** | Percentage of code executed by tests. |
-| **Flaky** | Passes/fails inconsistently without code changes. |
-| **Idempotent** | Repeating an operation yields the same result. |
-| **Dead-letter queue** | Queue for messages that cannot be processed after retries. |
-| **Soak** | Long-duration moderate load test. |
-| **Spike** | Sudden burst load test. |
-| **Threshold** | Aggregate performance/coverage limit used as a gate. |
+| Term                          | Definition                                                               |
+| :---------------------------- | :----------------------------------------------------------------------- |
+| **AC / Accepted**             | Submission passed all test cases.                                        |
+| **WA / Wrong Answer**         | Output did not match expected output.                                    |
+| **TLE / Time Limit Exceeded** | Program ran longer than the per-case limit.                              |
+| **RE / Runtime Error**        | Program exited non-zero or crashed.                                      |
+| **CE / Compilation Error**    | Code failed to compile or syntax-check.                                  |
+| **INTERNAL_ERROR**            | Infrastructure-side failure during evaluation.                           |
+| **JTI**                       | JWT ID; used to blacklist a specific access token.                       |
+| **RBAC**                      | Role-Based Access Control.                                               |
+| **IDOR**                      | Insecure Direct Object Reference; accessing another user's record by ID. |
+| **FIM**                       | Fill-In-The-Middle; the AI completion technique used by the AI service.  |
+| **VU**                        | Virtual User; a simulated concurrent client in k6.                       |
+| **p95**                       | 95th percentile latency.                                                 |
+| **Fixture**                   | Predefined data/state for a test.                                        |
+| **Mock/Stub/Spy/Fake**        | Test doubles replacing real dependencies.                                |
+| **Assertion**                 | A condition that must hold for a test to pass.                           |
+| **Coverage**                  | Percentage of code executed by tests.                                    |
+| **Flaky**                     | Passes/fails inconsistently without code changes.                        |
+| **Idempotent**                | Repeating an operation yields the same result.                           |
+| **Dead-letter queue**         | Queue for messages that cannot be processed after retries.               |
+| **Soak**                      | Long-duration moderate load test.                                        |
+| **Spike**                     | Sudden burst load test.                                                  |
+| **Threshold**                 | Aggregate performance/coverage limit used as a gate.                     |
 
 ---
 

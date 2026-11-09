@@ -18,13 +18,15 @@ describe("LoginPage component", () => {
         <BrowserRouter>
           <LoginPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("Welcome Back")).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^sign in$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /^sign in$/i }),
+    ).toBeInTheDocument();
   });
 
   it("validates empty fields on submission", async () => {
@@ -33,11 +35,15 @@ describe("LoginPage component", () => {
         <BrowserRouter>
           <LoginPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
-    fireEvent.submit(screen.getByRole("button", { name: /^sign in$/i }).closest("form")!);
-    expect(await screen.findByText(/please fill in both email and password/i)).toBeInTheDocument();
+    fireEvent.submit(
+      screen.getByRole("button", { name: /^sign in$/i }).closest("form")!,
+    );
+    expect(
+      await screen.findByText(/please fill in both email and password/i),
+    ).toBeInTheDocument();
   });
 
   it("handles successful password login", async () => {
@@ -56,7 +62,7 @@ describe("LoginPage component", () => {
         <BrowserRouter>
           <LoginPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     fireEvent.change(screen.getByLabelText(/email address/i), {
@@ -93,7 +99,7 @@ describe("LoginPage component", () => {
         <BrowserRouter>
           <LoginPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     // Switch to OTP tab
@@ -107,7 +113,9 @@ describe("LoginPage component", () => {
     // Click Send Code
     fireEvent.click(screen.getByText("Send Code"));
 
-    expect(await screen.findByText(/verification code dispatched/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/verification code dispatched/i),
+    ).toBeInTheDocument();
     expect(authService.sendOtp).toHaveBeenCalledWith("otpuser@example.com");
 
     // Enter OTP

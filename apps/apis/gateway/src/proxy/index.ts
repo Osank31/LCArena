@@ -1,1 +1,1 @@
-export * from "./proxy.factory"
+export * from "./proxy.factory";

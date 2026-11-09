@@ -37,7 +37,9 @@ const TestAuthConsumer: React.FC = () => {
 
       <button
         onClick={() =>
-          loginWithOtp({ email: "otp@example.com", otp: "123456" }).catch(() => {})
+          loginWithOtp({ email: "otp@example.com", otp: "123456" }).catch(
+            () => {},
+          )
         }
       >
         Trigger OTP Login
@@ -79,7 +81,7 @@ describe("AuthContext and useAuth hook", () => {
     console.error = vi.fn();
 
     expect(() => render(<TestAuthConsumer />)).toThrow(
-      "useAuth must be used within an AuthProvider"
+      "useAuth must be used within an AuthProvider",
     );
 
     console.error = originalConsoleError;
@@ -89,7 +91,7 @@ describe("AuthContext and useAuth hook", () => {
     render(
       <AuthProvider>
         <TestAuthConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -102,7 +104,9 @@ describe("AuthContext and useAuth hook", () => {
 
   it("attempts token refresh if getProfile fails on mount", async () => {
     setStoredToken("old_access_token");
-    vi.spyOn(authService, "getProfile").mockRejectedValueOnce(new Error("Expired"));
+    vi.spyOn(authService, "getProfile").mockRejectedValueOnce(
+      new Error("Expired"),
+    );
     vi.spyOn(authService, "refresh").mockResolvedValueOnce({
       user: {
         userId: "refreshed_id",
@@ -116,12 +120,12 @@ describe("AuthContext and useAuth hook", () => {
     render(
       <AuthProvider>
         <TestAuthConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
       expect(screen.getByTestId("user-email")).toHaveTextContent(
-        "refreshed@example.com"
+        "refreshed@example.com",
       );
     });
 
@@ -130,13 +134,17 @@ describe("AuthContext and useAuth hook", () => {
 
   it("clears user and stored token if both getProfile and refresh fail", async () => {
     setStoredToken("bad_token");
-    vi.spyOn(authService, "getProfile").mockRejectedValueOnce(new Error("Invalid"));
-    vi.spyOn(authService, "refresh").mockRejectedValueOnce(new Error("Session dead"));
+    vi.spyOn(authService, "getProfile").mockRejectedValueOnce(
+      new Error("Invalid"),
+    );
+    vi.spyOn(authService, "refresh").mockRejectedValueOnce(
+      new Error("Session dead"),
+    );
 
     render(
       <AuthProvider>
         <TestAuthConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -149,13 +157,13 @@ describe("AuthContext and useAuth hook", () => {
 
   it("handles login, login error, and clearError", async () => {
     vi.spyOn(authService, "login").mockRejectedValueOnce(
-      new Error("Invalid credentials")
+      new Error("Invalid credentials"),
     );
 
     render(
       <AuthProvider>
         <TestAuthConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -166,7 +174,9 @@ describe("AuthContext and useAuth hook", () => {
       screen.getByText("Trigger Login").click();
     });
 
-    expect(screen.getByTestId("error-msg")).toHaveTextContent("Invalid credentials");
+    expect(screen.getByTestId("error-msg")).toHaveTextContent(
+      "Invalid credentials",
+    );
 
     act(() => {
       screen.getByText("Trigger Clear Error").click();
@@ -177,13 +187,13 @@ describe("AuthContext and useAuth hook", () => {
 
   it("handles loginWithOtp failure", async () => {
     vi.spyOn(authService, "loginWithOtp").mockRejectedValueOnce(
-      new Error("OTP expired")
+      new Error("OTP expired"),
     );
 
     render(
       <AuthProvider>
         <TestAuthConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await act(async () => {
@@ -195,27 +205,31 @@ describe("AuthContext and useAuth hook", () => {
 
   it("handles register and sendOtp failures", async () => {
     vi.spyOn(authService, "register").mockRejectedValueOnce(
-      new Error("Email already taken")
+      new Error("Email already taken"),
     );
     vi.spyOn(authService, "sendOtp").mockRejectedValueOnce(
-      new Error("Mail provider rate limited")
+      new Error("Mail provider rate limited"),
     );
 
     render(
       <AuthProvider>
         <TestAuthConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await act(async () => {
       screen.getByText("Trigger Register").click();
     });
-    expect(screen.getByTestId("error-msg")).toHaveTextContent("Email already taken");
+    expect(screen.getByTestId("error-msg")).toHaveTextContent(
+      "Email already taken",
+    );
 
     await act(async () => {
       screen.getByText("Trigger Send OTP").click();
     });
-    expect(screen.getByTestId("error-msg")).toHaveTextContent("Mail provider rate limited");
+    expect(screen.getByTestId("error-msg")).toHaveTextContent(
+      "Mail provider rate limited",
+    );
   });
 
   it("handles refreshUser success and failure", async () => {
@@ -229,17 +243,21 @@ describe("AuthContext and useAuth hook", () => {
     render(
       <AuthProvider>
         <TestAuthConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await act(async () => {
       screen.getByText("Trigger Refresh User").click();
     });
 
-    expect(screen.getByTestId("user-email")).toHaveTextContent("ref@example.com");
+    expect(screen.getByTestId("user-email")).toHaveTextContent(
+      "ref@example.com",
+    );
 
     // Failure case
-    vi.spyOn(authService, "getProfile").mockRejectedValueOnce(new Error("Failed"));
+    vi.spyOn(authService, "getProfile").mockRejectedValueOnce(
+      new Error("Failed"),
+    );
 
     await act(async () => {
       screen.getByText("Trigger Refresh User").click();
@@ -254,7 +272,7 @@ describe("AuthContext and useAuth hook", () => {
     render(
       <AuthProvider>
         <TestAuthConsumer />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await act(async () => {

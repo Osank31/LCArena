@@ -62,7 +62,7 @@ export const Modal: React.FC<ModalProps> = ({
             duration: MOTION.duration.fast,
             ease: MOTION.ease.out,
             clearProps: "opacity",
-          }
+          },
         );
       }
 
@@ -77,17 +77,17 @@ export const Modal: React.FC<ModalProps> = ({
             duration: MOTION.duration.base,
             ease: MOTION.ease.out,
             clearProps: "opacity,transform",
-          }
+          },
         );
       }
 
       // Never leave the dialog hidden if the ticker stalls.
       const targets = [backdropRef.current, dialogRef.current].filter(
-        (el): el is HTMLDivElement => el !== null
+        (el): el is HTMLDivElement => el !== null,
       );
       return scheduleVisibilityFallback(targets, MOTION.duration.base * 1000);
     },
-    { scope: scopeRef, dependencies: [isOpen] }
+    { scope: scopeRef, dependencies: [isOpen] },
   );
 
   if (!isOpen) return null;

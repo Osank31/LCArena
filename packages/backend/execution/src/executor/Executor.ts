@@ -8,181 +8,181 @@ import { ExecutionResult } from "./executionResult.type.js";
 import { TestCasesUnavailableError } from "../errors.js";
 
 export abstract class Executor {
-	static docker: Docker = new Docker();
+  static docker: Docker = new Docker();
 
-	/**
-	 * Host directory whose *contents* become `/workspace/testcases` inside the
-	 * container. Defaults to `<cwd>/testcases` to preserve the original
-	 * behaviour, but callers (e.g. the evaluation worker) can point it at an
-	 * isolated per-submission workspace so concurrent runs cannot clobber each
-	 * other's test files.
-	 */
-	protected readonly testCasesDir: string;
+  /**
+   * Host directory whose *contents* become `/workspace/testcases` inside the
+   * container. Defaults to `<cwd>/testcases` to preserve the original
+   * behaviour, but callers (e.g. the evaluation worker) can point it at an
+   * isolated per-submission workspace so concurrent runs cannot clobber each
+   * other's test files.
+   */
+  protected readonly testCasesDir: string;
 
-	constructor(testCasesDir?: string) {
-		this.testCasesDir = testCasesDir ?? path.join(process.cwd(), "testcases");
-	}
+  constructor(testCasesDir?: string) {
+    this.testCasesDir = testCasesDir ?? path.join(process.cwd(), "testcases");
+  }
 
-	protected async pullImage(imageName: string): Promise<any> {
-		logger.info(`Checking if image exists: ${imageName}`);
-		try {
-			logger.debug(`Getting image: ${imageName} if it doesn't exist`);
-			await Executor.docker.getImage(imageName).inspect();
-			logger.info(`Image already exists: ${imageName}`);
-			return; // Image exists, no need to pull
-		} catch (error: any) {
-			if (error.statusCode !== 404) {
-				logger.error(`Error inspecting image ${imageName}: ${error}`);
-				throw error;
-			}
-		}
+  protected async pullImage(imageName: string): Promise<any> {
+    logger.info(`Checking if image exists: ${imageName}`);
+    try {
+      logger.debug(`Getting image: ${imageName} if it doesn't exist`);
+      await Executor.docker.getImage(imageName).inspect();
+      logger.info(`Image already exists: ${imageName}`);
+      return; // Image exists, no need to pull
+    } catch (error: any) {
+      if (error.statusCode !== 404) {
+        logger.error(`Error inspecting image ${imageName}: ${error}`);
+        throw error;
+      }
+    }
 
-		return new Promise((resolve, reject) => {
-			logger.info(`Pulling image: ${imageName}`);
-			Executor.docker.pull(
-				imageName,
-				(err: Error | null, stream: NodeJS.ReadableStream) => {
-					if (err) {
-						logger.error(
-							`Error initiating pull for image ${imageName}: ${err.message}`
-						);
-						return reject(err);
-					}
-					Executor.docker.modem.followProgress(stream, onFinished);
+    return new Promise((resolve, reject) => {
+      logger.info(`Pulling image: ${imageName}`);
+      Executor.docker.pull(
+        imageName,
+        (err: Error | null, stream: NodeJS.ReadableStream) => {
+          if (err) {
+            logger.error(
+              `Error initiating pull for image ${imageName}: ${err.message}`,
+            );
+            return reject(err);
+          }
+          Executor.docker.modem.followProgress(stream, onFinished);
 
-					function onFinished(err: Error | null, output: any[]) {
-						if (err) {
-							logger.error(
-								`Error during image pull progress for ${imageName}: ${err.message}`
-							);
-							reject(err);
-						} else {
-							logger.info(
-								`Successfully pulled image: ${imageName}`
-							);
-							resolve(output);
-						}
-					}
-				}
-			);
-		});
-	}
+          function onFinished(err: Error | null, output: any[]) {
+            if (err) {
+              logger.error(
+                `Error during image pull progress for ${imageName}: ${err.message}`,
+              );
+              reject(err);
+            } else {
+              logger.info(`Successfully pulled image: ${imageName}`);
+              resolve(output);
+            }
+          }
+        },
+      );
+    });
+  }
 
-	protected async runCommand(
-		container: Docker.Container,
-		cmdString: string
-	): Promise<string> {
-		logger.info(
-			`Running command in container: ${Buffer.from(cmdString, "base64").toString("utf-8")}`
-		);
-		const exec = await container.exec({
-			Cmd: ["/bin/bash", "-c", cmdString],
-			AttachStdout: true,
-			AttachStderr: true,
-		});
+  protected async runCommand(
+    container: Docker.Container,
+    cmdString: string,
+  ): Promise<string> {
+    logger.info(
+      `Running command in container: ${Buffer.from(cmdString, "base64").toString("utf-8")}`,
+    );
+    const exec = await container.exec({
+      Cmd: ["/bin/bash", "-c", cmdString],
+      AttachStdout: true,
+      AttachStderr: true,
+    });
 
-		const stream = await exec.start({ Detach: false });
+    const stream = await exec.start({ Detach: false });
 
-		return new Promise((resolve, reject) => {
-			let stdout = "";
-			let stderr = "";
+    return new Promise((resolve, reject) => {
+      let stdout = "";
+      let stderr = "";
 
-			const stdoutStream = new Writable({
-				write(chunk, encoding, callback) {
-					stdout += chunk.toString("utf-8");
-					callback();
-				},
-			});
+      const stdoutStream = new Writable({
+        write(chunk, encoding, callback) {
+          stdout += chunk.toString("utf-8");
+          callback();
+        },
+      });
 
-			const stderrStream = new Writable({
-				write(chunk, encoding, callback) {
-					stderr += chunk.toString("utf-8");
-					callback();
-				},
-			});
+      const stderrStream = new Writable({
+        write(chunk, encoding, callback) {
+          stderr += chunk.toString("utf-8");
+          callback();
+        },
+      });
 
-			container.modem.demuxStream(stream, stdoutStream, stderrStream);
+      container.modem.demuxStream(stream, stdoutStream, stderrStream);
 
-			stream.on("end", () => {
-				logger.debug(
-					`Command execution finished. Output length: ${stdout.length}`
-				);
-				if (stderr) {
-					logger.debug(`Command stderr: ${stderr.trim()}`);
-				}
-				resolve(stdout);
-			});
-			stream.on("error", (err) => {
-				logger.error(`Error executing command '${cmdString}': ${err}`);
-				reject(err);
-			});
-		});
-	}
+      stream.on("end", () => {
+        logger.debug(
+          `Command execution finished. Output length: ${stdout.length}`,
+        );
+        if (stderr) {
+          logger.debug(`Command stderr: ${stderr.trim()}`);
+        }
+        resolve(stdout);
+      });
+      stream.on("error", (err) => {
+        logger.error(`Error executing command '${cmdString}': ${err}`);
+        reject(err);
+      });
+    });
+  }
 
-	protected async copyTestCasesToContainer(
-		container: Docker.Container
-	): Promise<void> {
-		logger.info("Starting to copy test cases to container...");
-		const pack = tar.pack();
-		const testCasesDir = this.testCasesDir;
-		let packedFiles = 0;
+  protected async copyTestCasesToContainer(
+    container: Docker.Container,
+  ): Promise<void> {
+    logger.info("Starting to copy test cases to container...");
+    const pack = tar.pack();
+    const testCasesDir = this.testCasesDir;
+    let packedFiles = 0;
 
-		const addFilesRecursively = async (dir: string, baseDir: string) => {
-			const items = await fs.readdir(dir);
-			for (const item of items) {
-				const itemPath = path.join(dir, item);
-				const stat = await fs.stat(itemPath);
-				if (stat.isDirectory()) {
-					await addFilesRecursively(itemPath, baseDir);
-				} else if (stat.isFile()) {
-					const content = await fs.readFile(itemPath);
-					const relativePath = path.relative(baseDir, itemPath);
-					const posixPath = relativePath.split(path.sep).join("/");
-					pack.entry({ name: `testcases/${posixPath}` }, content);
-					packedFiles += 1;
-				}
-			}
-		};
+    const addFilesRecursively = async (dir: string, baseDir: string) => {
+      const items = await fs.readdir(dir);
+      for (const item of items) {
+        const itemPath = path.join(dir, item);
+        const stat = await fs.stat(itemPath);
+        if (stat.isDirectory()) {
+          await addFilesRecursively(itemPath, baseDir);
+        } else if (stat.isFile()) {
+          const content = await fs.readFile(itemPath);
+          const relativePath = path.relative(baseDir, itemPath);
+          const posixPath = relativePath.split(path.sep).join("/");
+          pack.entry({ name: `testcases/${posixPath}` }, content);
+          packedFiles += 1;
+        }
+      }
+    };
 
-		try {
-			await addFilesRecursively(testCasesDir, testCasesDir);
-		} catch (err) {
-			pack.destroy();
-			logger.error(`Failed to read testcases directory ${testCasesDir}: ${err}`);
-			throw new TestCasesUnavailableError(
-				`Unable to read test cases from ${testCasesDir}`
-			);
-		}
+    try {
+      await addFilesRecursively(testCasesDir, testCasesDir);
+    } catch (err) {
+      pack.destroy();
+      logger.error(
+        `Failed to read testcases directory ${testCasesDir}: ${err}`,
+      );
+      throw new TestCasesUnavailableError(
+        `Unable to read test cases from ${testCasesDir}`,
+      );
+    }
 
-		if (packedFiles === 0) {
-			pack.destroy();
-			throw new TestCasesUnavailableError(
-				`No test cases found in ${testCasesDir}`
-			);
-		}
+    if (packedFiles === 0) {
+      pack.destroy();
+      throw new TestCasesUnavailableError(
+        `No test cases found in ${testCasesDir}`,
+      );
+    }
 
-		logger.info(`Successfully packed testcases from ${testCasesDir}`);
+    logger.info(`Successfully packed testcases from ${testCasesDir}`);
 
-		pack.finalize();
+    pack.finalize();
 
-		await container.putArchive(pack as any, {
-			path: "/workspace",
-		});
-		logger.info(
-			"Successfully copied test cases archive to container /workspace"
-		);
-	}
+    await container.putArchive(pack as any, {
+      path: "/workspace",
+    });
+    logger.info(
+      "Successfully copied test cases archive to container /workspace",
+    );
+  }
 
-	protected generateRunnerScript(
-		time_limit: number,
-		testcases_dir: string,
-		compileCmd: string,
-		runCmd: string
-	): string {
-		logger.info(
-			`Generating runner script with time limit: ${time_limit}s for testcases in ${testcases_dir}`
-		);
-		return `#!/bin/bash
+  protected generateRunnerScript(
+    time_limit: number,
+    testcases_dir: string,
+    compileCmd: string,
+    runCmd: string,
+  ): string {
+    logger.info(
+      `Generating runner script with time limit: ${time_limit}s for testcases in ${testcases_dir}`,
+    );
+    return `#!/bin/bash
 TIME_LIMIT="${time_limit}s"
 TESTCASES_DIR="./${testcases_dir}"
 
@@ -275,26 +275,26 @@ cat <<EOF
 }
 EOF
 `;
-	}
+  }
 
-	protected parseRunnerOutput(output: string): ExecutionResult {
-		const trimmed = output.trim();
-		try {
-			return JSON.parse(trimmed);
-		} catch {
-			const jsonStart = trimmed.indexOf("{");
-			const jsonEnd = trimmed.lastIndexOf("}");
-			if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-				const jsonSubstring = trimmed.slice(jsonStart, jsonEnd + 1);
-				return JSON.parse(jsonSubstring);
-			}
-			throw new Error(`Failed to parse runner output as JSON: ${trimmed}`);
-		}
-	}
+  protected parseRunnerOutput(output: string): ExecutionResult {
+    const trimmed = output.trim();
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      const jsonStart = trimmed.indexOf("{");
+      const jsonEnd = trimmed.lastIndexOf("}");
+      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+        const jsonSubstring = trimmed.slice(jsonStart, jsonEnd + 1);
+        return JSON.parse(jsonSubstring);
+      }
+      throw new Error(`Failed to parse runner output as JSON: ${trimmed}`);
+    }
+  }
 
-	abstract execute(
-		clientCode: string,
-		time_limit: number,
-		testcases_dir: string
-	): Promise<ExecutionResult>;
+  abstract execute(
+    clientCode: string,
+    time_limit: number,
+    testcases_dir: string,
+  ): Promise<ExecutionResult>;
 }

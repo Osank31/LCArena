@@ -30,12 +30,12 @@ Three things make this secure and are the whole point of the design:
 
 ## 2. Prerequisites
 
-| Requirement | Notes |
-| :--- | :--- |
-| Node.js ≥ 24, npm ≥ 11 | see the root `package.json` `engines` |
-| AWS CLI v2, configured | `aws sts get-caller-identity` must succeed |
-| Region | the bucket's region; this project uses `ap-south-1` |
-| IAM permissions | `s3:CreateBucket`, `s3:PutObject`, `s3:PutBucketPolicy`, `s3:PutBucketEncryption`, `s3:PutPublicAccessBlock`, `cloudfront:CreateDistribution`, `cloudfront:CreateOriginAccessControl`, `cloudfront:CreateInvalidation` |
+| Requirement            | Notes                                                                                                                                                                                                                  |
+| :--------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js ≥ 24, npm ≥ 11 | see the root `package.json` `engines`                                                                                                                                                                                  |
+| AWS CLI v2, configured | `aws sts get-caller-identity` must succeed                                                                                                                                                                             |
+| Region                 | the bucket's region; this project uses `ap-south-1`                                                                                                                                                                    |
+| IAM permissions        | `s3:CreateBucket`, `s3:PutObject`, `s3:PutBucketPolicy`, `s3:PutBucketEncryption`, `s3:PutPublicAccessBlock`, `cloudfront:CreateDistribution`, `cloudfront:CreateOriginAccessControl`, `cloudfront:CreateInvalidation` |
 
 > **This account cannot create buckets.** In account `808644003350` the action
 > `s3:CreateBucket` is explicitly denied for every name and region by AWS
@@ -266,15 +266,15 @@ page painted.
 
 ## 8. Console route instead of CLI
 
-1. **S3 → Create bucket** — name it, pick the region, leave *Block all public
-   access* **on**.
+1. **S3 → Create bucket** — name it, pick the region, leave _Block all public
+   access_ **on**.
 2. Upload the contents of `dist/` (`assets/` must land as a folder at the root).
 3. **CloudFront → Create distribution** → choose **Single website or app** →
-   select the bucket as the *Amazon S3* origin → **Use recommended origin
+   select the bucket as the _Amazon S3_ origin → **Use recommended origin
    settings** (this configures OAC and offers to update the bucket policy for you
    — accept it).
 4. **Default root object**: `index.html` (no leading slash).
-5. **Viewer protocol policy**: *Redirect HTTP to HTTPS*.
+5. **Viewer protocol policy**: _Redirect HTTP to HTTPS_.
 6. After creation, edit the distribution and add the two **Custom error
    responses** (403 and 404 → `/index.html`, response code 200) if the wizard did
    not apply them.
@@ -291,7 +291,7 @@ Attaching the gateway as a second origin is what makes the deployed app actually
 usable:
 
 1. **Origins** → create an origin for your gateway host (an ALB, App Runner
-   service, or EC2/Nginx with TLS) — protocol *HTTPS only* if the gateway
+   service, or EC2/Nginx with TLS) — protocol _HTTPS only_ if the gateway
    terminates TLS.
 2. **Behaviors** → add ordered behaviors for the path patterns `/auth/*`,
    `/api/*`, `/health`, `/suggestions*` pointing at that origin, with
@@ -371,16 +371,16 @@ works but is slower and costs more than necessary.
 
 ## 11. Gotchas and troubleshooting
 
-| Symptom | Cause / fix |
-| :--- | :--- |
-| `403 AccessDenied` from CloudFront on every object | Bucket policy missing, stale, or its `AWS:SourceArn` names a different distribution. Re-run step 4d with the current `$DIST_ID`. |
-| `InvalidClientTokenId` from the CLI | Stale `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` exported in the shell override the profile. `unset` them. |
-| `AccessDenied ... explicit deny in a service control policy` | An Organizations SCP (this account: `p-7i3xfto1`) blocks the action. It can only be changed from the management account. |
-| Deep link works in dev, 404/blank on refresh | SPA fallback missing. Add the 403/404 → `/index.html` error responses, or a viewer-request CloudFront Function. |
-| A missing asset returns the app shell with `200` | Expected side effect of the 403/404 fallback — check `content-type` when debugging missing files. |
-| Old page after a deploy | `index.html` cached (or a stale service worker). Invalidate it; keep `no-cache` on the root sync. |
-| Site slow for Indian users | Use `PriceClass_200` or `PriceClass_All` rather than `PriceClass_100`. |
-| Bucket not readable by OAC with SSE-KMS objects | The KMS key policy must also allow CloudFront. AES256 (step 2) needs no extra grant. |
+| Symptom                                                      | Cause / fix                                                                                                                      |
+| :----------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
+| `403 AccessDenied` from CloudFront on every object           | Bucket policy missing, stale, or its `AWS:SourceArn` names a different distribution. Re-run step 4d with the current `$DIST_ID`. |
+| `InvalidClientTokenId` from the CLI                          | Stale `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` exported in the shell override the profile. `unset` them.                      |
+| `AccessDenied ... explicit deny in a service control policy` | An Organizations SCP (this account: `p-7i3xfto1`) blocks the action. It can only be changed from the management account.         |
+| Deep link works in dev, 404/blank on refresh                 | SPA fallback missing. Add the 403/404 → `/index.html` error responses, or a viewer-request CloudFront Function.                  |
+| A missing asset returns the app shell with `200`             | Expected side effect of the 403/404 fallback — check `content-type` when debugging missing files.                                |
+| Old page after a deploy                                      | `index.html` cached (or a stale service worker). Invalidate it; keep `no-cache` on the root sync.                                |
+| Site slow for Indian users                                   | Use `PriceClass_200` or `PriceClass_All` rather than `PriceClass_100`.                                                           |
+| Bucket not readable by OAC with SSE-KMS objects              | The KMS key policy must also allow CloudFront. AES256 (step 2) needs no extra grant.                                             |
 
 ### Optional: CloudFront Function for SPA routing
 
@@ -391,11 +391,15 @@ paths and leaves real files alone:
 function handler(event) {
   var request = event.request;
   var uri = request.uri;
-  if (uri.startsWith('/assets/') || uri.startsWith('/api/') ||
-      uri.startsWith('/auth/') || uri.includes('.')) {
+  if (
+    uri.startsWith("/assets/") ||
+    uri.startsWith("/api/") ||
+    uri.startsWith("/auth/") ||
+    uri.includes(".")
+  ) {
     return request;
   }
-  request.uri = '/index.html';
+  request.uri = "/index.html";
   return request;
 }
 ```
@@ -406,10 +410,10 @@ request, so API prefixes still need their own behaviors.
 
 ## 12. Values used for this project
 
-| Item | Value |
-| :--- | :--- |
-| AWS account | `808644003350` (`arn:aws:iam::808644003350:user/Admin`) |
-| Region / bucket | `ap-south-1`, `lcarena-frontend-808644003350` |
-| Build output | `apps/frontend/dist` — 5 files, ~572 KB |
-| Entry point | `index.html` (references `/assets/index-*.js` and `/assets/index-*.css`) |
-| Blocking SCP | `p-7i3xfto1` in org `o-crddxzlun1` — denies `s3:CreateBucket` |
+| Item            | Value                                                                    |
+| :-------------- | :----------------------------------------------------------------------- |
+| AWS account     | `808644003350` (`arn:aws:iam::808644003350:user/Admin`)                  |
+| Region / bucket | `ap-south-1`, `lcarena-frontend-808644003350`                            |
+| Build output    | `apps/frontend/dist` — 5 files, ~572 KB                                  |
+| Entry point     | `index.html` (references `/assets/index-*.js` and `/assets/index-*.css`) |
+| Blocking SCP    | `p-7i3xfto1` in org `o-crddxzlun1` — denies `s3:CreateBucket`            |

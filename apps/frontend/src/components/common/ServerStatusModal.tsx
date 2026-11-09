@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Check,
-  Copy,
-  ExternalLink,
-  RefreshCw,
-  Terminal,
-} from "lucide-react";
+import { Check, Copy, ExternalLink, RefreshCw, Terminal } from "lucide-react";
 import { backendStatus } from "../../services/backendStatus";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
@@ -87,7 +81,7 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
       if (onDismiss) onDismiss();
     } catch {
       setRetryMessage(
-        "Server is still unreachable. Please ensure Docker is running and try again."
+        "Server is still unreachable. Please ensure Docker is running and try again.",
       );
     } finally {
       setIsRetrying(false);
@@ -115,8 +109,9 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
             Sorry, I haven't deployed the backend yet! T-T
           </p>
           <p className="text-ink-2">
-            Running the code execution servers and supporting infrastructure gets
-            pretty expensive, so for now, LCArena is available as a frontend demo.
+            Running the code execution servers and supporting infrastructure
+            gets pretty expensive, so for now, LCArena is available as a
+            frontend demo.
           </p>
           <p className="text-ink-2">
             I still want you to explore what I've built! I've added a few sample
@@ -124,8 +119,9 @@ export const ServerStatusModal: React.FC<ServerStatusModalProps> = ({
             problem-solving experience, and see how the platform is designed.
           </p>
           <p className="text-ink-2">
-            Want to experience LCArena's full potential? Clone the repository, set up
-            the backend locally using Docker Compose, and run it on your own machine.
+            Want to experience LCArena's full potential? Clone the repository,
+            set up the backend locally using Docker Compose, and run it on your
+            own machine.
           </p>
           <p className="font-medium text-ink">
             Thanks for checking out my project! ❤️

@@ -12,11 +12,11 @@ three persistent collections (`users`, `problems`, `submissions`), the
 
 ## Overview
 
-| Export | Kind | Notes |
-| :--- | :--- | :--- |
+| Export                                                   | Kind                 | Notes                                       |
+| :------------------------------------------------------- | :------------------- | :------------------------------------------ |
 | `User`, `IUser`, `IUserMethods`, `UserModel`, `UserType` | model + types + enum | bcrypt hashing on save, `comparePassword()` |
-| `Problem`, `IProblem` | model + type | metadata + object-storage pointers |
-| `Submission`, `ISubmission`, `ELanguage` | model + type + enum | `status` is the canonical execution verdict |
+| `Problem`, `IProblem`                                    | model + type         | metadata + object-storage pointers          |
+| `Submission`, `ISubmission`, `ELanguage`                 | model + type + enum  | `status` is the canonical execution verdict |
 
 ## Architecture
 
@@ -41,20 +41,20 @@ flowchart TD
 
 Each collection has exactly one owning writer for its meaningful fields:
 
-| Collection | Written by | Read by |
-| :--- | :--- | :--- |
-| `users` | Gateway (register, role change, password change, delete) | Gateway, `userValidation` in the Submission service |
-| `problems` | Problem service (create/update/delete) | Problem service, Execution worker |
-| `submissions` | Submission service (create), Execution worker (verdict) | Both, plus the gateway's ownership guard |
+| Collection    | Written by                                               | Read by                                             |
+| :------------ | :------------------------------------------------------- | :-------------------------------------------------- |
+| `users`       | Gateway (register, role change, password change, delete) | Gateway, `userValidation` in the Submission service |
+| `problems`    | Problem service (create/update/delete)                   | Problem service, Execution worker                   |
+| `submissions` | Submission service (create), Execution worker (verdict)  | Both, plus the gateway's ownership guard            |
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| ODM | `mongoose` ^9 (`Schema`, `Model`, `Document`, `HydratedDocument`) |
-| Password hashing | `bcrypt` ^6 (cost 10, `pre("save")` hook + `comparePassword`) |
-| Verdict typing | `ExecutionResult` from `@LCArena/execution` |
-| Module format | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/` |
+| Concern          | Choice                                                            |
+| :--------------- | :---------------------------------------------------------------- |
+| ODM              | `mongoose` ^9 (`Schema`, `Model`, `Document`, `HydratedDocument`) |
+| Password hashing | `bcrypt` ^6 (cost 10, `pre("save")` hook + `comparePassword`)     |
+| Verdict typing   | `ExecutionResult` from `@LCArena/execution`                       |
+| Module format    | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/`   |
 
 `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` are declared
 dependencies that this package's source does not import.
@@ -169,26 +169,33 @@ from those arrays (see `apps/frontend/src/utils/verdictHelper.ts`).
 
 ```ts
 import {
-  User, type IUser, type IUserMethods, type UserModel, UserType,
-  Problem, type IProblem,
-  Submission, type ISubmission, ELanguage,
+  User,
+  type IUser,
+  type IUserMethods,
+  type UserModel,
+  UserType,
+  Problem,
+  type IProblem,
+  Submission,
+  type ISubmission,
+  ELanguage,
 } from "@LCArena/models";
 ```
 
-| Export | Kind | Notes |
-| :--- | :--- | :--- |
-| `User` | model | `mongoose.model<IUser, UserModel>("User", userSchema)` |
-| `IUser`, `UserModel`, `IUserMethods` | types | Document/model/method typing |
-| `UserType` | enum | `"Regular" \| "Admin" \| "Premium"` |
-| `Problem`, `IProblem` | model + type | Catalogue + storage pointers |
-| `Submission`, `ISubmission` | model + type | `status` is the verdict union |
-| `ELanguage` | enum | `"py" \| "cpp" \| "java" \| "js"` |
+| Export                               | Kind         | Notes                                                  |
+| :----------------------------------- | :----------- | :----------------------------------------------------- |
+| `User`                               | model        | `mongoose.model<IUser, UserModel>("User", userSchema)` |
+| `IUser`, `UserModel`, `IUserMethods` | types        | Document/model/method typing                           |
+| `UserType`                           | enum         | `"Regular" \| "Admin" \| "Premium"`                    |
+| `Problem`, `IProblem`                | model + type | Catalogue + storage pointers                           |
+| `Submission`, `ISubmission`          | model + type | `status` is the verdict union                          |
+| `ELanguage`                          | enum         | `"py" \| "cpp" \| "java" \| "js"`                      |
 
 Instance method on `User` documents:
 
 ```ts
 const user = await User.findOne({ email });
-await user?.comparePassword(candidate);   // -> Promise<boolean>
+await user?.comparePassword(candidate); // -> Promise<boolean>
 ```
 
 Typical usage:
@@ -196,8 +203,10 @@ Typical usage:
 ```ts
 const submission = await Submission.create({
   problemId: new mongoose.Types.ObjectId(problemId),
-  userId:    new mongoose.Types.ObjectId(userId),
-  code, language, status: { status: "PENDING" },
+  userId: new mongoose.Types.ObjectId(userId),
+  code,
+  language,
+  status: { status: "PENDING" },
 });
 ```
 
@@ -207,7 +216,7 @@ const submission = await Submission.create({
 ## Inter-service communication
 
 None directly — this package opens no connections and makes no network calls. It
-*is* the shared vocabulary over which services communicate indirectly: every
+_is_ the shared vocabulary over which services communicate indirectly: every
 service writes and reads the same three collections through the same schemas
 (see the ownership table in [Architecture](#architecture)).
 
@@ -218,13 +227,13 @@ into `dbConnect` from [`@LCArena/config`](../config/README.md).
 
 ## Dependencies and prerequisites
 
-| Dependency | Role |
-| :--- | :--- |
-| `mongoose` ^9 | Schemas and models |
-| `bcrypt` ^6 | Password hashing (native module — the Docker build needs build tools or a prebuilt binary) |
-| `@LCArena/execution` | The `ExecutionResult` type used by `Submission.status` |
-| `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner` | Declared but **unused** in this package's source |
-| `@types/jsonwebtoken`, `@types/otp-generator` | Declared dev deps for packages not imported here |
+| Dependency                                            | Role                                                                                       |
+| :---------------------------------------------------- | :----------------------------------------------------------------------------------------- |
+| `mongoose` ^9                                         | Schemas and models                                                                         |
+| `bcrypt` ^6                                           | Password hashing (native module — the Docker build needs build tools or a prebuilt binary) |
+| `@LCArena/execution`                                  | The `ExecutionResult` type used by `Submission.status`                                     |
+| `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner` | Declared but **unused** in this package's source                                           |
+| `@types/jsonwebtoken`, `@types/otp-generator`         | Declared dev deps for packages not imported here                                           |
 
 Because `Submission` imports a type from `@LCArena/execution`, that package must
 be built first — Turborepo's `dependsOn: ["^build"]` handles this in
@@ -256,13 +265,13 @@ connection is opened.
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| `E11000 duplicate key error … email_1` | The unique index rejected a duplicate signup; the gateway normally pre-checks with `findOne` and returns a 400 |
+| Symptom                                                            | Cause / handling                                                                                                                                              |
+| :----------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `E11000 duplicate key error … email_1`                             | The unique index rejected a duplicate signup; the gateway normally pre-checks with `findOne` and returns a 400                                                |
 | Password stored in plaintext / login fails after a direct `save()` | The hook only re-hashes when `password` is modified — assign `user.password = …` then `save()`, never `findByIdAndUpdate({ password })`, which bypasses hooks |
-| `CastError` on `userId`/`problemId` | A non-ObjectId string was written; `appErrorHandler` maps this to `400 Invalid value for <path>` |
-| Verdict reads as `undefined` | `status` is `Mixed`; there is no schema-level shape enforcement, so validate at the boundary (the submission service does, with Zod) |
-| Indexes missing in production | `autoIndex` is not enabled explicitly; create them in a migration step |
+| `CastError` on `userId`/`problemId`                                | A non-ObjectId string was written; `appErrorHandler` maps this to `400 Invalid value for <path>`                                                              |
+| Verdict reads as `undefined`                                       | `status` is `Mixed`; there is no schema-level shape enforcement, so validate at the boundary (the submission service does, with Zod)                          |
+| Indexes missing in production                                      | `autoIndex` is not enabled explicitly; create them in a migration step                                                                                        |
 
 ## Related packages and services
 

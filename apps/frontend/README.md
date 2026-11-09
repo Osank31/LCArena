@@ -42,15 +42,15 @@ at runtime by probing the gateway health endpoint:
 
 ## Overview
 
-| Area | Pages / components |
-| :--- | :--- |
-| Auth | `LoginPage`, `RegisterPage`, `AuthContext`, `ProtectedRoute` |
-| Catalogue | `ProblemsPage`, `ProblemFilters`, `ProblemRow` |
+| Area      | Pages / components                                                                                                                    |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------ |
+| Auth      | `LoginPage`, `RegisterPage`, `AuthContext`, `ProtectedRoute`                                                                          |
+| Catalogue | `ProblemsPage`, `ProblemFilters`, `ProblemRow`                                                                                        |
 | Workspace | `ProblemDetailPage` → `WorkspaceHeader`, `ProblemDescription`, `CodeEditorPane`, `OutputConsole`, `SubmissionHistoryTab`, `Resizable` |
-| History | `SubmissionsPage`, `SubmissionHistoryTab` |
-| Account | `ProfilePage`, `ServerStatusModal` |
-| Chrome | `Navbar`, `Footer`, `Alert`, `Badge`, `Button`, `Input`, `Modal`, `Skeleton`, `Tabs`, `EmptyState`, `DeveloperApologyBanner` |
-| Routing | `App.tsx`, `NotFoundPage` |
+| History   | `SubmissionsPage`, `SubmissionHistoryTab`                                                                                             |
+| Account   | `ProfilePage`, `ServerStatusModal`                                                                                                    |
+| Chrome    | `Navbar`, `Footer`, `Alert`, `Badge`, `Button`, `Input`, `Modal`, `Skeleton`, `Tabs`, `EmptyState`, `DeveloperApologyBanner`          |
+| Routing   | `App.tsx`, `NotFoundPage`                                                                                                             |
 
 ## Architecture
 
@@ -74,16 +74,16 @@ flowchart LR
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| UI | React 19 (`react`, `react-dom`), TypeScript |
-| Build/dev | Vite 8, `@vitejs/plugin-react`, Tailwind CSS v4 via `@tailwindcss/vite` |
-| Routing | `react-router-dom` 7 |
-| HTTP | `axios` (a single `apiClient` instance) |
-| Editor | `@monaco-editor/react` (a **devDependency**), custom `lcarena-paper` theme |
-| Icons | `lucide-react` |
-| Animation | `gsap` + `@gsap/react` (`src/animations/*`) |
-| Tests | Vitest 5 + Testing Library + `jsdom` |
+| Concern   | Choice                                                                     |
+| :-------- | :------------------------------------------------------------------------- |
+| UI        | React 19 (`react`, `react-dom`), TypeScript                                |
+| Build/dev | Vite 8, `@vitejs/plugin-react`, Tailwind CSS v4 via `@tailwindcss/vite`    |
+| Routing   | `react-router-dom` 7                                                       |
+| HTTP      | `axios` (a single `apiClient` instance)                                    |
+| Editor    | `@monaco-editor/react` (a **devDependency**), custom `lcarena-paper` theme |
+| Icons     | `lucide-react`                                                             |
+| Animation | `gsap` + `@gsap/react` (`src/animations/*`)                                |
+| Tests     | Vitest 5 + Testing Library + `jsdom`                                       |
 
 ## Directory structure
 
@@ -216,19 +216,19 @@ Per-problem code is persisted in `localStorage` at
 The frontend consumes the gateway; it defines no API of its own. Client-side
 surface:
 
-| Function | Method + path | Purpose |
-| :--- | :--- | :--- |
-| `submissionService.createSubmission` | `POST /api/submissions` | Submit `{ problemId, code, language }` |
-| `submissionService.getSubmission` | `GET /api/submissions/:id` | Fetch status/details |
-| `submissionService.pollVerdict` | repeated `GET` | Poll to a terminal verdict |
-| `submissionService.recordLocalSubmission` | — | localStorage history write |
-| `submissionService.getLocalSubmissions` | — | localStorage history read |
-| `submissionService.getProblemSubmissions` | — | History filtered by problem |
-| `problemService.getAllProblems` | — | Returns local sample problems |
-| `problemService.getProblemById` | — | Local lookup; throws `"Problem not found"` |
-| `problemService.fetchRemoteProblems` / `fetchRemoteProblemById` | `GET /api/problems` | Preserved remote fetchers, unused by pages |
-| `authService.*` | `/auth/*` | Login, register, OTP, me, logout, change password, delete account |
-| `CodeEditorPane` | `POST /suggestions` | AI completion (see AI service README) |
+| Function                                                        | Method + path              | Purpose                                                           |
+| :-------------------------------------------------------------- | :------------------------- | :---------------------------------------------------------------- |
+| `submissionService.createSubmission`                            | `POST /api/submissions`    | Submit `{ problemId, code, language }`                            |
+| `submissionService.getSubmission`                               | `GET /api/submissions/:id` | Fetch status/details                                              |
+| `submissionService.pollVerdict`                                 | repeated `GET`             | Poll to a terminal verdict                                        |
+| `submissionService.recordLocalSubmission`                       | —                          | localStorage history write                                        |
+| `submissionService.getLocalSubmissions`                         | —                          | localStorage history read                                         |
+| `submissionService.getProblemSubmissions`                       | —                          | History filtered by problem                                       |
+| `problemService.getAllProblems`                                 | —                          | Returns local sample problems                                     |
+| `problemService.getProblemById`                                 | —                          | Local lookup; throws `"Problem not found"`                        |
+| `problemService.fetchRemoteProblems` / `fetchRemoteProblemById` | `GET /api/problems`        | Preserved remote fetchers, unused by pages                        |
+| `authService.*`                                                 | `/auth/*`                  | Login, register, OTP, me, logout, change password, delete account |
+| `CodeEditorPane`                                                | `POST /suggestions`        | AI completion (see AI service README)                             |
 
 Response typing assumes the shared envelope (`ApiResponse<T>` with `data`).
 
@@ -242,29 +242,29 @@ defends against that when filtering by problem id.
 
 ## Inter-service communication
 
-| Direction | Mechanism | Details |
-| :--- | :--- | :--- |
-| Out | HTTP to the gateway | `/auth`, `/api`, `/health`; Bearer header + `withCredentials` for the refresh cookie; 15s axios timeout |
-| Out | HTTP to the AI service | `POST /suggestions`, debounced, abortable |
-| In | — | No server-to-client channel exists; **no WebSocket / SSE** |
-| Storage | `localStorage` | `lcarena_access_token`, `lcarena_refresh_token`, `lcarena_code_*`, `lcarena_submissions_*`, `lcarena_editor_font_size` |
+| Direction | Mechanism              | Details                                                                                                                |
+| :-------- | :--------------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| Out       | HTTP to the gateway    | `/auth`, `/api`, `/health`; Bearer header + `withCredentials` for the refresh cookie; 15s axios timeout                |
+| Out       | HTTP to the AI service | `POST /suggestions`, debounced, abortable                                                                              |
+| In        | —                      | No server-to-client channel exists; **no WebSocket / SSE**                                                             |
+| Storage   | `localStorage`         | `lcarena_access_token`, `lcarena_refresh_token`, `lcarena_code_*`, `lcarena_submissions_*`, `lcarena_editor_font_size` |
 
 ## Environment variables and configuration
 
 Vite only exposes `import.meta.env.*`, so every variable must be prefixed with
 `VITE_` and is **compiled into the bundle** — never put secrets here.
 
-| Variable | Default | Purpose |
-| :--- | :--- | :--- |
-| `VITE_API_URL` | `""` (same origin → Vite proxy) | Base URL for the gateway |
-| `VITE_AI_URL` | falls back to `VITE_API_URL` | Base URL for the AI suggestion service |
+| Variable       | Default                         | Purpose                                |
+| :------------- | :------------------------------ | :------------------------------------- |
+| `VITE_API_URL` | `""` (same origin → Vite proxy) | Base URL for the gateway               |
+| `VITE_AI_URL`  | falls back to `VITE_API_URL`    | Base URL for the AI suggestion service |
 
 Development proxy (`vite.config.ts`):
 
-| Prefix | Target |
-| :--- | :--- |
-| `/auth`, `/api`, `/health` | `http://localhost:3000` (gateway) |
-| `/suggestions` | `http://localhost:8000` (AI service) |
+| Prefix                     | Target                               |
+| :------------------------- | :----------------------------------- |
+| `/auth`, `/api`, `/health` | `http://localhost:3000` (gateway)    |
+| `/suggestions`             | `http://localhost:8000` (AI service) |
 
 Because the SPA and gateway share an origin in development, CORS is not
 exercised locally. For a separate deployment origin, set `CORS_ORIGIN` on the
@@ -328,17 +328,17 @@ and connectivity-error classification.
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| Catalogue shows only 4 problems | Backend detected offline, so the local `sampleProblems.ts` fallback is used — check `GET /health` through the Vite proxy |
-| `400 Invalid problem id` after Submit | A sample slug was submitted instead of a live ObjectId (backend went offline after the catalogue loaded) |
-| "Code Execution Unavailable in Online Demo" modal | Only shown when the backend is unreachable; a reachable backend surfaces the real error in the console instead |
-| Submit button requires sign-in | `handleSubmit` opens the auth modal when `!isAuthenticated` |
-| Every `401` then a redirect to login | Refresh token missing/expired; `apiClient` falls through and clears tokens |
-| Requests fail with a CORS error | Frontend and gateway on different origins without `CORS_ORIGIN` allowing the frontend |
-| Verdict never appears | Polling stopped after ~30s; the submission may still have been judged — refetch it |
-| Loss of submission history | History is localStorage-only; clearing site data or switching devices loses it |
-| AI completion does nothing | The AI toggle is off, or the response is discarded (current behaviour) |
+| Symptom                                           | Cause / handling                                                                                                         |
+| :------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------- |
+| Catalogue shows only 4 problems                   | Backend detected offline, so the local `sampleProblems.ts` fallback is used — check `GET /health` through the Vite proxy |
+| `400 Invalid problem id` after Submit             | A sample slug was submitted instead of a live ObjectId (backend went offline after the catalogue loaded)                 |
+| "Code Execution Unavailable in Online Demo" modal | Only shown when the backend is unreachable; a reachable backend surfaces the real error in the console instead           |
+| Submit button requires sign-in                    | `handleSubmit` opens the auth modal when `!isAuthenticated`                                                              |
+| Every `401` then a redirect to login              | Refresh token missing/expired; `apiClient` falls through and clears tokens                                               |
+| Requests fail with a CORS error                   | Frontend and gateway on different origins without `CORS_ORIGIN` allowing the frontend                                    |
+| Verdict never appears                             | Polling stopped after ~30s; the submission may still have been judged — refetch it                                       |
+| Loss of submission history                        | History is localStorage-only; clearing site data or switching devices loses it                                           |
+| AI completion does nothing                        | The AI toggle is off, or the response is discarded (current behaviour)                                                   |
 
 ## Gaps at the frontend/backend boundary
 

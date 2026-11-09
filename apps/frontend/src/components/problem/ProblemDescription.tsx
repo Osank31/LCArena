@@ -34,7 +34,12 @@ export const ProblemDescription: React.FC<{ problem: ParsedProblem }> = ({
         {/* Tags */}
         <div className="flex items-center gap-1.5 flex-wrap mt-2">
           {problem.tags.map((tag) => (
-            <Badge key={tag} variant="outline" size="sm" className="text-[11px]">
+            <Badge
+              key={tag}
+              variant="outline"
+              size="sm"
+              className="text-[11px]"
+            >
               <Tag className="w-2.5 h-2.5 text-ink-3" />
               {tag}
             </Badge>

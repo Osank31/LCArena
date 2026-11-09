@@ -109,7 +109,7 @@ export const ProblemEditorPage: React.FC = () => {
         setSaving(false);
       }
     },
-    [id, navigate]
+    [id, navigate],
   );
 
   const handleCancel = useCallback(() => {

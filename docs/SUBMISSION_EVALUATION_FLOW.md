@@ -19,18 +19,18 @@ verdict because the browser **polls** `GET /api/submissions/:id`. See
 
 ## 1. Component inventory
 
-| Component | Path | Port | Role in this flow |
-| :--- | :--- | :--- | :--- |
-| React SPA | `apps/frontend` | 5173 | Submits code, polls for the verdict, persists local history |
-| API Gateway | `apps/apis/gateway` | 3000 | Auth, RBAC, ownership checks, reverse proxy, injects `x-user-id` |
-| Submission service | `apps/apis/submission` | 3002 | Persists `PENDING`, publishes `submission.created` |
-| RabbitMQ | Docker | 5672 / 15672 | `submission.created`, `submission.completed`, `submission.created.dead` |
-| Execution worker | `apps/apis/execution` (`@LCArena/evaluator`) | 3004 (`/health`) | Consumes, stages test cases, runs Docker sandboxes, persists verdict, publishes completion |
-| `@LCArena/execution` | `packages/backend/execution` | — | `Executor` + 4 language executors, runner script, `ExecutionResult` |
-| Object storage | MinIO / R2 / S3 | 9000 | Immutable test-case objects |
-| MongoDB | Docker | 27017 | `users`, `problems`, `submissions` |
-| Problem service | `apps/apis/problem` | 3001 | **Writes** the test cases the worker reads |
-| **Sockets service** | — | — | **[not implemented]** — `AGENTS.md` §3.5 describes `apps/apis/sockets` on port 3007; the directory does not exist |
+| Component            | Path                                         | Port             | Role in this flow                                                                                                 |
+| :------------------- | :------------------------------------------- | :--------------- | :---------------------------------------------------------------------------------------------------------------- |
+| React SPA            | `apps/frontend`                              | 5173             | Submits code, polls for the verdict, persists local history                                                       |
+| API Gateway          | `apps/apis/gateway`                          | 3000             | Auth, RBAC, ownership checks, reverse proxy, injects `x-user-id`                                                  |
+| Submission service   | `apps/apis/submission`                       | 3002             | Persists `PENDING`, publishes `submission.created`                                                                |
+| RabbitMQ             | Docker                                       | 5672 / 15672     | `submission.created`, `submission.completed`, `submission.created.dead`                                           |
+| Execution worker     | `apps/apis/execution` (`@LCArena/evaluator`) | 3004 (`/health`) | Consumes, stages test cases, runs Docker sandboxes, persists verdict, publishes completion                        |
+| `@LCArena/execution` | `packages/backend/execution`                 | —                | `Executor` + 4 language executors, runner script, `ExecutionResult`                                               |
+| Object storage       | MinIO / R2 / S3                              | 9000             | Immutable test-case objects                                                                                       |
+| MongoDB              | Docker                                       | 27017            | `users`, `problems`, `submissions`                                                                                |
+| Problem service      | `apps/apis/problem`                          | 3001             | **Writes** the test cases the worker reads                                                                        |
+| **Sockets service**  | —                                            | —                | **[not implemented]** — `AGENTS.md` §3.5 describes `apps/apis/sockets` on port 3007; the directory does not exist |
 
 ---
 
@@ -192,7 +192,7 @@ reaches the user.
 
 - `authenticate` extracts the bearer token, verifies the signature, rejects an
   expired token with `401 Access token expired` and any other failure with `401
-  Invalid access token`, checks `revoked_access:<jti>` in Redis, and **re-reads
+Invalid access token`, checks `revoked_access:<jti>` in Redis, and **re-reads
   the user from MongoDB** so a deleted account or changed role applies instantly.
 - `proxy.factory` removes the client's `x-user-id` and `authorization` headers and
   sets `x-user-id: <verified userId>`.
@@ -202,9 +202,9 @@ reaches the user.
 ```ts
 createSubmissionSchema = z.object({
   problemId: z.string().min(1, "Problem Id is required"),
-  code:      z.string().min(1, "Code is required"),
-  language:  z.nativeEnum(ELanguage).default(ELanguage.cpp),
-})
+  code: z.string().min(1, "Code is required"),
+  language: z.nativeEnum(ELanguage).default(ELanguage.cpp),
+});
 ```
 
 `status` is deliberately **not** in the schema; Zod strips unknown keys, so a
@@ -220,22 +220,29 @@ quotes, looks the user up in MongoDB, sets `req.user`. Missing header →
 **Persistence and enqueue** (`evaluationService`):
 
 ```ts
-const status: ExecutionResult = { status: "PENDING" }   // always server-minted
+const status: ExecutionResult = { status: "PENDING" }; // always server-minted
 
 const submission = await Submission.create({
   problemId: new mongoose.Types.ObjectId(problemId),
-  code, language,
+  code,
+  language,
   userId: new mongoose.Types.ObjectId(userId),
   status,
-})
+});
 
-channel.sendToQueue(queue.submissionCreated, Buffer.from(JSON.stringify({
-  code, language,
-  status: submission.status,
-  submissionId: submission._id,
-  userId,
-  problemId,
-})))
+channel.sendToQueue(
+  queue.submissionCreated,
+  Buffer.from(
+    JSON.stringify({
+      code,
+      language,
+      status: submission.status,
+      submissionId: submission._id,
+      userId,
+      problemId,
+    }),
+  ),
+);
 ```
 
 **Response to the frontend:** `201 Created`, envelope
@@ -251,31 +258,31 @@ appended to the local history list.
 
 ### 4.2 Queueing and processing
 
-| Aspect | Implementation |
-| :--- | :--- |
-| Exchange | **None.** `channel.sendToQueue(name, …)` publishes directly to the queue (AMQP default exchange, routing key = queue name). No topic/fanout exchange, no routing keys. |
-| Queue | `submission.created` |
-| Queue durability | **Not durable** — `connectToQueue()` calls `assertQueue("submission.created")` with no options, so `durable: false` **[gap]** |
-| Message persistence | **Not persistent** — `sendToQueue` is called with no `options` **[gap]** |
-| Producer | Submission service (`Node.js` / `amqplib`) |
-| Consumer | Execution worker, `prefetch(1)`, `noAck: false` (manual ack) |
-| Concurrency | `prefetch(1)` — **one submission at a time per worker process**. Add replicas to parallelise. |
-| Ack timing | Only after the verdict is durably persisted (`channel.ack` after `processSubmission` resolves) |
-| Retries | Re-publish the **same content** with an incremented `x-attempts` header, up to `EXECUTION_MAX_ATTEMPTS` (default 3), then ack |
-| Dead lettering | After exhaustion: persist `INTERNAL_ERROR`, publish `submission.completed`, park on `submission.created.dead` with `x-park-reason: retries-exhausted`, ack |
-| Malformed messages | Parked immediately with `x-park-reason: malformed`, ack (no retry) |
-| Duplicate delivery | Handled by idempotency (see 4.4) |
+| Aspect              | Implementation                                                                                                                                                         |
+| :------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exchange            | **None.** `channel.sendToQueue(name, …)` publishes directly to the queue (AMQP default exchange, routing key = queue name). No topic/fanout exchange, no routing keys. |
+| Queue               | `submission.created`                                                                                                                                                   |
+| Queue durability    | **Not durable** — `connectToQueue()` calls `assertQueue("submission.created")` with no options, so `durable: false` **[gap]**                                          |
+| Message persistence | **Not persistent** — `sendToQueue` is called with no `options` **[gap]**                                                                                               |
+| Producer            | Submission service (`Node.js` / `amqplib`)                                                                                                                             |
+| Consumer            | Execution worker, `prefetch(1)`, `noAck: false` (manual ack)                                                                                                           |
+| Concurrency         | `prefetch(1)` — **one submission at a time per worker process**. Add replicas to parallelise.                                                                          |
+| Ack timing          | Only after the verdict is durably persisted (`channel.ack` after `processSubmission` resolves)                                                                         |
+| Retries             | Re-publish the **same content** with an incremented `x-attempts` header, up to `EXECUTION_MAX_ATTEMPTS` (default 3), then ack                                          |
+| Dead lettering      | After exhaustion: persist `INTERNAL_ERROR`, publish `submission.completed`, park on `submission.created.dead` with `x-park-reason: retries-exhausted`, ack             |
+| Malformed messages  | Parked immediately with `x-park-reason: malformed`, ack (no retry)                                                                                                     |
+| Duplicate delivery  | Handled by idempotency (see 4.4)                                                                                                                                       |
 
 Message payload (produced by the submission service, validated by the worker):
 
 ```jsonc
 {
   "code": "<user source>",
-  "language": "cpp",                    // ELanguage: py | cpp | java | js
-  "status": { "status": "PENDING" },    // present but NEVER trusted
+  "language": "cpp", // ELanguage: py | cpp | java | js
+  "status": { "status": "PENDING" }, // present but NEVER trusted
   "submissionId": "<ObjectId>",
   "userId": "<ObjectId string>",
-  "problemId": "<ObjectId string>"
+  "problemId": "<ObjectId string>",
 }
 ```
 
@@ -289,10 +296,10 @@ Retry envelope written on re-publish:
 
 ```ts
 channel.sendToQueue(queues.submissionCreated, message.content, {
-  persistent: true,                     // note: upgrades persistence on retry only
+  persistent: true, // note: upgrades persistence on retry only
   contentType: message.properties.contentType,
   headers: { ...message.properties.headers, "x-attempts": nextAttempt },
-})
+});
 ```
 
 ### 4.3 Code execution and test-case evaluation
@@ -313,7 +320,7 @@ problemId, maxBytes, maxEntries })` resolves the source in this precedence order
    relative to `cwd` and `__dirname`.
 5. No path, but a `problemId` → `getProblemTestCasePrefix(problemId)`.
 6. Otherwise → `TestCaseSourceError("No test cases source or storage reference
-   specified")`.
+specified")`.
 
 **Retrieval of input/expected-output files** — `downloadFromS3` lists the prefix
 (`listObjects`) and fetches each key (`getObject`), writing files at
@@ -344,18 +351,18 @@ are not regular files skipped.
 **Compilation and execution in the sandbox** — `createExecutor(language,
 testCasesDir)` picks from the registry:
 
-| `language` | Class | Image | Compile command | Run command |
-| :--- | :--- | :--- | :--- | :--- |
-| `cpp` | `CPPExecutor` | `gcc:latest` | `g++ -O3 -std=c++17 "Main.cpp" -o "./solution"` | `./solution` |
-| `java` | `JavaExecutor` | `eclipse-temurin` | `javac Main.java Solution.java` | `java Main` |
-| `py` | `PythonExecutor` | `python:3.11-slim` | `python -m py_compile solution.py` | `python main.py` |
-| `js` | `JSExecutor` | `node:20-slim` | `node -c solution.js` | `node main.js` |
+| `language` | Class            | Image              | Compile command                                 | Run command      |
+| :--------- | :--------------- | :----------------- | :---------------------------------------------- | :--------------- |
+| `cpp`      | `CPPExecutor`    | `gcc:latest`       | `g++ -O3 -std=c++17 "Main.cpp" -o "./solution"` | `./solution`     |
+| `java`     | `JavaExecutor`   | `eclipse-temurin`  | `javac Main.java Solution.java`                 | `java Main`      |
+| `py`       | `PythonExecutor` | `python:3.11-slim` | `python -m py_compile solution.py`              | `python main.py` |
+| `js`       | `JSExecutor`     | `node:20-slim`     | `node -c solution.js`                           | `node main.js`   |
 
 Container protocol per submission:
 
 1. `pullImage` (inspect; pull only on a 404).
 2. `createContainer({ Image, Cmd: ["/bin/bash","-c","tail -f /dev/null"],
-   WorkingDir: "/workspace", HostConfig: {} })`, `start()`.
+WorkingDir: "/workspace", HostConfig: {} })`, `start()`.
 3. `copyTestCasesToContainer`: pack the workspace into a `tar-stream` archive as
    `testcases/<relpath>` and `container.putArchive(..., { path: "/workspace" })`.
    Zero files → `TestCasesUnavailableError` (fails closed).
@@ -430,14 +437,14 @@ execution worker.
 
 `status` holds the whole verdict:
 
-| Verdict | Stored `status` |
-| :--- | :--- |
-| Accepted | `{ status:"SUCCESS", passed:N, total:N, failedCases:{tle:[],re:[],wa:[]}, executionTimeMs:{…} }` |
-| Wrong answer | `SUCCESS` with `failedCases.wa` non-empty |
-| Runtime error | `SUCCESS` with `failedCases.re` non-empty |
-| Time limit exceeded | `SUCCESS` with `failedCases.tle` non-empty |
-| Compilation error | `{ status:"COMPILE_ERROR", compileError:"…" }` |
-| Infrastructure failure | `{ status:"INTERNAL_ERROR", message:"…" }` |
+| Verdict                | Stored `status`                                                                                  |
+| :--------------------- | :----------------------------------------------------------------------------------------------- |
+| Accepted               | `{ status:"SUCCESS", passed:N, total:N, failedCases:{tle:[],re:[],wa:[]}, executionTimeMs:{…} }` |
+| Wrong answer           | `SUCCESS` with `failedCases.wa` non-empty                                                        |
+| Runtime error          | `SUCCESS` with `failedCases.re` non-empty                                                        |
+| Time limit exceeded    | `SUCCESS` with `failedCases.tle` non-empty                                                       |
+| Compilation error      | `{ status:"COMPILE_ERROR", compileError:"…" }`                                                   |
+| Infrastructure failure | `{ status:"INTERNAL_ERROR", message:"…" }`                                                       |
 
 `SUCCESS` therefore means "the harness completed", and the human verdict is
 derived from `failedCases` with precedence **TLE → RE → WA → Accepted**.
@@ -446,10 +453,10 @@ derived from `failedCases` with precedence **TLE → RE → WA → Accepted**.
 
 ```ts
 Submission.findOneAndUpdate(
-  { _id: submissionId, "status.status": "PENDING" },   // guard
+  { _id: submissionId, "status.status": "PENDING" }, // guard
   { $set: { status } },
   { returnDocument: "after" },
-)
+);
 ```
 
 - Resolves `null` when another worker already finalised it → the loser logs
@@ -459,13 +466,19 @@ Submission.findOneAndUpdate(
 
   ```ts
   if (submission.status?.status !== "PENDING") {
-      await deps.publishCompletion(buildCompletionPayload(submission, submission.status));
-      return { outcome: "skipped", reason: "already-finalized", status: submission.status };
+    await deps.publishCompletion(
+      buildCompletionPayload(submission, submission.status),
+    );
+    return {
+      outcome: "skipped",
+      reason: "already-finalized",
+      status: submission.status,
+    };
   }
   ```
 
   This is the compensation for "persisted but crashed before publishing", so a
-  completion event is not lost. **[gap]** It re-emits on *every* duplicate
+  completion event is not lost. **[gap]** It re-emits on _every_ duplicate
   delivery for the same id, so a re-delivered message produces a second
   `submission.completed` for the same submission (the E2E test asserts
   `eventCountAfter >= eventCountBefore`, i.e. it accepts duplicates).
@@ -490,9 +503,13 @@ Built by `buildCompletionPayload(submission, status)` in
 `apps/apis/execution/src/service.ts` and published by `publishCompletion`:
 
 ```ts
-channel.sendToQueue(queue.submissionCompleted, Buffer.from(JSON.stringify(payload)), {
-  persistent: true,
-})
+channel.sendToQueue(
+  queue.submissionCompleted,
+  Buffer.from(JSON.stringify(payload)),
+  {
+    persistent: true,
+  },
+);
 ```
 
 ```jsonc
@@ -598,8 +615,8 @@ a signal, a non-zero `exit`. The case is appended to `RE_CASES`.
 - stderr is captured to `<case>/user.err` inside the container, but it is **not**
   surfaced in the verdict or to the user.
 
-> **Design asymmetry to be aware of:** a *parse-time* failure in the wrapper
-> produces `COMPILE_ERROR`, whereas a failure *during* a test case produces
+> **Design asymmetry to be aware of:** a _parse-time_ failure in the wrapper
+> produces `COMPILE_ERROR`, whereas a failure _during_ a test case produces
 > `failedCases.re` inside a `SUCCESS` verdict. The UI distinguishes them, and
 > `parseVerdict` gives `RE` precedence over `WA`.
 
@@ -624,9 +641,9 @@ not the exit code, is the result. Nothing is persisted from the run beyond
 Nothing in the pipeline can produce this from user code. It is minted only by the
 worker, in two places:
 
-| Trigger | `message` | Path |
-| :--- | :--- | :--- |
-| `Problem.findById` returns nothing | `Referenced problem could not be loaded` | Inline in `processSubmission`, persisted + published immediately |
+| Trigger                                           | `message`                                   | Path                                                                       |
+| :------------------------------------------------ | :------------------------------------------ | :------------------------------------------------------------------------- |
+| `Problem.findById` returns nothing                | `Referenced problem could not be loaded`    | Inline in `processSubmission`, persisted + published immediately           |
 | Docker/storage/persistence threw on every attempt | `Evaluation failed after repeated attempts` | `recordPermanentFailure()` in `consumer.ts` after `EXECUTION_MAX_ATTEMPTS` |
 
 In the second case the message is also parked on `submission.created.dead` with
@@ -660,19 +677,19 @@ flowchart LR
     DB -.->|"verdict visible here"| SUB
 ```
 
-| Question | Verified answer |
-| :--- | :--- |
-| How does the frontend know evaluation finished? | **HTTP polling.** `submissionService.pollVerdict()` calls `GET /api/submissions/:id` up to 20 times, 1500 ms apart (a 30 s ceiling), stopping as soon as `status.status !== "PENDING"`. |
-| Socket.IO / WebSockets? | **No.** No `socket.io`, no `ws`, no `WebSocket`, no `Server-Sent Events`, no `EventSource` anywhere in the repository. |
-| SSE / notifications? | **No.** |
-| Which service emits the notification? | The **execution worker** emits the RabbitMQ message `submission.completed`. No service delivers anything to a browser. |
-| Exact event name? | The AMQP queue is `submission.completed`. `AGENTS.md` names a Socket.IO event `submissionCompleted` and a service at port 3007 — **neither exists in this repository.** |
-| Payload? | See [§4.5](#45-the-completion-payload). It identifies the submission via `submissionId` and carries the verdict in `status`/`results`, plus `userId`, `problemId` and `failedTestCase`. |
-| How does the frontend subscribe / associate? | It does not subscribe. It correlates by holding the `_id` returned from its own `createSubmission` call and polling that exact id. |
-| Does the frontend navigate, update UI, toast, refresh? | It **updates UI state**: `onProgress` sets `executionResult` for every poll (so the console shows live `PENDING` → verdict), then the final submission replaces the entry in the `submissions` list. No navigation, no toast, no notification API. |
-| What if the user disconnects / refreshes / misses it? | **Nothing is lost**, because the verdict is in MongoDB and polling is stateless. A refresh re-mounts `ProblemDetailPage`, reads history from `localStorage` via `getProblemSubmissions`, and displays the last recorded status. A submission in flight at refresh time is lost from the client's perspective (polling stops), but the correct verdict is still stored server-side and would be returned by `GET /api/submissions/:id` if the id were kept. |
-| Fallback for retrieving the final result? | Yes — `GET /api/submissions/:id`. It is the *only* mechanism, not a fallback. History is also cached in `localStorage["lcarena_submissions_<userId>"]`, capped at 50 entries, but it is a client-side cache, never a server query. |
-| Emitted only after the DB is updated? | **Yes.** `publishCompletion` runs after the conditional `findOneAndUpdate` returns a document. |
+| Question                                               | Verified answer                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :----------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| How does the frontend know evaluation finished?        | **HTTP polling.** `submissionService.pollVerdict()` calls `GET /api/submissions/:id` up to 20 times, 1500 ms apart (a 30 s ceiling), stopping as soon as `status.status !== "PENDING"`.                                                                                                                                                                                                                                                                    |
+| Socket.IO / WebSockets?                                | **No.** No `socket.io`, no `ws`, no `WebSocket`, no `Server-Sent Events`, no `EventSource` anywhere in the repository.                                                                                                                                                                                                                                                                                                                                     |
+| SSE / notifications?                                   | **No.**                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Which service emits the notification?                  | The **execution worker** emits the RabbitMQ message `submission.completed`. No service delivers anything to a browser.                                                                                                                                                                                                                                                                                                                                     |
+| Exact event name?                                      | The AMQP queue is `submission.completed`. `AGENTS.md` names a Socket.IO event `submissionCompleted` and a service at port 3007 — **neither exists in this repository.**                                                                                                                                                                                                                                                                                    |
+| Payload?                                               | See [§4.5](#45-the-completion-payload). It identifies the submission via `submissionId` and carries the verdict in `status`/`results`, plus `userId`, `problemId` and `failedTestCase`.                                                                                                                                                                                                                                                                    |
+| How does the frontend subscribe / associate?           | It does not subscribe. It correlates by holding the `_id` returned from its own `createSubmission` call and polling that exact id.                                                                                                                                                                                                                                                                                                                         |
+| Does the frontend navigate, update UI, toast, refresh? | It **updates UI state**: `onProgress` sets `executionResult` for every poll (so the console shows live `PENDING` → verdict), then the final submission replaces the entry in the `submissions` list. No navigation, no toast, no notification API.                                                                                                                                                                                                         |
+| What if the user disconnects / refreshes / misses it?  | **Nothing is lost**, because the verdict is in MongoDB and polling is stateless. A refresh re-mounts `ProblemDetailPage`, reads history from `localStorage` via `getProblemSubmissions`, and displays the last recorded status. A submission in flight at refresh time is lost from the client's perspective (polling stops), but the correct verdict is still stored server-side and would be returned by `GET /api/submissions/:id` if the id were kept. |
+| Fallback for retrieving the final result?              | Yes — `GET /api/submissions/:id`. It is the _only_ mechanism, not a fallback. History is also cached in `localStorage["lcarena_submissions_<userId>"]`, capped at 50 entries, but it is a client-side cache, never a server query.                                                                                                                                                                                                                         |
+| Emitted only after the DB is updated?                  | **Yes.** `publishCompletion` runs after the conditional `findOneAndUpdate` returns a document.                                                                                                                                                                                                                                                                                                                                                             |
 
 ### 6.2 The missing components, precisely
 
@@ -687,8 +704,8 @@ The flow **stops at RabbitMQ**. Concretely, what does not exist:
    registry that consumes `submission.completed` and emits `submissionCompleted`.
    `docker-compose.yml` has no such service, `apps/apis/` has no such directory,
    and the root workspace list contains no such package. `docs/BACKEND.md`
-   already states this explicitly: *"Sockets | — | — | Not implemented in this
-   repository."*
+   already states this explicitly: _"Sockets | — | — | Not implemented in this
+   repository."_
 3. **No client-side subscription code.** The SPA has no socket client, no
    `EventSource`, no Service Worker push handling.
 4. **No server-side submission list endpoint.** There is no
@@ -723,16 +740,16 @@ The flow **stops at RabbitMQ**. Concretely, what does not exist:
 Derived by, in order: the runner (`diff`/exit code) → the persisted
 `ExecutionResult` → `firstFailedTestCase` → the frontend's `parseVerdict`.
 
-| User-visible verdict | Persisted `status` | `failedTestCase` | `passed`/`total` | `timeMs` in UI | Detail shown |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Accepted** | `SUCCESS`, `failedCases` all empty | `null` | present, equal | max per-case | — |
-| **Wrong Answer** | `SUCCESS`, `wa` non-empty | first `wa` | present | max per-case | `Failed case: <case>` |
-| **Time Limit Exceeded** | `SUCCESS`, `tle` non-empty | first `tle` | present | max per-case | `Failed case: <case>` |
-| **Runtime Error** | `SUCCESS`, `re` non-empty | first `re` | present | max per-case | `Failed case: <case>` |
-| **Compilation Error** | `COMPILE_ERROR` | `null` | absent | — | `compileError` verbatim |
-| **Internal Error** | `INTERNAL_ERROR` | `null` | absent | — | `status.message` |
-| **Pending** | `PENDING` | — | — | — | "Judging solution in ephemeral Docker container…" |
-| *No verdict within 30 s* | still `PENDING` server-side | — | — | — | Renders as **Pending**, silently |
+| User-visible verdict     | Persisted `status`                 | `failedTestCase` | `passed`/`total` | `timeMs` in UI | Detail shown                                      |
+| :----------------------- | :--------------------------------- | :--------------- | :--------------- | :------------- | :------------------------------------------------ |
+| **Accepted**             | `SUCCESS`, `failedCases` all empty | `null`           | present, equal   | max per-case   | —                                                 |
+| **Wrong Answer**         | `SUCCESS`, `wa` non-empty          | first `wa`       | present          | max per-case   | `Failed case: <case>`                             |
+| **Time Limit Exceeded**  | `SUCCESS`, `tle` non-empty         | first `tle`      | present          | max per-case   | `Failed case: <case>`                             |
+| **Runtime Error**        | `SUCCESS`, `re` non-empty          | first `re`       | present          | max per-case   | `Failed case: <case>`                             |
+| **Compilation Error**    | `COMPILE_ERROR`                    | `null`           | absent           | —              | `compileError` verbatim                           |
+| **Internal Error**       | `INTERNAL_ERROR`                   | `null`           | absent           | —              | `status.message`                                  |
+| **Pending**              | `PENDING`                          | —                | —                | —              | "Judging solution in ephemeral Docker container…" |
+| _No verdict within 30 s_ | still `PENDING` server-side        | —                | —                | —              | Renders as **Pending**, silently                  |
 
 Precedence when several case types fail in one run:
 **TLE → RE → WA** — the first non-empty array wins, and only one case name is
@@ -783,20 +800,20 @@ at a shared broker.
 
 ## 9. Reliability summary of the implemented path
 
-| Property | Status |
-| :--- | :--- |
-| Verdict persisted exactly once per submission | ✅ conditional `findOneAndUpdate` on `status.status == "PENDING"` |
-| Idempotent duplicate delivery | ✅ never re-executes a terminal submission |
-| Lost completion event after a crash between persist and publish | ✅ repaired by re-publishing the stored verdict on the next delivery |
-| Infrastructure failure never recorded as a verdict | ✅ explicit `INTERNAL_ERROR`, bounded retries, DLQ |
-| Empty/partial test-case set never reported as a pass | ✅ rejected before execution |
-| Workspace and container cleanup on every path | ✅ `finally` blocks in both the worker and the executor |
-| Submission survives a broker restart | ❌ `submission.created` is non-durable and published non-persistent |
-| Completion message survives a broker restart | ✅ durable queue + `persistent: true` |
-| Real-time delivery of the verdict to the user | ❌ no consumer exists; polling only |
-| Per-submission time limit enforced | ✅ GNU `timeout`, whole seconds, min 1s |
-| Memory limit enforced | ❌ not implemented |
-| Ownership enforced on every read | ✅ gateway `requireSubmissionOwner` (at the cost of an extra Mongo read per poll) |
+| Property                                                        | Status                                                                            |
+| :-------------------------------------------------------------- | :-------------------------------------------------------------------------------- |
+| Verdict persisted exactly once per submission                   | ✅ conditional `findOneAndUpdate` on `status.status == "PENDING"`                 |
+| Idempotent duplicate delivery                                   | ✅ never re-executes a terminal submission                                        |
+| Lost completion event after a crash between persist and publish | ✅ repaired by re-publishing the stored verdict on the next delivery              |
+| Infrastructure failure never recorded as a verdict              | ✅ explicit `INTERNAL_ERROR`, bounded retries, DLQ                                |
+| Empty/partial test-case set never reported as a pass            | ✅ rejected before execution                                                      |
+| Workspace and container cleanup on every path                   | ✅ `finally` blocks in both the worker and the executor                           |
+| Submission survives a broker restart                            | ❌ `submission.created` is non-durable and published non-persistent               |
+| Completion message survives a broker restart                    | ✅ durable queue + `persistent: true`                                             |
+| Real-time delivery of the verdict to the user                   | ❌ no consumer exists; polling only                                               |
+| Per-submission time limit enforced                              | ✅ GNU `timeout`, whole seconds, min 1s                                           |
+| Memory limit enforced                                           | ❌ not implemented                                                                |
+| Ownership enforced on every read                                | ✅ gateway `requireSubmissionOwner` (at the cost of an extra Mongo read per poll) |
 
 ---
 
@@ -809,20 +826,20 @@ suggested direction — **none of these were changed by this documentation task.
 
 1. **`submission.completed` has no consumer.** The worker correctly publishes only
    after the verdict is durable, and nothing reads the queue. The message
-   accumulates until the broker's queue limits apply. *Direction: implement the
+   accumulates until the broker's queue limits apply. _Direction: implement the
    `apps/apis/sockets` service described in `AGENTS.md` §9.2 / §3.5, or an internal
    SSE endpoint on the gateway, consuming `submission.completed` with its own
-   idempotency keys.*
+   idempotency keys._
 2. **A 30-second polling ceiling silently masks late verdicts.** `maxAttempts = 20`,
    `intervalMs = 1500`. A slow first image pull routinely exceeds 30 s, and the UI
    then shows **Pending** forever with no retry, no error and no "keep waiting".
-   *Direction: raise/backoff the ceiling, show an explicit "still running" state,
-   and add a manual re-check.*
+   _Direction: raise/backoff the ceiling, show an explicit "still running" state,
+   and add a manual re-check._
 3. **Polling is O(N) per submission with an extra MongoDB read per request.**
    `requireSubmissionOwner` queries `submissions` on every poll, then the
    submission service reads the same document again — two reads per 1.5 s per
-   active submission. *Direction: move ownership into the document response, or add
-   a cheap status-only endpoint with a shorter payload.*
+   active submission. _Direction: move ownership into the document response, or add
+   a cheap status-only endpoint with a shorter payload._
 4. **Duplicate completion events.** Re-delivering a `submission.created` message
    for an already-finalised submission re-publishes `submission.completed` (the
    E2E test explicitly tolerates `>=`). A future consumer must dedupe on
@@ -836,14 +853,14 @@ suggested direction — **none of these were changed by this documentation task.
 6. **`submission.created` is asserted non-durable and published non-persistent.**
    A broker restart drops queued-but-unprocessed submissions, leaving those
    submissions `PENDING` forever with no error surfaced anywhere. The retry path
-   *does* set `persistent: true`, which is inconsistent with the initial publish.
-   *Direction: `assertQueue(name, { durable: true })` and publish with
-   `{ persistent: true }` everywhere.*
+   _does_ set `persistent: true`, which is inconsistent with the initial publish.
+   _Direction: `assertQueue(name, { durable: true })` and publish with
+   `{ persistent: true }` everywhere._
 7. **The submission is persisted before the publish succeeds.** If
    `sendToQueue` throws (channel closed, broker gone), the document exists as
    `PENDING` and the client receives a 500 — an orphaned submission that will never
-   be evaluated and that no retry mechanism can discover. *Direction: publish a
-   persistent outbox record, or re-publish pending submissions on boot.*
+   be evaluated and that no retry mechanism can discover. _Direction: publish a
+   persistent outbox record, or re-publish pending submissions on boot._
 8. **No `POST /submissions` idempotency key.** A double-click or a retried request
    creates two submissions and two sandbox runs. The frontend guards with
    `isEvaluating`, but that is client-side only.
@@ -862,8 +879,8 @@ suggested direction — **none of these were changed by this documentation task.
     neither the API nor the UI can report a memory limit exceeded.
 12. **No timeout on the Docker API calls themselves.** A hung `pull` or `exec`
     blocks the `prefetch(1)` consumer indefinitely — and because prefetch is 1,
-    that worker stops processing *all* submissions. *Direction: wrap Docker calls
-    in an `AbortController`-style timeout and/or guard with a heartbeat.*
+    that worker stops processing _all_ submissions. _Direction: wrap Docker calls
+    in an `AbortController`-style timeout and/or guard with a heartbeat._
 13. **`prefetch(1)` caps throughput at one submission per worker process.** Fine
     for correctness, a bottleneck under load; scaling means more replicas, each
     with its own Docker access.
@@ -914,64 +931,64 @@ suggested direction — **none of these were changed by this documentation task.
 
 ## 11. Recommended improvements (proposed, not implemented)
 
-| # | Improvement | Addresses |
-| :--- | :--- | :--- |
-| 1 | Build a consumer for `submission.completed` (Socket.IO service or gateway SSE) with per-user fan-out and idempotency on `submissionId` | 10.1.1, 10.1.4, 10.1.5 |
-| 2 | Persist the verdict *and* an outbox row in one transaction; a relay publishes and marks sent | 10.2.6, 10.2.7 |
-| 3 | Make `submission.created` durable and publish it persistent | 10.2.6 |
-| 4 | Add `HostConfig` limits: `Memory`, `MemorySwap`, `NanoCPUs`, `PidsLimit`, `CapDrop: ["ALL"]`, `ReadonlyRootfs`, `SecurityOpt: ["no-new-privileges"]`, `NetworkMode: "none"` | 10.3.9, 10.3.10, 10.3.11 |
-| 5 | Add timeouts around Docker pull/exec and a consumer heartbeat | 10.3.12 |
-| 6 | Make the runner report `passed`/`failed` counts for every status and include the failing case's stderr (truncated, escaped) | 10.3.15, 10.3.17 |
-| 7 | Replace the runner's `diff -b -B` with the shared `compareOutputs` policy in one implementation used by both the sandbox and the browser judge | 10.3.14 |
-| 8 | Generalise the wrapper I/O: have the harness supply raw stdin and compare raw stdout, letting the user's `Solution` own parsing | 10.3.16 |
-| 9 | Replace client polling with a push channel, with polling retained as the documented fallback and a bounded backoff | 10.1.2, 10.1.3 |
-| 10 | Add `GET /api/submissions` (owner-scoped, paginated) and make history server-authoritative | 10.4.18 |
-| 11 | Point the frontend catalogue at `fetchRemoteProblems()` and map/seed real ObjectIds | 10.4.19 |
-| 12 | Wire the Run button to `codeRunner.runCode()` | 10.4.20 |
-| 13 | Report the failing test case's expected vs actual output in the verdict for WA | UX |
-| 14 | Add an `attempt`/`idempotencyKey` to submission creation | 10.2.8 |
-| 15 | Move ownership checks into the submission service, or expose a status-only endpoint | 10.4.24, 10.1.3 |
-| 16 | Add metrics/alerts for queue depth, `PENDING` age, DLQ size and completion publish rate | 10.4.22, 10.4.23 |
-| 17 | Implement memory accounting (cgroup `memory.peak` or `ru_maxrss`) and a `MEMORY_LIMIT_EXCEEDED` verdict | 10.3.11 |
+| #   | Improvement                                                                                                                                                                 | Addresses                |
+| :-- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------- |
+| 1   | Build a consumer for `submission.completed` (Socket.IO service or gateway SSE) with per-user fan-out and idempotency on `submissionId`                                      | 10.1.1, 10.1.4, 10.1.5   |
+| 2   | Persist the verdict _and_ an outbox row in one transaction; a relay publishes and marks sent                                                                                | 10.2.6, 10.2.7           |
+| 3   | Make `submission.created` durable and publish it persistent                                                                                                                 | 10.2.6                   |
+| 4   | Add `HostConfig` limits: `Memory`, `MemorySwap`, `NanoCPUs`, `PidsLimit`, `CapDrop: ["ALL"]`, `ReadonlyRootfs`, `SecurityOpt: ["no-new-privileges"]`, `NetworkMode: "none"` | 10.3.9, 10.3.10, 10.3.11 |
+| 5   | Add timeouts around Docker pull/exec and a consumer heartbeat                                                                                                               | 10.3.12                  |
+| 6   | Make the runner report `passed`/`failed` counts for every status and include the failing case's stderr (truncated, escaped)                                                 | 10.3.15, 10.3.17         |
+| 7   | Replace the runner's `diff -b -B` with the shared `compareOutputs` policy in one implementation used by both the sandbox and the browser judge                              | 10.3.14                  |
+| 8   | Generalise the wrapper I/O: have the harness supply raw stdin and compare raw stdout, letting the user's `Solution` own parsing                                             | 10.3.16                  |
+| 9   | Replace client polling with a push channel, with polling retained as the documented fallback and a bounded backoff                                                          | 10.1.2, 10.1.3           |
+| 10  | Add `GET /api/submissions` (owner-scoped, paginated) and make history server-authoritative                                                                                  | 10.4.18                  |
+| 11  | Point the frontend catalogue at `fetchRemoteProblems()` and map/seed real ObjectIds                                                                                         | 10.4.19                  |
+| 12  | Wire the Run button to `codeRunner.runCode()`                                                                                                                               | 10.4.20                  |
+| 13  | Report the failing test case's expected vs actual output in the verdict for WA                                                                                              | UX                       |
+| 14  | Add an `attempt`/`idempotencyKey` to submission creation                                                                                                                    | 10.2.8                   |
+| 15  | Move ownership checks into the submission service, or expose a status-only endpoint                                                                                         | 10.4.24, 10.1.3          |
+| 16  | Add metrics/alerts for queue depth, `PENDING` age, DLQ size and completion publish rate                                                                                     | 10.4.22, 10.4.23         |
+| 17  | Implement memory accounting (cgroup `memory.peak` or `ru_maxrss`) and a `MEMORY_LIMIT_EXCEEDED` verdict                                                                     | 10.3.11                  |
 
 ---
 
 ## 12. Source-of-truth index
 
-| Concern | File |
-| :--- | :--- |
-| Submit endpoint + enqueue | [`apps/apis/submission/src/service.ts`](../apps/apis/submission/src/service.ts), [`controller.ts`](../apps/apis/submission/src/controller.ts), [`validations.ts`](../apps/apis/submission/src/validations.ts) |
-| Gateway proxy + identity injection | [`apps/apis/gateway/src/proxy/proxy.factory.ts`](../apps/apis/gateway/src/proxy/proxy.factory.ts) |
-| Ownership guard | [`apps/apis/gateway/src/middlewares/submissionOwner.middleware.ts`](../apps/apis/gateway/src/middlewares/submissionOwner.middleware.ts) |
-| Queue name registry | [`packages/backend/config/src/rabbitMQ.config.ts`](../packages/backend/config/src/rabbitMQ.config.ts) |
-| Consume / retry / DLQ | [`apps/apis/execution/src/consumer.ts`](../apps/apis/execution/src/consumer.ts) |
-| Pipeline + completion payload | [`apps/apis/execution/src/service.ts`](../apps/apis/execution/src/service.ts), [`evaluation.ts`](../apps/apis/execution/src/evaluation.ts) |
-| Test-case acquisition | [`apps/apis/execution/src/testCases.ts`](../apps/apis/execution/src/testCases.ts) |
-| Runner script generation | [`packages/backend/execution/src/executor/Executor.ts`](../packages/backend/execution/src/executor/Executor.ts) |
-| Language executors | [`packages/backend/execution/src/executors/`](../packages/backend/execution/src/executors/) |
-| Verdict union | [`packages/backend/execution/src/executor/executionResult.type.ts`](../packages/backend/execution/src/executor/executionResult.type.ts) |
-| Comparison policy | [`packages/backend/execution/src/judging/outputComparison.ts`](../packages/backend/execution/src/judging/outputComparison.ts) |
-| Submission model | [`packages/backend/models/src/submission.model.ts`](../packages/backend/models/src/submission.model.ts) |
-| Storage key layout | [`packages/backend/config/src/storage.config.ts`](../packages/backend/config/src/storage.config.ts) |
-| Test-case producer | [`apps/apis/problem/src/service.ts`](../apps/apis/problem/src/service.ts) |
-| Client polling | [`apps/frontend/src/services/submissionService.ts`](../apps/frontend/src/services/submissionService.ts) |
-| Client submit + render | [`apps/frontend/src/pages/ProblemDetailPage.tsx`](../apps/frontend/src/pages/ProblemDetailPage.tsx), [`utils/verdictHelper.ts`](../apps/frontend/src/utils/verdictHelper.ts) |
-| Automated proof of the pipeline | [`apps/apis/execution/test/integration/full-flow.e2e.ts`](../apps/apis/execution/test/integration/full-flow.e2e.ts) |
+| Concern                            | File                                                                                                                                                                                                          |
+| :--------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Submit endpoint + enqueue          | [`apps/apis/submission/src/service.ts`](../apps/apis/submission/src/service.ts), [`controller.ts`](../apps/apis/submission/src/controller.ts), [`validations.ts`](../apps/apis/submission/src/validations.ts) |
+| Gateway proxy + identity injection | [`apps/apis/gateway/src/proxy/proxy.factory.ts`](../apps/apis/gateway/src/proxy/proxy.factory.ts)                                                                                                             |
+| Ownership guard                    | [`apps/apis/gateway/src/middlewares/submissionOwner.middleware.ts`](../apps/apis/gateway/src/middlewares/submissionOwner.middleware.ts)                                                                       |
+| Queue name registry                | [`packages/backend/config/src/rabbitMQ.config.ts`](../packages/backend/config/src/rabbitMQ.config.ts)                                                                                                         |
+| Consume / retry / DLQ              | [`apps/apis/execution/src/consumer.ts`](../apps/apis/execution/src/consumer.ts)                                                                                                                               |
+| Pipeline + completion payload      | [`apps/apis/execution/src/service.ts`](../apps/apis/execution/src/service.ts), [`evaluation.ts`](../apps/apis/execution/src/evaluation.ts)                                                                    |
+| Test-case acquisition              | [`apps/apis/execution/src/testCases.ts`](../apps/apis/execution/src/testCases.ts)                                                                                                                             |
+| Runner script generation           | [`packages/backend/execution/src/executor/Executor.ts`](../packages/backend/execution/src/executor/Executor.ts)                                                                                               |
+| Language executors                 | [`packages/backend/execution/src/executors/`](../packages/backend/execution/src/executors/)                                                                                                                   |
+| Verdict union                      | [`packages/backend/execution/src/executor/executionResult.type.ts`](../packages/backend/execution/src/executor/executionResult.type.ts)                                                                       |
+| Comparison policy                  | [`packages/backend/execution/src/judging/outputComparison.ts`](../packages/backend/execution/src/judging/outputComparison.ts)                                                                                 |
+| Submission model                   | [`packages/backend/models/src/submission.model.ts`](../packages/backend/models/src/submission.model.ts)                                                                                                       |
+| Storage key layout                 | [`packages/backend/config/src/storage.config.ts`](../packages/backend/config/src/storage.config.ts)                                                                                                           |
+| Test-case producer                 | [`apps/apis/problem/src/service.ts`](../apps/apis/problem/src/service.ts)                                                                                                                                     |
+| Client polling                     | [`apps/frontend/src/services/submissionService.ts`](../apps/frontend/src/services/submissionService.ts)                                                                                                       |
+| Client submit + render             | [`apps/frontend/src/pages/ProblemDetailPage.tsx`](../apps/frontend/src/pages/ProblemDetailPage.tsx), [`utils/verdictHelper.ts`](../apps/frontend/src/utils/verdictHelper.ts)                                  |
+| Automated proof of the pipeline    | [`apps/apis/execution/test/integration/full-flow.e2e.ts`](../apps/apis/execution/test/integration/full-flow.e2e.ts)                                                                                           |
 
 ## 13. Per-service documentation
 
-| Component | README |
-| :--- | :--- |
-| Gateway | [apps/apis/gateway/README.md](../apps/apis/gateway/README.md) |
-| Problem service | [apps/apis/problem/README.md](../apps/apis/problem/README.md) |
-| Submission service | [apps/apis/submission/README.md](../apps/apis/submission/README.md) |
-| Execution worker | [apps/apis/execution/README.md](../apps/apis/execution/README.md) |
-| Mail service | [apps/apis/mail/README.md](../apps/apis/mail/README.md) |
-| AI suggestion service | [apps/apis/ai-suggestion-service/README.md](../apps/apis/ai-suggestion-service/README.md) |
-| Frontend | [apps/frontend/README.md](../apps/frontend/README.md) |
-| `@LCArena/config` | [packages/backend/config/README.md](../packages/backend/config/README.md) |
-| `@LCArena/models` | [packages/backend/models/README.md](../packages/backend/models/README.md) |
-| `@LCArena/middlewares` | [packages/backend/middlewares/README.md](../packages/backend/middlewares/README.md) |
-| `@LCArena/utils` | [packages/backend/utils/README.md](../packages/backend/utils/README.md) |
-| `@LCArena/execution` | [packages/backend/execution/README.md](../packages/backend/execution/README.md) |
-| Backend operations guide | [docs/BACKEND.md](./BACKEND.md) |
+| Component                | README                                                                                    |
+| :----------------------- | :---------------------------------------------------------------------------------------- |
+| Gateway                  | [apps/apis/gateway/README.md](../apps/apis/gateway/README.md)                             |
+| Problem service          | [apps/apis/problem/README.md](../apps/apis/problem/README.md)                             |
+| Submission service       | [apps/apis/submission/README.md](../apps/apis/submission/README.md)                       |
+| Execution worker         | [apps/apis/execution/README.md](../apps/apis/execution/README.md)                         |
+| Mail service             | [apps/apis/mail/README.md](../apps/apis/mail/README.md)                                   |
+| AI suggestion service    | [apps/apis/ai-suggestion-service/README.md](../apps/apis/ai-suggestion-service/README.md) |
+| Frontend                 | [apps/frontend/README.md](../apps/frontend/README.md)                                     |
+| `@LCArena/config`        | [packages/backend/config/README.md](../packages/backend/config/README.md)                 |
+| `@LCArena/models`        | [packages/backend/models/README.md](../packages/backend/models/README.md)                 |
+| `@LCArena/middlewares`   | [packages/backend/middlewares/README.md](../packages/backend/middlewares/README.md)       |
+| `@LCArena/utils`         | [packages/backend/utils/README.md](../packages/backend/utils/README.md)                   |
+| `@LCArena/execution`     | [packages/backend/execution/README.md](../packages/backend/execution/README.md)           |
+| Backend operations guide | [docs/BACKEND.md](./BACKEND.md)                                                           |

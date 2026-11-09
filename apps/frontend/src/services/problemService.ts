@@ -1,7 +1,10 @@
 import { ApiResponse } from "../types/auth.types";
 import { IProblem, ParsedProblem } from "../types/problem.types";
 import { parseProblem } from "../utils/problemParser";
-import { getSampleProblemById, getSampleProblems } from "../data/sampleProblems";
+import {
+  getSampleProblemById,
+  getSampleProblems,
+} from "../data/sampleProblems";
 import { apiClient } from "./apiClient";
 import { backendStatus, isConnectivityError } from "./backendStatus";
 
@@ -67,7 +70,8 @@ export const problemService = {
    * Fetch all problems from backend API.
    */
   async fetchRemoteProblems(): Promise<ParsedProblem[]> {
-    const response = await apiClient.get<ApiResponse<IProblem[]>>("/api/problems");
+    const response =
+      await apiClient.get<ApiResponse<IProblem[]>>("/api/problems");
     const rawList = response.data?.data || [];
     return rawList.map(parseProblem);
   },
@@ -76,7 +80,9 @@ export const problemService = {
    * Fetch a single problem by ID from backend API.
    */
   async fetchRemoteProblemById(id: string): Promise<ParsedProblem> {
-    const response = await apiClient.get<ApiResponse<IProblem>>(`/api/problems/${id}`);
+    const response = await apiClient.get<ApiResponse<IProblem>>(
+      `/api/problems/${id}`,
+    );
     const raw = response.data?.data;
     if (!raw) {
       throw new Error("Problem not found");

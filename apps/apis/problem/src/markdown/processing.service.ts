@@ -21,18 +21,18 @@ import { sanitizeHtml } from "./sanitize";
 import { normalizeMarkdown } from "./normalize";
 
 export interface ProcessedMarkdown {
-	/** Normalized, safe Markdown to store as the canonical representation. */
-	canonical: string;
-	/** Sanitized HTML derived from `canonical` (render-time representation). */
-	html: string;
-	/** Light metadata extracted during processing. */
-	metadata: {
-		title?: string;
-		slug?: string;
-		tags: string[];
-		hasMath: boolean;
-		codeLangs: string[];
-	};
+  /** Normalized, safe Markdown to store as the canonical representation. */
+  canonical: string;
+  /** Sanitized HTML derived from `canonical` (render-time representation). */
+  html: string;
+  /** Light metadata extracted during processing. */
+  metadata: {
+    title?: string;
+    slug?: string;
+    tags: string[];
+    hasMath: boolean;
+    codeLangs: string[];
+  };
 }
 
 /**
@@ -40,8 +40,8 @@ export interface ProcessedMarkdown {
  * Returns undefined if no H1 exists (we never invent content).
  */
 function extractTitle(markdown: string): string | undefined {
-	const h1 = markdown.match(/^#\s+(.+?)\s*$/m);
-	return h1 ? h1[1].trim() : undefined;
+  const h1 = markdown.match(/^#\s+(.+?)\s*$/m);
+  return h1 ? h1[1].trim() : undefined;
 }
 
 /**
@@ -49,35 +49,37 @@ function extractTitle(markdown: string): string | undefined {
  * when there is no title — we never invent a slug.
  */
 function extractSlug(title?: string): string | undefined {
-	if (!title) return undefined;
-	return title
-		.toLowerCase()
-		.trim()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "") || undefined;
+  if (!title) return undefined;
+  return (
+    title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || undefined
+  );
 }
 
 /**
  * Collect the set of fenced-code language identifiers used in the Markdown.
  */
 function collectCodeLangs(markdown: string): string[] {
-	const langs = new Set<string>();
-	const fenceRe = /^ {0,3}(`{3,}|~{3,})\s*(\S*)(\s*.*)$/gm;
-	let match: RegExpExecArray | null;
-	while ((match = fenceRe.exec(markdown)) !== null) {
-		const lang = match[2]?.trim();
-		if (lang) {
-			langs.add(lang);
-		}
-	}
-	return Array.from(langs);
+  const langs = new Set<string>();
+  const fenceRe = /^ {0,3}(`{3,}|~{3,})\s*(\S*)(\s*.*)$/gm;
+  let match: RegExpExecArray | null;
+  while ((match = fenceRe.exec(markdown)) !== null) {
+    const lang = match[2]?.trim();
+    if (lang) {
+      langs.add(lang);
+    }
+  }
+  return Array.from(langs);
 }
 
 /**
  * Detect whether the Markdown contains LaTeX math delimiters.
  */
 function hasMath(markdown: string): boolean {
-	return /\$\$|\$[^\s]/.test(markdown);
+  return /\$\$|\$[^\s]/.test(markdown);
 }
 
 /**
@@ -85,43 +87,43 @@ function hasMath(markdown: string): boolean {
  * Returns the markdown-it renderer rule replacement.
  */
 function makeHighlightRenderer() {
-	return function (
-		this: any,
-		tokens: any[],
-		idx: number,
-		options: any,
-		env: any,
-		self: any
-	): string {
-		const token = tokens[idx];
-		const lang = token.info ? token.info.trim() : "";
-		const code = token.content;
+  return function (
+    this: any,
+    tokens: any[],
+    idx: number,
+    options: any,
+    env: any,
+    self: any,
+  ): string {
+    const token = tokens[idx];
+    const lang = token.info ? token.info.trim() : "";
+    const code = token.content;
 
-		// Escape HTML entities in code content (markdown-it already escapes,
-		// but token.content is the raw string; we re-escape for safety).
-		const escaped = self
-			? self.asEscape?.call(this, code) || escapeHtml(code)
-			: escapeHtml(code);
+    // Escape HTML entities in code content (markdown-it already escapes,
+    // but token.content is the raw string; we re-escape for safety).
+    const escaped = self
+      ? self.asEscape?.call(this, code) || escapeHtml(code)
+      : escapeHtml(code);
 
-		if (lang && hljs.getLanguage(lang)) {
-			const highlighted = hljs.highlight(code, { language: lang });
-			return `<pre><code class="hljs language-${escapeHtml(
-				lang
-			)}">${highlighted.value}</code></pre>`;
-		}
+    if (lang && hljs.getLanguage(lang)) {
+      const highlighted = hljs.highlight(code, { language: lang });
+      return `<pre><code class="hljs language-${escapeHtml(
+        lang,
+      )}">${highlighted.value}</code></pre>`;
+    }
 
-		// Unknown language or no language: plain code block.
-		return `<pre><code class="language-${escapeHtml(lang)}">${escaped}</code></pre>`;
-	};
+    // Unknown language or no language: plain code block.
+    return `<pre><code class="language-${escapeHtml(lang)}">${escaped}</code></pre>`;
+  };
 }
 
 function escapeHtml(unsafe: string): string {
-	return unsafe
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;");
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 /**
@@ -134,54 +136,54 @@ function escapeHtml(unsafe: string): string {
  * @returns ProcessedMarkdown with canonical, html, and metadata.
  */
 export function processMarkdown(input: string): ProcessedMarkdown {
-	const canonical = normalizeMarkdown(input);
+  const canonical = normalizeMarkdown(input);
 
-	let html = "";
-	try {
-		const md = markdownIt({
-			html: false, // escape raw HTML by default
-			xhtmlOut: false,
-			breaks: true,
-			linkify: true,
-			typographer: true,
-		});
+  let html = "";
+  try {
+    const md = markdownIt({
+      html: false, // escape raw HTML by default
+      xhtmlOut: false,
+      breaks: true,
+      linkify: true,
+      typographer: true,
+    });
 
-		// LaTeX math support: $$...$$ and $...$ -> <span class="math">
-		md.use(texmath, {
-			delimiters: "dollars",
-			// mathjs not needed; we only produce placeholder spans, frontend KaTeX renders them.
-			engine: (katexInput: string) => katexInput,
-		});
+    // LaTeX math support: $$...$$ and $...$ -> <span class="math">
+    md.use(texmath, {
+      delimiters: "dollars",
+      // mathjs not needed; we only produce placeholder spans, frontend KaTeX renders them.
+      engine: (katexInput: string) => katexInput,
+    });
 
-		// Syntax highlighting for fenced code blocks via highlight.js.
-		const originalFence = md.renderer.rules.fence.bind(md.renderer.rules);
-		md.renderer.rules.fence = makeHighlightRenderer();
+    // Syntax highlighting for fenced code blocks via highlight.js.
+    const originalFence = md.renderer.rules.fence.bind(md.renderer.rules);
+    md.renderer.rules.fence = makeHighlightRenderer();
 
-		html = md.render(canonical);
-	} catch (err) {
-		// Parse failure: fall back to a minimal HTML rendering of the raw text.
-		// We never fail create/update solely because Markdown is malformed.
-		html = `<p>${escapeHtml(canonical)}</p>`;
-	}
+    html = md.render(canonical);
+  } catch (err) {
+    // Parse failure: fall back to a minimal HTML rendering of the raw text.
+    // We never fail create/update solely because Markdown is malformed.
+    html = `<p>${escapeHtml(canonical)}</p>`;
+  }
 
-	const sanitizedHtml = sanitizeHtml(html);
+  const sanitizedHtml = sanitizeHtml(html);
 
-	const title = extractTitle(canonical);
-	const slug = extractSlug(title);
-	const tags = extractTags(canonical);
-	const codeLangs = collectCodeLangs(canonical);
+  const title = extractTitle(canonical);
+  const slug = extractSlug(title);
+  const tags = extractTags(canonical);
+  const codeLangs = collectCodeLangs(canonical);
 
-	return {
-		canonical,
-		html: sanitizedHtml,
-		metadata: {
-			title,
-			slug,
-			tags,
-			hasMath: hasMath(canonical),
-			codeLangs,
-		},
-	};
+  return {
+    canonical,
+    html: sanitizedHtml,
+    metadata: {
+      title,
+      slug,
+      tags,
+      hasMath: hasMath(canonical),
+      codeLangs,
+    },
+  };
 }
 
 /**
@@ -189,12 +191,10 @@ export function processMarkdown(input: string): ProcessedMarkdown {
  * Returns an empty array when none found — we never invent tags.
  */
 function extractTags(markdown: string): string[] {
-	const m = markdown.match(
-		/\*\*Topics:\*\*\s*([^\n]+)/i
-	);
-	if (!m) return [];
-	return m[1]
-		.split(",")
-		.map((t) => t.trim())
-		.filter(Boolean);
+  const m = markdown.match(/\*\*Topics:\*\*\s*([^\n]+)/i);
+  if (!m) return [];
+  return m[1]
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
 }

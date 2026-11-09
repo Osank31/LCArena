@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { parseProblem } from "../../utils/problemParser";
 import { parseVerdict } from "../../utils/verdictHelper";
-import { DEFAULT_STARTER_CODE, LANGUAGE_OPTIONS } from "../../utils/starterCode";
+import {
+  DEFAULT_STARTER_CODE,
+  LANGUAGE_OPTIONS,
+} from "../../utils/starterCode";
 import { IProblem } from "../../types/problem.types";
 import { ExecutionResult } from "../../types/submission.types";
 
@@ -15,7 +18,12 @@ describe("starterCode utilities", () => {
 
   it("exports valid language options", () => {
     expect(LANGUAGE_OPTIONS).toHaveLength(4);
-    expect(LANGUAGE_OPTIONS.map((l) => l.value)).toEqual(["cpp", "py", "java", "js"]);
+    expect(LANGUAGE_OPTIONS.map((l) => l.value)).toEqual([
+      "cpp",
+      "py",
+      "java",
+      "js",
+    ]);
   });
 });
 
@@ -57,7 +65,9 @@ Given an array of integers nums and an integer target, return indices of the two
     expect(parsed.examples).toHaveLength(1);
     expect(parsed.examples[0].input).toBe("nums = [2,7,11,15], target = 9");
     expect(parsed.examples[0].output).toBe("[0,1]");
-    expect(parsed.examples[0].explanation).toBe("Because nums[0] + nums[1] == 9, we return [0, 1].");
+    expect(parsed.examples[0].explanation).toBe(
+      "Because nums[0] + nums[1] == 9, we return [0, 1].",
+    );
     expect(parsed.constraints).toHaveLength(2);
   });
 

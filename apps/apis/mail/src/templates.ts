@@ -1,7 +1,7 @@
 export interface EmailContent {
-    subject: string;
-    text: string;
-    html: string;
+  subject: string;
+  text: string;
+  html: string;
 }
 
 export const OTP_TTL_MINUTES = 5;
@@ -11,19 +11,19 @@ export const OTP_TTL_MINUTES = 5;
  * string (enforced by validation), so it is safe to interpolate.
  */
 export const buildOtpEmail = (
-    otp: string,
-    ttlMinutes: number = OTP_TTL_MINUTES
+  otp: string,
+  ttlMinutes: number = OTP_TTL_MINUTES,
 ): EmailContent => ({
-    subject: "Your LCArena verification code",
-    text: [
-        `Your LCArena verification code is ${otp}.`,
-        `It expires in ${ttlMinutes} minutes.`,
-        `If you did not request this code, you can safely ignore this email.`,
-    ].join("\n\n"),
-    html: [
-        `<p>Your LCArena verification code is:</p>`,
-        `<p style="font-size:24px;letter-spacing:4px;font-weight:bold">${otp}</p>`,
-        `<p>It expires in ${ttlMinutes} minutes.</p>`,
-        `<p>If you did not request this code, you can safely ignore this email.</p>`,
-    ].join("\n"),
+  subject: "Your LCArena verification code",
+  text: [
+    `Your LCArena verification code is ${otp}.`,
+    `It expires in ${ttlMinutes} minutes.`,
+    `If you did not request this code, you can safely ignore this email.`,
+  ].join("\n\n"),
+  html: [
+    `<p>Your LCArena verification code is:</p>`,
+    `<p style="font-size:24px;letter-spacing:4px;font-weight:bold">${otp}</p>`,
+    `<p>It expires in ${ttlMinutes} minutes.</p>`,
+    `<p>If you did not request this code, you can safely ignore this email.</p>`,
+  ].join("\n"),
 });

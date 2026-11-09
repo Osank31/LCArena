@@ -20,7 +20,7 @@ describe("App Routing and Navigation", () => {
         <MemoryRouter initialEntries={[initialPath]}>
           <AppLayout />
         </MemoryRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
   };
 
@@ -105,7 +105,9 @@ describe("App Routing and Navigation", () => {
     renderRoute("/problems/prob_abc");
     expect(await screen.findAllByText("Workspace Problem")).toHaveLength(2);
     // Verify footer is omitted on workspace
-    expect(screen.queryByText(/sandboxed online judge/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/sandboxed online judge/i),
+    ).not.toBeInTheDocument();
   });
 
   it("renders full root App component and lands on the problems catalog", async () => {

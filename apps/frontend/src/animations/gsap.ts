@@ -24,12 +24,15 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
  */
 export function scheduleVisibilityFallback(
   targets: gsap.DOMTarget,
-  totalMs: number
+  totalMs: number,
 ): () => void {
   if (typeof window === "undefined") return () => {};
-  const id = window.setTimeout(() => {
-    gsap.set(targets, { clearProps: "opacity,transform,visibility" });
-  }, Math.max(300, totalMs + 400));
+  const id = window.setTimeout(
+    () => {
+      gsap.set(targets, { clearProps: "opacity,transform,visibility" });
+    },
+    Math.max(300, totalMs + 400),
+  );
   return () => window.clearTimeout(id);
 }
 
@@ -42,7 +45,10 @@ export function scheduleVisibilityFallback(
  * do nothing, leaving elements in their natural (visible) state.
  */
 export function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+  if (
+    typeof window === "undefined" ||
+    typeof window.matchMedia !== "function"
+  ) {
     return false;
   }
   return window.matchMedia(REDUCED_MOTION_QUERY).matches;

@@ -76,7 +76,9 @@ export const Navbar: React.FC = () => {
           )}
           {isOffline && (
             <button
-              onClick={() => window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"))}
+              onClick={() =>
+                window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"))
+              }
               className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-sm border border-rule-2 bg-paper-2/60 hover:border-ink-3 text-ink-2 hover:text-ink transition-colors cursor-pointer"
               title="Frontend Demo Mode — View Developer Apology Note"
               aria-label="Open developer apology note"
@@ -118,7 +120,9 @@ export const Navbar: React.FC = () => {
                     className="absolute right-0 mt-2 w-56 rounded-sm bg-paper-3 border border-rule-2 shadow-[4px_4px_0_0_rgba(33,30,25,0.12)] py-1.5 z-30 text-xs"
                   >
                     <div className="px-3 py-2 border-b border-rule mb-1">
-                      <p className="font-serif font-bold text-ink">{user.name}</p>
+                      <p className="font-serif font-bold text-ink">
+                        {user.name}
+                      </p>
                       <p className="text-[11px] text-ink-3 truncate">
                         {user.email}
                       </p>
@@ -212,7 +216,9 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                window.dispatchEvent(new CustomEvent("lcarena:open-demo-modal"));
+                window.dispatchEvent(
+                  new CustomEvent("lcarena:open-demo-modal"),
+                );
               }}
               className="w-full flex items-center gap-2 px-3 py-2 text-xs font-mono text-ink-2 hover:text-ink border border-rule-2 rounded-sm bg-paper-2/60 text-left cursor-pointer"
             >

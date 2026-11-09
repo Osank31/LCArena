@@ -59,7 +59,9 @@ export const LoginPage: React.FC = () => {
     try {
       await sendOtp(email.trim());
       setOtpSent(true);
-      setSuccessMsg("Verification code dispatched! Please check your email inbox.");
+      setSuccessMsg(
+        "Verification code dispatched! Please check your email inbox.",
+      );
     } catch (err: any) {
       setError(err.message || "Failed to send OTP code.");
     } finally {
@@ -93,7 +95,9 @@ export const LoginPage: React.FC = () => {
         className="w-full max-w-md bg-paper-3 border border-rule-2 rounded-sm p-6 sm:p-8 shadow-[6px_6px_0_0_rgba(33,30,25,0.10)] space-y-6"
       >
         <div className="text-center space-y-1">
-          <h1 className="text-2xl font-serif font-bold text-ink">Welcome Back</h1>
+          <h1 className="text-2xl font-serif font-bold text-ink">
+            Welcome Back
+          </h1>
           <p className="text-xs text-ink-3">
             Sign in to access your coding submissions and progress.
           </p>

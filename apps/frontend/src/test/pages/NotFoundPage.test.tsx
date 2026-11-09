@@ -9,15 +9,21 @@ describe("NotFoundPage component", () => {
     render(
       <BrowserRouter>
         <NotFoundPage />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("404")).toBeInTheDocument();
     expect(screen.getByText("Page Not Found")).toBeInTheDocument();
     expect(
-      screen.getByText(/the challenge or route you are looking for does not exist/i)
+      screen.getByText(
+        /the challenge or route you are looking for does not exist/i,
+      ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /browse problems/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /go home/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /browse problems/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /go home/i }),
+    ).toBeInTheDocument();
   });
 });

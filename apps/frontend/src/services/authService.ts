@@ -35,7 +35,7 @@ export const authService = {
   async register(credentials: RegisterCredentials): Promise<AuthResponseData> {
     const response = await apiClient.post<ApiResponse<AuthResponseData>>(
       "/auth/register",
-      credentials
+      credentials,
     );
     const data = response.data.data;
     if (data?.accessToken) {
@@ -51,7 +51,7 @@ export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponseData> {
     const response = await apiClient.post<ApiResponse<AuthResponseData>>(
       "/auth/login",
-      credentials
+      credentials,
     );
     const data = response.data.data;
     if (data?.accessToken) {
@@ -64,10 +64,12 @@ export const authService = {
   },
 
   /** Login passwordlessly with email and OTP */
-  async loginWithOtp(credentials: LoginOtpCredentials): Promise<AuthResponseData> {
+  async loginWithOtp(
+    credentials: LoginOtpCredentials,
+  ): Promise<AuthResponseData> {
     const response = await apiClient.post<ApiResponse<AuthResponseData>>(
       "/auth/login-otp",
-      credentials
+      credentials,
     );
     const data = response.data.data;
     if (data?.accessToken) {
@@ -90,7 +92,7 @@ export const authService = {
     const refreshToken = getStoredRefreshToken();
     const response = await apiClient.post<ApiResponse<AuthResponseData>>(
       "/auth/refresh",
-      refreshToken ? { refreshToken } : {}
+      refreshToken ? { refreshToken } : {},
     );
     const data = response.data.data;
     if (data?.accessToken) {
@@ -106,7 +108,10 @@ export const authService = {
   async logout(): Promise<void> {
     try {
       const refreshToken = getStoredRefreshToken();
-      await apiClient.post("/auth/logout", refreshToken ? { refreshToken } : {});
+      await apiClient.post(
+        "/auth/logout",
+        refreshToken ? { refreshToken } : {},
+      );
     } catch {
       // Best-effort logout cleanup
     } finally {

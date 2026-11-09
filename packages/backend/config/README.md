@@ -13,14 +13,14 @@ package, so connection singletons and naming conventions exist exactly once.
 
 ## Overview
 
-| Export | Purpose |
-| :--- | :--- |
-| `dbConnect(MONGODB_URL)` | Singleton Mongoose connection; **exits the process** on failure |
-| `redisConnect()` / `getRedisClient()` | Singleton Redis client; `getRedisClient()` throws if `redisConnect()` never ran |
-| `connectToQueue()` / `closeQueue()` | AMQP connection + channel, and graceful teardown |
-| `channel`, `queue` | The live AMQP channel and the queue-name registry |
-| Storage helpers | `getS3Client`, `ensureBucketExists`, `putObject`, `getObject`, `listObjects`, `deleteObject`, `deleteObjectsWithPrefix`, `getPresignedDownloadUrl`, `getStorageConfig`, `getBucketName`, `resetS3Client` |
-| Key-layout helpers | `getProblemTestCasePrefix`, `getTestCaseInputKey`, `getTestCaseOutputKey`, `formatTestCaseFolderName` |
+| Export                                | Purpose                                                                                                                                                                                                  |
+| :------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dbConnect(MONGODB_URL)`              | Singleton Mongoose connection; **exits the process** on failure                                                                                                                                          |
+| `redisConnect()` / `getRedisClient()` | Singleton Redis client; `getRedisClient()` throws if `redisConnect()` never ran                                                                                                                          |
+| `connectToQueue()` / `closeQueue()`   | AMQP connection + channel, and graceful teardown                                                                                                                                                         |
+| `channel`, `queue`                    | The live AMQP channel and the queue-name registry                                                                                                                                                        |
+| Storage helpers                       | `getS3Client`, `ensureBucketExists`, `putObject`, `getObject`, `listObjects`, `deleteObject`, `deleteObjectsWithPrefix`, `getPresignedDownloadUrl`, `getStorageConfig`, `getBucketName`, `resetS3Client` |
+| Key-layout helpers                    | `getProblemTestCasePrefix`, `getTestCaseInputKey`, `getTestCaseOutputKey`, `formatTestCaseFolderName`                                                                                                    |
 
 ## Architecture
 
@@ -48,14 +48,14 @@ value after connecting. Import them as `import { channel, queue } from "@LCArena
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| MongoDB | `mongoose` ^9 |
-| Redis | `redis` ^6 (`createClient`, socket host/port) |
-| RabbitMQ | `amqplib` ^2 |
-| Object storage | `@aws-sdk/client-s3` ^3 + `@aws-sdk/s3-request-presigner` |
-| Logging / errors | `@LCArena/utils` (`logger`, `InternalServerError`) |
-| Module format | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/` |
+| Concern          | Choice                                                          |
+| :--------------- | :-------------------------------------------------------------- |
+| MongoDB          | `mongoose` ^9                                                   |
+| Redis            | `redis` ^6 (`createClient`, socket host/port)                   |
+| RabbitMQ         | `amqplib` ^2                                                    |
+| Object storage   | `@aws-sdk/client-s3` ^3 + `@aws-sdk/s3-request-presigner`       |
+| Logging / errors | `@LCArena/utils` (`logger`, `InternalServerError`)              |
+| Module format    | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/` |
 
 `jsonwebtoken` and `otp-generator` are declared dependencies but no source file
 in this package imports them.
@@ -78,7 +78,7 @@ packages/backend/config/
 ### MongoDB (`db.config.ts`)
 
 ```ts
-await dbConnect(process.env.MONGODB_URL)
+await dbConnect(process.env.MONGODB_URL);
 ```
 
 Calls `mongoose.connect` and logs success. On an `Error` it logs
@@ -101,10 +101,10 @@ Only the gateway uses Redis today.
 
 ```ts
 export const queue = {
-  submissionCreated:          "submission.created",
-  submissionCompleted:        "submission.completed",
-  submissionCreatedDeadLetter:"submission.created.dead",
-}
+  submissionCreated: "submission.created",
+  submissionCompleted: "submission.completed",
+  submissionCreatedDeadLetter: "submission.created.dead",
+};
 ```
 
 `connectToQueue()`:
@@ -133,14 +133,14 @@ each error, and is safe to call when nothing was ever connected.
 defaults) and resolves credentials from `S3_*` first, then the legacy
 `AWS_ACCESS_KEY_ID` / `AWS_ACCESS_KEY` names:
 
-| Resolved field | Resolution order |
-| :--- | :--- |
-| `endpoint` | `S3_ENDPOINT` (undefined → real AWS) |
-| `region` | `S3_REGION` → `us-east-1` |
-| `accessKeyId` | `S3_ACCESS_KEY_ID` → `AWS_ACCESS_KEY_ID` → `AWS_ACCESS_KEY` → `minioadmin` |
-| `secretAccessKey` | `S3_SECRET_ACCESS_KEY` → `AWS_SECRET_ACCESS_KEY` → `minioadmin` |
-| `bucketName` | `S3_BUCKET_NAME` → `lcarena-testcases` |
-| `forcePathStyle` | explicit `S3_FORCE_PATH_STYLE`; else `true` whenever an endpoint is set |
+| Resolved field    | Resolution order                                                           |
+| :---------------- | :------------------------------------------------------------------------- |
+| `endpoint`        | `S3_ENDPOINT` (undefined → real AWS)                                       |
+| `region`          | `S3_REGION` → `us-east-1`                                                  |
+| `accessKeyId`     | `S3_ACCESS_KEY_ID` → `AWS_ACCESS_KEY_ID` → `AWS_ACCESS_KEY` → `minioadmin` |
+| `secretAccessKey` | `S3_SECRET_ACCESS_KEY` → `AWS_SECRET_ACCESS_KEY` → `minioadmin`            |
+| `bucketName`      | `S3_BUCKET_NAME` → `lcarena-testcases`                                     |
+| `forcePathStyle`  | explicit `S3_FORCE_PATH_STYLE`; else `true` whenever an endpoint is set    |
 
 `getS3Client()` lazily creates and **caches** one `S3Client`. `resetS3Client()`
 clears the cache so tests can change env vars between cases — call it in test
@@ -181,43 +181,58 @@ Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_002/input.in
 ```ts
 import {
   // connections
-  dbConnect, redisConnect, getRedisClient,
-  connectToQueue, closeQueue, channel, queue,
+  dbConnect,
+  redisConnect,
+  getRedisClient,
+  connectToQueue,
+  closeQueue,
+  channel,
+  queue,
   // storage
-  getStorageConfig, getS3Client, resetS3Client, getBucketName,
-  ensureBucketExists, putObject, getObject, listObjects, deleteObject,
-  deleteObjectsWithPrefix, getPresignedDownloadUrl,
+  getStorageConfig,
+  getS3Client,
+  resetS3Client,
+  getBucketName,
+  ensureBucketExists,
+  putObject,
+  getObject,
+  listObjects,
+  deleteObject,
+  deleteObjectsWithPrefix,
+  getPresignedDownloadUrl,
   // key layout
-  formatTestCaseFolderName, getProblemTestCasePrefix,
-  getTestCaseInputKey, getTestCaseOutputKey,
+  formatTestCaseFolderName,
+  getProblemTestCasePrefix,
+  getTestCaseInputKey,
+  getTestCaseOutputKey,
   type StorageConfig,
 } from "@LCArena/config";
 ```
 
-| Signature | Returns | Notes |
-| :--- | :--- | :--- |
-| `dbConnect(url: string)` | `Promise<void>` | Exits the process on failure |
-| `redisConnect()` | `Promise<void>` | Must run before `getRedisClient()` |
-| `getRedisClient()` | `RedisClientType` | Throws `InternalServerError` if unconnected |
-| `connectToQueue()` | `Promise<void>` | Asserts `submission.created`; re-throws on failure |
-| `closeQueue()` | `Promise<void>` | Never throws; safe when never connected |
-| `channel` | `Channel` | Live binding; `undefined` until connected |
-| `queue` | `{ submissionCreated, submissionCompleted, submissionCreatedDeadLetter }` | Queue-name registry |
-| `getStorageConfig()` | `StorageConfig` | Re-reads env on every call |
-| `getS3Client()` | `S3Client` | Lazily created, then cached |
-| `resetS3Client()` | `void` | Clears the cache (for tests) |
-| `getBucketName()` | `string` | Resolved bucket |
-| `ensureBucketExists(bucket?)` | `Promise<void>` | HeadBucket, then CreateBucket on 404 |
-| `putObject(key, body, contentType?, bucket?)` | `Promise<void>` | Defaults to UTF-8 text |
-| `getObject(key, bucket?)` | `Promise<Buffer>` | Normalises stream/Uint8Array bodies |
-| `listObjects(prefix, bucket?)` | `Promise<string[]>` | Paginates via continuation tokens |
-| `deleteObject(key, bucket?)` | `Promise<void>` | Single key |
-| `deleteObjectsWithPrefix(prefix, bucket?)` | `Promise<number>` | Batches of 1000; returns the count |
-| `getPresignedDownloadUrl(key, expiresInSeconds?, bucket?)` | `Promise<string>` | Default TTL 900s; currently unused |
-| `formatTestCaseFolderName(index)` | `string` | `test_case_001` |
-| `getProblemTestCasePrefix(problemId)` | `string` | `Evaluation_Test_Cases/Test_Cases_<id>/` |
-| `getTestCaseInputKey(problemId, index)` | `string` | `…/input.in` |
-| `getTestCaseOutputKey(problemId, index)` | `string` | `…/output.ans` |
+| Signature                                                  | Returns                                                                   | Notes                                              |
+| :--------------------------------------------------------- | :------------------------------------------------------------------------ | :------------------------------------------------- |
+| `dbConnect(url: string)`                                   | `Promise<void>`                                                           | Exits the process on failure                       |
+| `redisConnect()`                                           | `Promise<void>`                                                           | Must run before `getRedisClient()`                 |
+| `getRedisClient()`                                         | `RedisClientType`                                                         | Throws `InternalServerError` if unconnected        |
+| `connectToQueue()`                                         | `Promise<void>`                                                           | Asserts `submission.created`; re-throws on failure |
+| `closeQueue()`                                             | `Promise<void>`                                                           | Never throws; safe when never connected            |
+| `channel`                                                  | `Channel`                                                                 | Live binding; `undefined` until connected          |
+| `queue`                                                    | `{ submissionCreated, submissionCompleted, submissionCreatedDeadLetter }` | Queue-name registry                                |
+| `getStorageConfig()`                                       | `StorageConfig`                                                           | Re-reads env on every call                         |
+| `getS3Client()`                                            | `S3Client`                                                                | Lazily created, then cached                        |
+| `resetS3Client()`                                          | `void`                                                                    | Clears the cache (for tests)                       |
+| `getBucketName()`                                          | `string`                                                                  | Resolved bucket                                    |
+| `ensureBucketExists(bucket?)`                              | `Promise<void>`                                                           | HeadBucket, then CreateBucket on 404               |
+| `putObject(key, body, contentType?, bucket?)`              | `Promise<void>`                                                           | Defaults to UTF-8 text                             |
+| `getObject(key, bucket?)`                                  | `Promise<Buffer>`                                                         | Normalises stream/Uint8Array bodies                |
+| `listObjects(prefix, bucket?)`                             | `Promise<string[]>`                                                       | Paginates via continuation tokens                  |
+| `deleteObject(key, bucket?)`                               | `Promise<void>`                                                           | Single key                                         |
+| `deleteObjectsWithPrefix(prefix, bucket?)`                 | `Promise<number>`                                                         | Batches of 1000; returns the count                 |
+| `getPresignedDownloadUrl(key, expiresInSeconds?, bucket?)` | `Promise<string>`                                                         | Default TTL 900s; currently unused                 |
+| `formatTestCaseFolderName(index)`                          | `string`                                                                  | `test_case_001`                                    |
+| `getProblemTestCasePrefix(problemId)`                      | `string`                                                                  | `Evaluation_Test_Cases/Test_Cases_<id>/`           |
+| `getTestCaseInputKey(problemId, index)`                    | `string`                                                                  | `…/input.in`                                       |
+| `getTestCaseOutputKey(problemId, index)`                   | `string`                                                                  | `…/output.ans`                                     |
 
 ```ts
 interface StorageConfig {
@@ -234,12 +249,12 @@ interface StorageConfig {
 This package contains **no application logic and initiates no inter-service
 calls**. It provides the clients that other services use:
 
-| Consumer | Uses |
-| :--- | :--- |
-| Gateway | `dbConnect`, `redisConnect` / `getRedisClient` |
-| Problem service | `dbConnect`, storage helpers (writes) |
-| Submission service | `dbConnect`, `connectToQueue` / `channel` / `queue` (publishes) |
-| Execution worker | `dbConnect`, `connectToQueue` / `channel` / `queue`, `listObjects` / `getObject` (reads) |
+| Consumer           | Uses                                                                                     |
+| :----------------- | :--------------------------------------------------------------------------------------- |
+| Gateway            | `dbConnect`, `redisConnect` / `getRedisClient`                                           |
+| Problem service    | `dbConnect`, storage helpers (writes)                                                    |
+| Submission service | `dbConnect`, `connectToQueue` / `channel` / `queue` (publishes)                          |
+| Execution worker   | `dbConnect`, `connectToQueue` / `channel` / `queue`, `listObjects` / `getObject` (reads) |
 
 The queue names and the storage key layout are the two shared contracts defined
 here; changing either affects both the producer and the consumer.
@@ -249,20 +264,20 @@ here; changing either affects both the producer and the consumer.
 Because this package reads `process.env` directly (no `getEnvVariable`), a
 missing variable falls back to a default rather than throwing.
 
-| Variable | Default | Used by |
-| :--- | :--- | :--- |
-| `MONGODB_URL` | *(passed in by each service)* | `dbConnect` argument |
-| `REDIS_HOST` | `localhost` | `redisConnect` |
-| `REDIS_PORT` | `6379` | `redisConnect` |
-| `RABBITMQ_URL` | `amqp://localhost` | `connectToQueue` |
-| `S3_ENDPOINT` | *(unset)* | `getStorageConfig` |
-| `S3_REGION` | `us-east-1` | `getStorageConfig` |
-| `S3_ACCESS_KEY_ID` | `minioadmin` | `getStorageConfig` |
-| `S3_SECRET_ACCESS_KEY` | `minioadmin` | `getStorageConfig` |
-| `S3_BUCKET_NAME` | `lcarena-testcases` | `getStorageConfig` |
-| `S3_FORCE_PATH_STYLE` | `true` when an endpoint is set | `getStorageConfig` |
-| `AWS_ACCESS_KEY_ID` / `AWS_ACCESS_KEY` | — | Credential fallback |
-| `AWS_SECRET_ACCESS_KEY` | — | Credential fallback |
+| Variable                               | Default                        | Used by              |
+| :------------------------------------- | :----------------------------- | :------------------- |
+| `MONGODB_URL`                          | _(passed in by each service)_  | `dbConnect` argument |
+| `REDIS_HOST`                           | `localhost`                    | `redisConnect`       |
+| `REDIS_PORT`                           | `6379`                         | `redisConnect`       |
+| `RABBITMQ_URL`                         | `amqp://localhost`             | `connectToQueue`     |
+| `S3_ENDPOINT`                          | _(unset)_                      | `getStorageConfig`   |
+| `S3_REGION`                            | `us-east-1`                    | `getStorageConfig`   |
+| `S3_ACCESS_KEY_ID`                     | `minioadmin`                   | `getStorageConfig`   |
+| `S3_SECRET_ACCESS_KEY`                 | `minioadmin`                   | `getStorageConfig`   |
+| `S3_BUCKET_NAME`                       | `lcarena-testcases`            | `getStorageConfig`   |
+| `S3_FORCE_PATH_STYLE`                  | `true` when an endpoint is set | `getStorageConfig`   |
+| `AWS_ACCESS_KEY_ID` / `AWS_ACCESS_KEY` | —                              | Credential fallback  |
+| `AWS_SECRET_ACCESS_KEY`                | —                              | Credential fallback  |
 
 Cloudflare R2 profile (see [`docs/BACKEND.md`](../../../docs/BACKEND.md)):
 `S3_ENDPOINT=https://<account>.r2.cloudflarestorage.com`, `S3_REGION=auto`,
@@ -273,14 +288,14 @@ on them outside local Compose.
 
 ## Dependencies and prerequisites
 
-| Dependency | Role |
-| :--- | :--- |
-| `mongoose` ^9 | MongoDB ODM |
-| `redis` ^6 | Redis client |
-| `amqplib` ^2 | AMQP 0-9-1 client |
-| `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner` | Object storage + presigning |
-| `jsonwebtoken`, `otp-generator` | Declared but **not imported by any source file in this package** (the gateway owns token and OTP logic) |
-| `@LCArena/utils` | `logger`, `InternalServerError` |
+| Dependency                                            | Role                                                                                                    |
+| :---------------------------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| `mongoose` ^9                                         | MongoDB ODM                                                                                             |
+| `redis` ^6                                            | Redis client                                                                                            |
+| `amqplib` ^2                                          | AMQP 0-9-1 client                                                                                       |
+| `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner` | Object storage + presigning                                                                             |
+| `jsonwebtoken`, `otp-generator`                       | Declared but **not imported by any source file in this package** (the gateway owns token and OTP logic) |
+| `@LCArena/utils`                                      | `logger`, `InternalServerError`                                                                         |
 
 Build before use outside Turborepo: `npm run build:backend` (or
 `npx turbo run build --filter=@LCArena/config`).
@@ -313,15 +328,15 @@ Neither suite opens a real network connection.
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| Process exits at boot with "Problem Service db connection failed" | Mongo unreachable; the message is generic but comes from `dbConnect` for every service |
-| `InternalServerError: Redis Client not found` | `redisConnect()` was never awaited (or failed) before `getRedisClient()` |
-| Service starts but never listens | `connectToQueue()` re-throws, and submission/execution await it before `listen()` |
-| `NoSuchBucket` / upload failures | Run `ensureBucketExists()` (the problem service does) or create the bucket manually; MinIO's `minio-init` handles Compose |
-| S3 requests signed for the wrong URL style | MinIO needs `forcePathStyle: true`; set `S3_FORCE_PATH_STYLE=true`, or unset `S3_ENDPOINT` to use virtual-host style against real AWS/R2 |
-| Tests are flaky after changing env vars | Call `resetS3Client()` — the client is cached after first use |
-| Messages disappear on broker restart | `submission.created` is asserted without `durable`; see the flow document's reliability section |
+| Symptom                                                           | Cause / handling                                                                                                                         |
+| :---------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| Process exits at boot with "Problem Service db connection failed" | Mongo unreachable; the message is generic but comes from `dbConnect` for every service                                                   |
+| `InternalServerError: Redis Client not found`                     | `redisConnect()` was never awaited (or failed) before `getRedisClient()`                                                                 |
+| Service starts but never listens                                  | `connectToQueue()` re-throws, and submission/execution await it before `listen()`                                                        |
+| `NoSuchBucket` / upload failures                                  | Run `ensureBucketExists()` (the problem service does) or create the bucket manually; MinIO's `minio-init` handles Compose                |
+| S3 requests signed for the wrong URL style                        | MinIO needs `forcePathStyle: true`; set `S3_FORCE_PATH_STYLE=true`, or unset `S3_ENDPOINT` to use virtual-host style against real AWS/R2 |
+| Tests are flaky after changing env vars                           | Call `resetS3Client()` — the client is cached after first use                                                                            |
+| Messages disappear on broker restart                              | `submission.created` is asserted without `durable`; see the flow document's reliability section                                          |
 
 ## Related packages and services
 

@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { Footer } from "./components/common/Footer";
 import { Navbar } from "./components/common/Navbar";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";

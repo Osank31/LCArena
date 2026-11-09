@@ -47,14 +47,14 @@ polls for it — see
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| HTTP | `express` ^5 |
-| Validation | `zod` ^4 (a discriminated union mirroring `ExecutionResult`) |
-| Persistence | Mongoose `Submission` model from `@LCArena/models` |
-| Queue | `amqplib` via `@LCArena/config` (`connectToQueue`, `channel`, `queue`) |
-| Identity | `userValidation` from `@LCArena/middlewares` |
-| Verdict types | `ExecutionResult` from `@LCArena/execution` |
+| Concern       | Choice                                                                 |
+| :------------ | :--------------------------------------------------------------------- |
+| HTTP          | `express` ^5                                                           |
+| Validation    | `zod` ^4 (a discriminated union mirroring `ExecutionResult`)           |
+| Persistence   | Mongoose `Submission` model from `@LCArena/models`                     |
+| Queue         | `amqplib` via `@LCArena/config` (`connectToQueue`, `channel`, `queue`) |
+| Identity      | `userValidation` from `@LCArena/middlewares`                           |
+| Verdict types | `ExecutionResult` from `@LCArena/execution`                            |
 
 ## Directory structure
 
@@ -97,8 +97,8 @@ Step by step in `service.ts`:
 
 1. `evaluationService({ problemId, code, language, userId })`.
 2. Guards `channel`/`queue` and throws `500 InternalServerError("Rabbit Mq chnnel
-   or queue not found")` if the broker never connected. **Note the ordering:** the
-   service connects to RabbitMQ *before* MongoDB at boot, so this guard fires
+or queue not found")` if the broker never connected. **Note the ordering:** the
+   service connects to RabbitMQ _before_ MongoDB at boot, so this guard fires
    early.
 3. `const status: ExecutionResult = { status: "PENDING" }` — minted here, never
    taken from the request.
@@ -140,13 +140,13 @@ Success envelope: `{ status, message, success, data, error: null }`.
 Error envelope: `{ success: false, message }` or `{ success: false, message:
 "Validation Error", errors: [{ path, message }] }`.
 
-| Method | Path | Middleware | Body | Success |
-| :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/` | `userValidation` | `{ problemId, code, language? }` | 201 `"Submission created successfully"` |
-| `GET` | `/:submissionId` | none in this service | — | 200 `"Submission fetched successfully"` |
-| `PUT` | `/:submissionId` | none in this service | any of `problemId`, `code`, `language`, `status` | 200 `"Submission updated successfully"` |
+| Method | Path             | Middleware           | Body                                             | Success                                 |
+| :----- | :--------------- | :------------------- | :----------------------------------------------- | :-------------------------------------- |
+| `POST` | `/`              | `userValidation`     | `{ problemId, code, language? }`                 | 201 `"Submission created successfully"` |
+| `GET`  | `/:submissionId` | none in this service | —                                                | 200 `"Submission fetched successfully"` |
+| `PUT`  | `/:submissionId` | none in this service | any of `problemId`, `code`, `language`, `status` | 200 `"Submission updated successfully"` |
 
-> ⚠️ **Authorization lives in the gateway.** `GET` and `PUT` here are *not*
+> ⚠️ **Authorization lives in the gateway.** `GET` and `PUT` here are _not_
 > wrapped in `userValidation`; the gateway enforces `authenticate` +
 > `requireSubmissionOwner` before proxying. A direct call to port 3002 bypasses
 > that check. Keep 3002 on the internal network.
@@ -164,12 +164,12 @@ Error envelope: `{ success: false, message }` or `{ success: false, message:
 **`PUT` validation** — `submissionStatusSchema` is a discriminated union on
 `status`:
 
-| `status` | Shape |
-| :--- | :--- |
-| `PENDING` | `{ status: "PENDING" }` (no extra fields) |
-| `COMPILE_ERROR` | `{ status, compileError: string }` |
-| `SUCCESS` | `{ status, passed: int ≥ 0, total: int ≥ 0, failedCases: { tle[], re[], wa[] }, executionTimeMs: Record<string, number> }` |
-| `INTERNAL_ERROR` | `{ status, message: string }` |
+| `status`         | Shape                                                                                                                      |
+| :--------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| `PENDING`        | `{ status: "PENDING" }` (no extra fields)                                                                                  |
+| `COMPILE_ERROR`  | `{ status, compileError: string }`                                                                                         |
+| `SUCCESS`        | `{ status, passed: int ≥ 0, total: int ≥ 0, failedCases: { tle[], re[], wa[] }, executionTimeMs: Record<string, number> }` |
+| `INTERNAL_ERROR` | `{ status, message: string }`                                                                                              |
 
 A compile-time assertion (`_assertCanonicalStatusCompatibility`) ties this union
 to `ExecutionResult` from `@LCArena/execution`, so the HTTP layer, the model and
@@ -177,24 +177,24 @@ the worker cannot silently drift apart.
 
 ## Inter-service communication
 
-| Direction | Mechanism | Details |
-| :--- | :--- | :--- |
-| In | HTTP | From the gateway only; identity via `x-user-id` |
-| Out | RabbitMQ | `submission.created` (non-persistent publish) |
-| Out | MongoDB | `Submission.create` / `findByIdAndUpdate` / `findById` |
-| In | MongoDB | The worker writes the final verdict into the same document |
+| Direction | Mechanism | Details                                                    |
+| :-------- | :-------- | :--------------------------------------------------------- |
+| In        | HTTP      | From the gateway only; identity via `x-user-id`            |
+| Out       | RabbitMQ  | `submission.created` (non-persistent publish)              |
+| Out       | MongoDB   | `Submission.create` / `findByIdAndUpdate` / `findById`     |
+| In        | MongoDB   | The worker writes the final verdict into the same document |
 
 No Redis, no sockets, no outbound HTTP to other services (`axios` is imported in
 `service.ts` but is not actually used there).
 
 ## Environment variables and configuration
 
-| Variable | Required | Default | Purpose |
-| :--- | :--- | :--- | :--- |
-| `PORT` | **yes** | — | HTTP port (3002 in Compose) |
-| `MONGODB_URL` | **yes** | — | Mongo connection string |
-| `RABBITMQ_URL` | no | `amqp://localhost` | Read by `@LCArena/config` `connectToQueue` |
-| `LOG_LEVEL` | no | `info` | Winston level |
+| Variable       | Required | Default            | Purpose                                    |
+| :------------- | :------- | :----------------- | :----------------------------------------- |
+| `PORT`         | **yes**  | —                  | HTTP port (3002 in Compose)                |
+| `MONGODB_URL`  | **yes**  | —                  | Mongo connection string                    |
+| `RABBITMQ_URL` | no       | `amqp://localhost` | Read by `@LCArena/config` `connectToQueue` |
+| `LOG_LEVEL`    | no       | `info`             | Winston level                              |
 
 ## Dependencies and prerequisites
 
@@ -253,15 +253,15 @@ TEST_USER_ID=<id> CONCURRENT_REQUESTS=200 npm run test:load
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| `401 { message: "Missing user header" }` | `userValidation` got no `x-user-id`; call through the gateway |
-| `404 "User not found"` | `x-user-id` is not a user in this database — the service looks the user up |
-| `400 "Invalid problem id"` | `problemId` is not a Mongo ObjectId (e.g. a slug like `two-sum`) |
-| `400 Validation Error` | Zod failure on `problemId`/`code`/`language` |
-| `500 "Rabbit Mq chnnel or queue not found"` | Broker not connected at boot (or the channel closed) |
-| Submission stays `PENDING` forever | The worker is not running, or its message was lost. Enqueue happens before the client even gets a response, so `PENDING` is not evidence of failure |
-| `404 "Submission not found"` | Bad or deleted id |
+| Symptom                                     | Cause / handling                                                                                                                                    |
+| :------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `401 { message: "Missing user header" }`    | `userValidation` got no `x-user-id`; call through the gateway                                                                                       |
+| `404 "User not found"`                      | `x-user-id` is not a user in this database — the service looks the user up                                                                          |
+| `400 "Invalid problem id"`                  | `problemId` is not a Mongo ObjectId (e.g. a slug like `two-sum`)                                                                                    |
+| `400 Validation Error`                      | Zod failure on `problemId`/`code`/`language`                                                                                                        |
+| `500 "Rabbit Mq chnnel or queue not found"` | Broker not connected at boot (or the channel closed)                                                                                                |
+| Submission stays `PENDING` forever          | The worker is not running, or its message was lost. Enqueue happens before the client even gets a response, so `PENDING` is not evidence of failure |
+| `404 "Submission not found"`                | Bad or deleted id                                                                                                                                   |
 
 ## Related services
 

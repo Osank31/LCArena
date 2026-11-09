@@ -1,47 +1,58 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const REPORTS_DIR = path.resolve(__dirname, '..', '..', '..', 'test-artifacts', 'load');
+const REPORTS_DIR = path.resolve(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "test-artifacts",
+  "load",
+);
 
 if (!fs.existsSync(REPORTS_DIR)) {
-    fs.mkdirSync(REPORTS_DIR, { recursive: true });
+  fs.mkdirSync(REPORTS_DIR, { recursive: true });
 }
 
 export async function generatePerformanceReport(manifest) {
-    const timestamp = manifest.timestamp.replace(/[:.]/g, '-');
-    const reportMdPath = path.join(REPORTS_DIR, `PERFORMANCE_REPORT_${timestamp}.md`);
-    const csvPath = path.join(REPORTS_DIR, `results_table_${timestamp}.csv`);
+  const timestamp = manifest.timestamp.replace(/[:.]/g, "-");
+  const reportMdPath = path.join(
+    REPORTS_DIR,
+    `PERFORMANCE_REPORT_${timestamp}.md`,
+  );
+  const csvPath = path.join(REPORTS_DIR, `results_table_${timestamp}.csv`);
 
-    const results = manifest.results || [];
+  const results = manifest.results || [];
 
-    // 1. Build CSV data
-    let csvContent = 'Test Name,VUs,Duration (s),Total Req,RPS,p50 (ms),p90 (ms),p95 (ms),p99 (ms),Errors (%),Peak Gateway CPU (%),Peak Gateway Mem (MB)\n';
+  // 1. Build CSV data
+  let csvContent =
+    "Test Name,VUs,Duration (s),Total Req,RPS,p50 (ms),p90 (ms),p95 (ms),p99 (ms),Errors (%),Peak Gateway CPU (%),Peak Gateway Mem (MB)\n";
 
-    for (const res of results) {
-        const km = res.k6Metrics || {};
-        const gwStats = res.resources?.containers?.['lcarena-gateway-1'] || {};
-        const vus = res.envVars?.VUS || km.vusMax || '-';
-        const dur = res.durationSeconds || '-';
-        const total = km.totalRequests || 0;
-        const rps = km.rps || 0;
-        const p50 = km.p50_ms || 0;
-        const p90 = km.p90_ms || 0;
-        const p95 = km.p95_ms || 0;
-        const p99 = km.p99_ms || 0;
-        const err = km.errorRatePercent || 0;
-        const cpu = gwStats.peakCpuPercent || '-';
-        const mem = gwStats.peakMemMb || '-';
+  for (const res of results) {
+    const km = res.k6Metrics || {};
+    const gwStats = res.resources?.containers?.["lcarena-gateway-1"] || {};
+    const vus = res.envVars?.VUS || km.vusMax || "-";
+    const dur = res.durationSeconds || "-";
+    const total = km.totalRequests || 0;
+    const rps = km.rps || 0;
+    const p50 = km.p50_ms || 0;
+    const p90 = km.p90_ms || 0;
+    const p95 = km.p95_ms || 0;
+    const p99 = km.p99_ms || 0;
+    const err = km.errorRatePercent || 0;
+    const cpu = gwStats.peakCpuPercent || "-";
+    const mem = gwStats.peakMemMb || "-";
 
-        csvContent += `"${res.testName}",${vus},${dur},${total},${rps},${p50},${p90},${p95},${p99},${err},${cpu},${mem}\n`;
-    }
+    csvContent += `"${res.testName}",${vus},${dur},${total},${rps},${p50},${p90},${p95},${p99},${err},${cpu},${mem}\n`;
+  }
 
-    fs.writeFileSync(csvPath, csvContent, 'utf-8');
+  fs.writeFileSync(csvPath, csvContent, "utf-8");
 
-    // 2. Build Markdown Report
-    let md = `# LCArena Backend Performance & Load Testing Report
+  // 2. Build Markdown Report
+  let md = `# LCArena Backend Performance & Load Testing Report
 
 **Generated:** ${manifest.timestamp}  
 **Suite Profile:** ${manifest.suiteType}  
@@ -103,16 +114,18 @@ The table below documents actual measurements under stepped concurrency levels t
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 `;
 
-    // Filter stepped load results
-    const steppedResults = results.filter((r) => r.testName.startsWith('profile_load_'));
-    for (const r of steppedResults) {
-        const km = r.k6Metrics || {};
-        const vus = r.envVars?.VUS || km.vusMax || '-';
-        const gwStats = r.resources?.containers?.['lcarena-gateway-1'] || {};
-        md += `| **${vus}** | ${km.rps || 0} | ${km.p50_ms || 0} | ${km.p90_ms || 0} | ${km.p95_ms || 0} | ${km.errorRatePercent || 0}% | ${gwStats.peakCpuPercent || '-'}% | ${gwStats.peakMemMb || '-'} MB |\n`;
-    }
+  // Filter stepped load results
+  const steppedResults = results.filter((r) =>
+    r.testName.startsWith("profile_load_"),
+  );
+  for (const r of steppedResults) {
+    const km = r.k6Metrics || {};
+    const vus = r.envVars?.VUS || km.vusMax || "-";
+    const gwStats = r.resources?.containers?.["lcarena-gateway-1"] || {};
+    md += `| **${vus}** | ${km.rps || 0} | ${km.p50_ms || 0} | ${km.p90_ms || 0} | ${km.p95_ms || 0} | ${km.errorRatePercent || 0}% | ${gwStats.peakCpuPercent || "-"}% | ${gwStats.peakMemMb || "-"} MB |\n`;
+  }
 
-    md += `
+  md += `
 ---
 
 ## 4. Per-Endpoint Benchmark Results
@@ -123,15 +136,18 @@ Comprehensive breakdown across individual HTTP endpoints:
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
 `;
 
-    const endpointResults = results.filter((r) => r.testName.startsWith('endpoint_'));
-    for (const r of endpointResults) {
-        const km = r.k6Metrics || {};
-        const vus = r.envVars?.VUS || km.vusMax || '-';
-        const failureStr = km.failedRequests > 0 ? (km.failedRequests + ' failures') : '100% Passed';
-        md += `| \`${r.testName.replace('endpoint_', '')}\` | ${vus} VUs | ${km.totalRequests || 0} | **${km.rps || 0}** | ${km.p50_ms || 0} | ${km.p95_ms || 0} | ${km.p99_ms || 0} | ${km.errorRatePercent || 0}% | ${failureStr} |\n`;
-    }
+  const endpointResults = results.filter((r) =>
+    r.testName.startsWith("endpoint_"),
+  );
+  for (const r of endpointResults) {
+    const km = r.k6Metrics || {};
+    const vus = r.envVars?.VUS || km.vusMax || "-";
+    const failureStr =
+      km.failedRequests > 0 ? km.failedRequests + " failures" : "100% Passed";
+    md += `| \`${r.testName.replace("endpoint_", "")}\` | ${vus} VUs | ${km.totalRequests || 0} | **${km.rps || 0}** | ${km.p50_ms || 0} | ${km.p95_ms || 0} | ${km.p99_ms || 0} | ${km.errorRatePercent || 0}% | ${failureStr} |\n`;
+  }
 
-    md += `
+  md += `
 ---
 
 ## 5. Isolated Microservice Capacity
@@ -142,13 +158,15 @@ Measurements obtained by driving microservices directly to measure raw capacity 
 | :--- | :--- | :---: | :---: | :--- |
 `;
 
-    const serviceResults = results.filter((r) => r.testName.startsWith('service_'));
-    for (const r of serviceResults) {
-        const km = r.k6Metrics || {};
-        md += `| \`${r.testName.replace('service_', '')}\` | HTTP direct | **${km.rps || 0}** | ${km.p95_ms || 0} ms | Container CPU & event-loop | \n`;
-    }
+  const serviceResults = results.filter((r) =>
+    r.testName.startsWith("service_"),
+  );
+  for (const r of serviceResults) {
+    const km = r.k6Metrics || {};
+    md += `| \`${r.testName.replace("service_", "")}\` | HTTP direct | **${km.rps || 0}** | ${km.p95_ms || 0} ms | Container CPU & event-loop | \n`;
+  }
 
-    md += `
+  md += `
 ---
 
 ## 6. End-to-End Workflow & Asynchronous Evaluation Lifecycle
@@ -157,14 +175,16 @@ Measurements obtained by driving microservices directly to measure raw capacity 
 | :--- | :--- | :---: | :---: | :---: | :--- |
 `;
 
-    const workflowResults = results.filter((r) => r.testName.startsWith('workflow_'));
-    for (const r of workflowResults) {
-        const km = r.k6Metrics || {};
-        const vus = r.envVars?.VUS || km.vusMax || '-';
-        md += `| \`${r.testName}\` | Multi-step chained requests | ${vus} | ${km.totalRequests || 0} | ${km.p95_ms || 0} ms | ${km.errorRatePercent === 0 ? 'Passed' : 'SLA Exceeded'} |\n`;
-    }
+  const workflowResults = results.filter((r) =>
+    r.testName.startsWith("workflow_"),
+  );
+  for (const r of workflowResults) {
+    const km = r.k6Metrics || {};
+    const vus = r.envVars?.VUS || km.vusMax || "-";
+    md += `| \`${r.testName}\` | Multi-step chained requests | ${vus} | ${km.totalRequests || 0} | ${km.p95_ms || 0} ms | ${km.errorRatePercent === 0 ? "Passed" : "SLA Exceeded"} |\n`;
+  }
 
-    md += `
+  md += `
 ---
 
 ## 7. System Resource Utilization by Container
@@ -175,28 +195,46 @@ Peak and average resource consumption captured across the test run:
 | :--- | :--- | :---: | :---: | :---: | :---: |
 `;
 
-    // Aggregate container metrics across all runs
-    const allContainers = {};
-    for (const r of results) {
-        if (!r.resources?.containers) continue;
-        for (const [name, stats] of Object.entries(r.resources.containers)) {
-            if (!allContainers[name]) {
-                allContainers[name] = { peakCpu: 0, peakMem: 0, growth: 0, sumCpu: 0, count: 0 };
-            }
-            allContainers[name].peakCpu = Math.max(allContainers[name].peakCpu, stats.peakCpuPercent || 0);
-            allContainers[name].peakMem = Math.max(allContainers[name].peakMem, stats.peakMemMb || 0);
-            allContainers[name].growth = Math.max(allContainers[name].growth, stats.memGrowthMb || 0);
-            allContainers[name].sumCpu += stats.avgCpuPercent || 0;
-            allContainers[name].count++;
-        }
+  // Aggregate container metrics across all runs
+  const allContainers = {};
+  for (const r of results) {
+    if (!r.resources?.containers) continue;
+    for (const [name, stats] of Object.entries(r.resources.containers)) {
+      if (!allContainers[name]) {
+        allContainers[name] = {
+          peakCpu: 0,
+          peakMem: 0,
+          growth: 0,
+          sumCpu: 0,
+          count: 0,
+        };
+      }
+      allContainers[name].peakCpu = Math.max(
+        allContainers[name].peakCpu,
+        stats.peakCpuPercent || 0,
+      );
+      allContainers[name].peakMem = Math.max(
+        allContainers[name].peakMem,
+        stats.peakMemMb || 0,
+      );
+      allContainers[name].growth = Math.max(
+        allContainers[name].growth,
+        stats.memGrowthMb || 0,
+      );
+      allContainers[name].sumCpu += stats.avgCpuPercent || 0;
+      allContainers[name].count++;
     }
+  }
 
-    for (const [name, stats] of Object.entries(allContainers)) {
-        const avgCpu = stats.count > 0 ? Math.round((stats.sumCpu / stats.count) * 100) / 100 : 0;
-        md += `| \`${name}\` | Service Container | **${stats.peakCpu}%** | ${avgCpu}% | ${stats.peakMem} MB | ${stats.growth} MB |\n`;
-    }
+  for (const [name, stats] of Object.entries(allContainers)) {
+    const avgCpu =
+      stats.count > 0
+        ? Math.round((stats.sumCpu / stats.count) * 100) / 100
+        : 0;
+    md += `| \`${name}\` | Service Container | **${stats.peakCpu}%** | ${avgCpu}% | ${stats.peakMem} MB | ${stats.growth} MB |\n`;
+  }
 
-    md += `
+  md += `
 ---
 
 ## 8. Saturation Points, Failure Modes & Discovered Bottlenecks
@@ -232,8 +270,10 @@ Peak and average resource consumption captured across the test run:
    - Ensure MongoDB connection pool \`maxPoolSize\` is tuned to match the expected container concurrency (default is 100).
 `;
 
-    fs.writeFileSync(reportMdPath, md, 'utf-8');
-    console.log(`[report] Generated Markdown Performance Report: ${reportMdPath}`);
-    console.log(`[report] Generated CSV Summary: ${csvPath}`);
-    return reportMdPath;
+  fs.writeFileSync(reportMdPath, md, "utf-8");
+  console.log(
+    `[report] Generated Markdown Performance Report: ${reportMdPath}`,
+  );
+  console.log(`[report] Generated CSV Summary: ${csvPath}`);
+  return reportMdPath;
 }

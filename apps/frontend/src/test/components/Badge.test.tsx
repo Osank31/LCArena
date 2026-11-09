@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import React from "react";
-import { Badge, DifficultyBadge, RoleBadge } from "../../components/common/Badge";
+import {
+  Badge,
+  DifficultyBadge,
+  RoleBadge,
+} from "../../components/common/Badge";
 
 describe("Badge components", () => {
   it("renders base Badge with children", () => {

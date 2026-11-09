@@ -17,7 +17,10 @@ export const TableSkeleton: React.FC<{ rows?: number }> = ({ rows = 8 }) => {
   return (
     <div className="w-full divide-y divide-rule" data-testid="table-skeleton">
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="flex items-center justify-between py-4 px-4 gap-4">
+        <div
+          key={i}
+          className="flex items-center justify-between py-4 px-4 gap-4"
+        >
           <div className="flex items-center gap-3 w-1/3">
             <Skeleton className="w-6 h-6 rounded-full" />
             <Skeleton className="h-4 w-3/4" />

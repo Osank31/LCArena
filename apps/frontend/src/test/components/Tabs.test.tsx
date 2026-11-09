@@ -27,7 +27,9 @@ describe("Tabs component", () => {
 
   it("triggers onChange when a tab is clicked", () => {
     const handleChange = vi.fn();
-    render(<Tabs tabs={tabs} activeTab="description" onChange={handleChange} />);
+    render(
+      <Tabs tabs={tabs} activeTab="description" onChange={handleChange} />,
+    );
 
     fireEvent.click(screen.getByText("Solutions"));
     expect(handleChange).toHaveBeenCalledWith("solution");
@@ -40,7 +42,7 @@ describe("Tabs component", () => {
         activeTab="description"
         onChange={() => {}}
         variant="pill"
-      />
+      />,
     );
     expect(screen.getByRole("tablist")).toHaveClass("bg-paper-2");
   });

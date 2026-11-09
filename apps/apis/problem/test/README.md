@@ -32,4 +32,5 @@ and `MONGODB_URL` (default `mongodb://localhost:27017/lcarena`).
 - The load test only performs reads, so it does not add data.
 
 ## Known Issues & Problem Logs
-*Log any problems happening during tests here.*
+
+_Log any problems happening during tests here._

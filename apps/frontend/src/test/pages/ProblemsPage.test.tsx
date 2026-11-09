@@ -63,14 +63,16 @@ describe("ProblemsPage component", () => {
   });
 
   it("renders problem list and summary counters after successful fetch", async () => {
-    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(mockProblems);
+    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(
+      mockProblems,
+    );
 
     render(
       <AuthProvider>
         <BrowserRouter>
           <ProblemsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     // Initial skeleton check
@@ -89,7 +91,9 @@ describe("ProblemsPage component", () => {
   });
 
   it("indicates solved status when user has an accepted submission", async () => {
-    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(mockProblems);
+    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(
+      mockProblems,
+    );
     vi.spyOn(submissionService, "getLocalSubmissions").mockReturnValueOnce([
       {
         _id: "sub_1",
@@ -114,7 +118,7 @@ describe("ProblemsPage component", () => {
         <BrowserRouter>
           <ProblemsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Two Sum")).toBeInTheDocument();
@@ -122,14 +126,16 @@ describe("ProblemsPage component", () => {
   });
 
   it("filters problems by search term", async () => {
-    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(mockProblems);
+    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(
+      mockProblems,
+    );
 
     render(
       <AuthProvider>
         <BrowserRouter>
           <ProblemsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Two Sum")).toBeInTheDocument();
@@ -143,14 +149,16 @@ describe("ProblemsPage component", () => {
   });
 
   it("filters problems by difficulty", async () => {
-    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(mockProblems);
+    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(
+      mockProblems,
+    );
 
     render(
       <AuthProvider>
         <BrowserRouter>
           <ProblemsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Two Sum")).toBeInTheDocument();
@@ -163,20 +171,24 @@ describe("ProblemsPage component", () => {
   });
 
   it("displays empty state and resets filters when no match found", async () => {
-    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(mockProblems);
+    vi.spyOn(problemService, "getAllProblems").mockResolvedValueOnce(
+      mockProblems,
+    );
 
     render(
       <AuthProvider>
         <BrowserRouter>
           <ProblemsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Two Sum")).toBeInTheDocument();
 
     const searchInput = screen.getByPlaceholderText(/search problems/i);
-    fireEvent.change(searchInput, { target: { value: "NonExistentProblem999" } });
+    fireEvent.change(searchInput, {
+      target: { value: "NonExistentProblem999" },
+    });
 
     expect(screen.getByText("No problems found")).toBeInTheDocument();
 
@@ -188,7 +200,7 @@ describe("ProblemsPage component", () => {
 
   it("handles fetch error and displays error alert", async () => {
     vi.spyOn(problemService, "getAllProblems").mockRejectedValueOnce(
-      new Error("Database connection timed out")
+      new Error("Database connection timed out"),
     );
 
     render(
@@ -196,11 +208,11 @@ describe("ProblemsPage component", () => {
         <BrowserRouter>
           <ProblemsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(
-      await screen.findByText(/database connection timed out/i)
+      await screen.findByText(/database connection timed out/i),
     ).toBeInTheDocument();
   });
 });

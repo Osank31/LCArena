@@ -46,16 +46,16 @@ on loopback.
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| Framework | `fastapi` with an `APIRouter(prefix="/suggestions")` |
-| Server | `uvicorn[standard]` |
-| Schemas | Pydantic v2 (`BaseModel`, `Literal`, `Field(ge=…)`) |
-| LLM | `langchain_anthropic.ChatAnthropic` + `langchain_core.prompts.ChatPromptTemplate` |
-| Model | `claude-sonnet-4-5-20250929`, `timeout=10` |
-| Structured output | `model.with_structured_output(LLMSuggestionResponse, include_raw=True)` |
-| Env loading | `python-dotenv` (`load_dotenv()` in `services/suggestion_service.py`) |
-| CORS | `CORSMiddleware` with `allow_origins=["*"]`, `allow_credentials=False` |
+| Concern           | Choice                                                                            |
+| :---------------- | :-------------------------------------------------------------------------------- |
+| Framework         | `fastapi` with an `APIRouter(prefix="/suggestions")`                              |
+| Server            | `uvicorn[standard]`                                                               |
+| Schemas           | Pydantic v2 (`BaseModel`, `Literal`, `Field(ge=…)`)                               |
+| LLM               | `langchain_anthropic.ChatAnthropic` + `langchain_core.prompts.ChatPromptTemplate` |
+| Model             | `claude-sonnet-4-5-20250929`, `timeout=10`                                        |
+| Structured output | `model.with_structured_output(LLMSuggestionResponse, include_raw=True)`           |
+| Env loading       | `python-dotenv` (`load_dotenv()` in `services/suggestion_service.py`)             |
+| CORS              | `CORSMiddleware` with `allow_origins=["*"]`, `allow_credentials=False`            |
 
 Dependencies are declared twice, deliberately: `requirements.txt` is what the
 Docker image installs; `pyproject.toml` additionally declares a `dev`
@@ -97,6 +97,7 @@ apps/apis/ai-suggestion-service/
      sees it; the point is to stop paying for tokens the user no longer wants.
    - Otherwise the disconnect watcher is cancelled and the LLM result is used.
    - `_watch_disconnect` polls `request.is_disconnected()` every 0.25s.
+
 4. **Latency** — `time.perf_counter()` around the whole operation, reported as
    `latency_ms` (rounded to 2 decimals). This overwrites the placeholder `0.0`
    that the service itself sets.
@@ -131,13 +132,13 @@ delimited by `--- PREFIX ---` / `--- SUFFIX ---` markers.
 
 Request (`GetSuggestionRequest`):
 
-| Field | Type | Required | Notes |
-| :--- | :--- | :--- | :--- |
-| `prefix` | `str` | yes | Code immediately before the cursor |
-| `suffix` | `str` | yes | Code immediately after the cursor |
-| `language_id` | `Literal['python','javascript','cpp','java']` | yes | Note: **not** LCArena's `py`/`js`/`cpp`/`java` enum |
-| `cursor_position` | `{ row: int ≥ 0, col: int ≥ 0 }` | yes | 0-indexed |
-| `editor_info` | `str` | no, default `"unknown"` | e.g. `"vscode-1.85"` |
+| Field             | Type                                          | Required                | Notes                                               |
+| :---------------- | :-------------------------------------------- | :---------------------- | :-------------------------------------------------- |
+| `prefix`          | `str`                                         | yes                     | Code immediately before the cursor                  |
+| `suffix`          | `str`                                         | yes                     | Code immediately after the cursor                   |
+| `language_id`     | `Literal['python','javascript','cpp','java']` | yes                     | Note: **not** LCArena's `py`/`js`/`cpp`/`java` enum |
+| `cursor_position` | `{ row: int ≥ 0, col: int ≥ 0 }`              | yes                     | 0-indexed                                           |
+| `editor_info`     | `str`                                         | no, default `"unknown"` | e.g. `"vscode-1.85"`                                |
 
 Response (`GetSuggestionResponse`):
 
@@ -149,24 +150,24 @@ Response (`GetSuggestionResponse`):
     {
       "index": 0,
       "insert_text": "return a + b;",
-      "finish_reason": "stop",          // "stop" | "length" | "model_length" | "cancelled"
-      "range": null,                    // or { start_row, start_col, end_row, end_col }
-      "score": 0.9                      // 0..1
-    }
+      "finish_reason": "stop", // "stop" | "length" | "model_length" | "cancelled"
+      "range": null, // or { start_row, start_col, end_row, end_col }
+      "score": 0.9, // 0..1
+    },
   ],
   "usage": { "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0 },
-  "latency_ms": 812.34
+  "latency_ms": 812.34,
 }
 ```
 
 Errors:
 
-| Condition | Status | Body |
-| :--- | :--- | :--- |
-| `prefix` and `suffix` both empty | 400 | `{ "detail": "Cannot generate suggestion: both prefix and suffix are empty." }` |
-| Client disconnected mid-flight | 499 | `{ "detail": "Client disconnected" }` (not observed by the client) |
-| Model/transport failure | 500 | `{ "detail": "Inference engine failure: <message>" }` |
-| Schema violation | 422 | FastAPI default validation error |
+| Condition                        | Status | Body                                                                            |
+| :------------------------------- | :----- | :------------------------------------------------------------------------------ |
+| `prefix` and `suffix` both empty | 400    | `{ "detail": "Cannot generate suggestion: both prefix and suffix are empty." }` |
+| Client disconnected mid-flight   | 499    | `{ "detail": "Client disconnected" }` (not observed by the client)              |
+| Model/transport failure          | 500    | `{ "detail": "Inference engine failure: <message>" }`                           |
+| Schema violation                 | 422    | FastAPI default validation error                                                |
 
 `GET /docs` and `GET /openapi.json` are enabled (FastAPI defaults); the Compose
 healthcheck uses `/docs`.
@@ -182,7 +183,7 @@ Verified behaviour in the current frontend source:
 - Cancellation: the previous request's `AbortController` is aborted on each new
   trigger, and on unmount. Axios cancellations are swallowed silently.
 - The request body is `{ prefix, suffix, language_id, cursor_position: { row: 1,
-  col: 1 } }` where `prefix`/`suffix` are computed from the Monaco model offset.
+col: 1 } }` where `prefix`/`suffix` are computed from the Monaco model offset.
   `language_id` uses Monaco language ids (`cpp`, `python`, `java`, `javascript`),
   which satisfy the service's `Literal`.
 - Base URL: `import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || ""`
@@ -198,12 +199,12 @@ This service is a **leaf**: it calls no other LCArena service and reads no share
 state (no MongoDB, no Redis, no RabbitMQ, no object storage). Its only external
 dependency is the Anthropic API over outbound HTTPS.
 
-| Direction | Endpoint | Caller |
-| :--- | :--- | :--- |
-| In | `POST /suggestions` | The React SPA (`CodeEditorPane.tsx`), directly |
-| In | `GET /docs`, `GET /openapi.json` | Humans; the Compose healthcheck |
-| In | `GET /health` | **Not implemented** — the Compose healthcheck probes `/docs` instead |
-| Out | Anthropic Messages API | This service, via LangChain |
+| Direction | Endpoint                         | Caller                                                               |
+| :-------- | :------------------------------- | :------------------------------------------------------------------- |
+| In        | `POST /suggestions`              | The React SPA (`CodeEditorPane.tsx`), directly                       |
+| In        | `GET /docs`, `GET /openapi.json` | Humans; the Compose healthcheck                                      |
+| In        | `GET /health`                    | **Not implemented** — the Compose healthcheck probes `/docs` instead |
+| Out       | Anthropic Messages API           | This service, via LangChain                                          |
 
 Because requests arrive directly rather than through the gateway, this service
 receives **no verified identity** and has no authentication or rate limiting of
@@ -212,8 +213,8 @@ quota. See [§Known deviations](#known-deviations-and-rough-edges).
 
 ## Environment variables and configuration
 
-| Variable | Required | Purpose |
-| :--- | :--- | :--- |
+| Variable            | Required            | Purpose                                                                                    |
+| :------------------ | :------------------ | :----------------------------------------------------------------------------------------- |
 | `ANTHROPIC_API_KEY` | **yes in practice** | Read implicitly by `ChatAnthropic` (via LangChain). Passed through by Compose from `.env`. |
 
 There is a `.env` file inside this service directory; it is **not** part of the
@@ -276,16 +277,16 @@ mapping would be the highest-value next step.
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| `400 Cannot generate suggestion` | Both `prefix` and `suffix` were empty — expected for an empty file |
-| `500 Inference engine failure` | Missing/invalid `ANTHROPIC_API_KEY`, rate limit, or network failure to Anthropic |
-| `422` | Body failed Pydantic validation — most commonly `language_id` outside the four allowed values |
-| Requests take ~10s then fail | `ChatAnthropic(timeout=10)` elapsed |
-| No suggestion appears in the editor | Expected: the frontend discards the response body (see above) |
-| No request is sent from the UI | The AI toggle is off; suggestions require `aiEnabled` |
-| Repeated duplicate reasoning in suggestions | Prompt rules 3–5 exist for this; if it persists, inspect `prefix`/`suffix` construction in `CodeEditorPane` |
-| Debug output on stdout | `services/suggestion_service.py` calls `print(result)` on every request — this is a leftover debug statement that should be removed |
+| Symptom                                     | Cause / handling                                                                                                                    |
+| :------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `400 Cannot generate suggestion`            | Both `prefix` and `suffix` were empty — expected for an empty file                                                                  |
+| `500 Inference engine failure`              | Missing/invalid `ANTHROPIC_API_KEY`, rate limit, or network failure to Anthropic                                                    |
+| `422`                                       | Body failed Pydantic validation — most commonly `language_id` outside the four allowed values                                       |
+| Requests take ~10s then fail                | `ChatAnthropic(timeout=10)` elapsed                                                                                                 |
+| No suggestion appears in the editor         | Expected: the frontend discards the response body (see above)                                                                       |
+| No request is sent from the UI              | The AI toggle is off; suggestions require `aiEnabled`                                                                               |
+| Repeated duplicate reasoning in suggestions | Prompt rules 3–5 exist for this; if it persists, inspect `prefix`/`suffix` construction in `CodeEditorPane`                         |
+| Debug output on stdout                      | `services/suggestion_service.py` calls `print(result)` on every request — this is a leftover debug statement that should be removed |
 
 ### Known deviations and rough edges
 

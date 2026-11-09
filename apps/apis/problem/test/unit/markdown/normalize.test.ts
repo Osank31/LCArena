@@ -34,10 +34,11 @@ describe("normalizeMarkdown", () => {
   });
 
   it("preserves fenced code block contents verbatim", () => {
-    const input = "# Title\n\n   \n\n```cpp\n#include <bits>\n  int x = 1;\n```\n\nmore\n";
+    const input =
+      "# Title\n\n   \n\n```cpp\n#include <bits>\n  int x = 1;\n```\n\nmore\n";
     assert.equal(
       normalizeMarkdown(input),
-      "# Title\n\n```cpp\n#include <bits>\n  int x = 1;\n```\nmore\n"
+      "# Title\n\n```cpp\n#include <bits>\n  int x = 1;\n```\nmore\n",
     );
   });
 

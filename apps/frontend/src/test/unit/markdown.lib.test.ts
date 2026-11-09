@@ -54,7 +54,9 @@ describe("extractTags", () => {
 
 describe("hasBalancedFences", () => {
   it("returns true for balanced fences", () => {
-    expect(hasBalancedFences("```cpp\ncode\n```\n\n```py\ncode\n```")).toBe(true);
+    expect(hasBalancedFences("```cpp\ncode\n```\n\n```py\ncode\n```")).toBe(
+      true,
+    );
   });
 
   it("returns false for unbalanced fences", () => {

@@ -36,7 +36,10 @@ import {
   SupportedLanguage,
 } from "../types/submission.types";
 import { DEFAULT_STARTER_CODE } from "../utils/starterCode";
-import { formatDemoRunNotice, formatOnlineRunNotice } from "../utils/codeRunner";
+import {
+  formatDemoRunNotice,
+  formatOnlineRunNotice,
+} from "../utils/codeRunner";
 
 export const ProblemDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -59,18 +62,22 @@ export const ProblemDetailPage: React.FC = () => {
 
   const [aiEnabled, setAiEnabled] = useState<boolean>(false);
   const [leftTab, setLeftTab] = useState<string>("description");
-  const [mobileTab, setMobileTab] = useState<"description" | "editor" | "console">("editor");
+  const [mobileTab, setMobileTab] = useState<
+    "description" | "editor" | "console"
+  >("editor");
 
   // Execution states
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
-  const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
+  const [executionResult, setExecutionResult] =
+    useState<ExecutionResult | null>(null);
   const [runOutput, setRunOutput] = useState<string | null>(null);
   const [submissions, setSubmissions] = useState<ISubmission[]>([]);
 
   // Modals
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-  const [showDemoNoticeModal, setShowDemoNoticeModal] = useState<boolean>(false);
+  const [showDemoNoticeModal, setShowDemoNoticeModal] =
+    useState<boolean>(false);
 
   // Coordinated (opacity-only) reveal of the workspace chrome once the problem
   // resolves. The editor surface stays completely stable while the user works.
@@ -109,13 +116,18 @@ export const ProblemDetailPage: React.FC = () => {
 
         // Load local submissions for this problem
         const effectiveUserId = user?.userId || (user as any)?.id;
-        const userSubs = submissionService.getProblemSubmissions(id, effectiveUserId);
+        const userSubs = submissionService.getProblemSubmissions(
+          id,
+          effectiveUserId,
+        );
         setSubmissions(userSubs);
       })
       .catch((err: any) => {
         if (isMounted) {
           setError(
-            err.response?.data?.message || err.message || "Failed to load problem."
+            err.response?.data?.message ||
+              err.message ||
+              "Failed to load problem.",
           );
         }
       })
@@ -132,7 +144,10 @@ export const ProblemDetailPage: React.FC = () => {
   useEffect(() => {
     if (!id) return;
     const effectiveUserId = user?.userId || (user as any)?.id;
-    const userSubs = submissionService.getProblemSubmissions(id, effectiveUserId);
+    const userSubs = submissionService.getProblemSubmissions(
+      id,
+      effectiveUserId,
+    );
     setSubmissions(userSubs);
   }, [id, user?.userId, (user as any)?.id]);
 
@@ -175,7 +190,9 @@ export const ProblemDetailPage: React.FC = () => {
     // Submit (server-side judging); otherwise explain the demo limitation.
     setTimeout(() => {
       setRunOutput(
-        isOnline ? formatOnlineRunNotice(problem) : formatDemoRunNotice(problem)
+        isOnline
+          ? formatOnlineRunNotice(problem)
+          : formatDemoRunNotice(problem),
       );
       setIsEvaluating(false);
       setMobileTab("console");
@@ -205,14 +222,17 @@ export const ProblemDetailPage: React.FC = () => {
       });
 
       // Update submissions list
-      setSubmissions((prev) => [submission, ...prev.filter((s) => s._id !== submission._id)]);
+      setSubmissions((prev) => [
+        submission,
+        ...prev.filter((s) => s._id !== submission._id),
+      ]);
 
       // Poll verdict until completed
       const finalSubmission = await submissionService.pollVerdict(
         submission._id,
         (updated) => {
           setExecutionResult(updated.status);
-        }
+        },
       );
 
       setExecutionResult(finalSubmission.status);
@@ -236,7 +256,7 @@ export const ProblemDetailPage: React.FC = () => {
             `Because LCArena is currently hosted as a frontend demo to save infrastructure costs, remote submission grading is disabled.\n\n` +
             `To evaluate code submissions against the full test suite, please clone and run the backend locally:\n\n` +
             `  git clone https://github.com/Osank31/LCArena.git && docker compose up\n` +
-            `  Repository: https://github.com/Osank31/LCArena`
+            `  Repository: https://github.com/Osank31/LCArena`,
         );
         setShowDemoNoticeModal(true);
       } else {
@@ -303,9 +323,7 @@ export const ProblemDetailPage: React.FC = () => {
         <button
           onClick={() => setMobileTab("description")}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono uppercase tracking-wide ${
-            mobileTab === "description"
-              ? "bg-ink text-paper"
-              : "text-ink-3"
+            mobileTab === "description" ? "bg-ink text-paper" : "text-ink-3"
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
@@ -358,7 +376,10 @@ export const ProblemDetailPage: React.FC = () => {
                     setLeftTab(tab);
                     if (tab === "submissions" && id) {
                       const effectiveUserId = user?.userId || (user as any)?.id;
-                      const latest = submissionService.getProblemSubmissions(id, effectiveUserId);
+                      const latest = submissionService.getProblemSubmissions(
+                        id,
+                        effectiveUserId,
+                      );
                       setSubmissions(latest);
                     }
                   }}
@@ -444,7 +465,11 @@ export const ProblemDetailPage: React.FC = () => {
         description="Are you sure you want to reset your editor code? This will discard your current changes for this language."
       >
         <div className="flex justify-end gap-3 mt-4">
-          <Button variant="ghost" size="sm" onClick={() => setShowResetModal(false)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowResetModal(false)}
+          >
             Cancel
           </Button>
           <Button variant="danger" size="sm" onClick={handleResetCode}>
@@ -463,15 +488,22 @@ export const ProblemDetailPage: React.FC = () => {
         <div className="space-y-4">
           {isOffline && (
             <div className="p-3 bg-paper-2 border border-rule-2 rounded-sm text-xs text-ink-2 space-y-1">
-              <span className="font-semibold text-ink">Online Demo Notice:</span>
+              <span className="font-semibold text-ink">
+                Online Demo Notice:
+              </span>
               <p>
-                Please note that in this free online demo, backend execution servers are not hosted.
-                Run LCArena locally with Docker Compose to evaluate submissions.
+                Please note that in this free online demo, backend execution
+                servers are not hosted. Run LCArena locally with Docker Compose
+                to evaluate submissions.
               </p>
             </div>
           )}
           <div className="flex justify-end gap-3 mt-2">
-            <Button variant="ghost" size="sm" onClick={() => setShowAuthModal(false)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAuthModal(false)}
+            >
               Cancel
             </Button>
             <Button
@@ -505,7 +537,10 @@ export const ProblemDetailPage: React.FC = () => {
               please run LCArena locally with Docker Compose:
             </p>
             <div className="bg-paper p-2.5 rounded-sm border border-rule-2 font-mono text-xs select-all text-ink overflow-x-auto">
-              <code>git clone https://github.com/Osank31/LCArena.git && docker compose up</code>
+              <code>
+                git clone https://github.com/Osank31/LCArena.git && docker
+                compose up
+              </code>
             </div>
           </div>
 

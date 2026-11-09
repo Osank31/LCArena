@@ -12,12 +12,12 @@ a Winston logger with a table renderer.
 
 ## Overview
 
-| Export | Kind | Purpose |
-| :--- | :--- | :--- |
-| `AppError` (+ 7 subclasses) | classes | Typed, status-carrying errors |
-| `sendSuccess`, `sendError` | functions | The shared JSON response envelope |
-| `getEnvVariable` | function (default export) | Required/optional env lookup that throws loudly |
-| `logger` | Winston instance (+ `.table()`) | Structured console logging |
+| Export                      | Kind                            | Purpose                                         |
+| :-------------------------- | :------------------------------ | :---------------------------------------------- |
+| `AppError` (+ 7 subclasses) | classes                         | Typed, status-carrying errors                   |
+| `sendSuccess`, `sendError`  | functions                       | The shared JSON response envelope               |
+| `getEnvVariable`            | function (default export)       | Required/optional env lookup that throws loudly |
+| `logger`                    | Winston instance (+ `.table()`) | Structured console logging                      |
 
 `getEnvVariable` is a **default export** (`import getEnvVariable from "@LCArena/utils"`),
 while every other member is named. `index.ts` re-exports the rest explicitly and
@@ -47,12 +47,12 @@ flowchart TD
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| Logging | `winston` ^3, console transport only, colourised printf format |
-| HTTP types | `express` ^5 (`Response`) — type-only at runtime |
-| Module format | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/` |
-| Runtime dependencies | None beyond the two above |
+| Concern              | Choice                                                          |
+| :------------------- | :-------------------------------------------------------------- |
+| Logging              | `winston` ^3, console transport only, colourised printf format  |
+| HTTP types           | `express` ^5 (`Response`) — type-only at runtime                |
+| Module format        | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/` |
+| Runtime dependencies | None beyond the two above                                       |
 
 ## Directory structure
 
@@ -73,20 +73,20 @@ packages/backend/utils/
 
 ```ts
 class AppError extends Error {
-  readonly statusCode: number
-  constructor(message, statusCode, name)   // captures the stack, sets `name`
+  readonly statusCode: number;
+  constructor(message, statusCode, name); // captures the stack, sets `name`
 }
 ```
 
-| Class | `statusCode` | Default `name` |
-| :--- | ---: | :--- |
-| `BadRequestError` | 400 | `BadRequestError` |
-| `UnauthorizedError` | 401 | `Unauthorized Error` |
-| `ForbiddenError` | 403 | `ForbiddenError` |
-| `NotFoundError` | 404 | `NotFoundError` |
-| `ConflictError` | 409 | `ConflictError` |
-| `InternalServerError` | 500 | `Internal Server Error` |
-| `NotImplementedError` | 501 | `NotImplementedError` |
+| Class                 | `statusCode` | Default `name`          |
+| :-------------------- | -----------: | :---------------------- |
+| `BadRequestError`     |          400 | `BadRequestError`       |
+| `UnauthorizedError`   |          401 | `Unauthorized Error`    |
+| `ForbiddenError`      |          403 | `ForbiddenError`        |
+| `NotFoundError`       |          404 | `NotFoundError`         |
+| `ConflictError`       |          409 | `ConflictError`         |
+| `InternalServerError` |          500 | `Internal Server Error` |
+| `NotImplementedError` |          501 | `NotImplementedError`   |
 
 Every subclass signature is `(message, statusCode = <default>, name = <default>)`,
 so a caller can override the status when a specific case deserves a different
@@ -135,10 +135,11 @@ failing on the first request. This is the intended behaviour and is documented i
 
 Winston, console transport only, level from `LOG_LEVEL` (default `info`),
 format `errors({ stack: true })` + `timestamp({ format: "YYYY-MM-DD HH:mm:ss" })`
-+ `colorize()` + a custom printf that appends `JSON.stringify(meta)`.
+
+- `colorize()` + a custom printf that appends `JSON.stringify(meta)`.
 
 ```ts
-logger.info("Email dispatched", { to, subject, messageId })
+logger.info("Email dispatched", { to, subject, messageId });
 // 2026-10-14 10:00:00 [info] Email dispatched {"to":"…","subject":"…"}
 ```
 
@@ -157,23 +158,30 @@ part of the security invariants in `AGENTS.md`.
 
 ```ts
 import {
-  getEnvVariable,                                   // default export
+  getEnvVariable, // default export
   logger,
-  sendSuccess, sendError,
-  AppError, BadRequestError, UnauthorizedError, ForbiddenError,
-  NotFoundError, ConflictError, InternalServerError, NotImplementedError,
+  sendSuccess,
+  sendError,
+  AppError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  InternalServerError,
+  NotImplementedError,
 } from "@LCArena/utils";
 ```
 
-| Signature | Returns |
-| :--- | :--- |
-| `getEnvVariable(name, required = true)` | `string` — throws when `required` and unset/blank; returns `""` otherwise |
-| `logger.error/info/warn/debug/http(msg, meta?)` | Winston methods; `meta` is JSON-appended |
-| `logger.table(rows: Record<string, unknown>[])` | `void` — renders and logs an ASCII table |
-| `sendSuccess<T>(res, data?, message = "Success", status = 200)` | `Response` |
-| `sendError<T>(res, message = "Something went wrong", status = 500, error = null)` | `Response` |
-| `new AppError(message, statusCode, name)` | `Error` with a readonly `statusCode` |
-| `new <Subclass>Error(message, statusCode?, name?)` | `AppError` with the subclass default |
+| Signature                                                                         | Returns                                                                   |
+| :-------------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| `getEnvVariable(name, required = true)`                                           | `string` — throws when `required` and unset/blank; returns `""` otherwise |
+| `logger.error/info/warn/debug/http(msg, meta?)`                                   | Winston methods; `meta` is JSON-appended                                  |
+| `logger.table(rows: Record<string, unknown>[])`                                   | `void` — renders and logs an ASCII table                                  |
+| `sendSuccess<T>(res, data?, message = "Success", status = 200)`                   | `Response`                                                                |
+| `sendError<T>(res, message = "Something went wrong", status = 500, error = null)` | `Response`                                                                |
+| `new AppError(message, statusCode, name)`                                         | `Error` with a readonly `statusCode`                                      |
+| `new <Subclass>Error(message, statusCode?, name?)`                                | `AppError` with the subclass default                                      |
 
 ```ts
 class AppError extends Error {
@@ -185,26 +193,26 @@ class AppError extends Error {
 ## Inter-service communication
 
 None directly — this package opens no sockets and makes no network calls. Its
-only cross-service effect is *shaping* traffic: `sendSuccess` defines the envelope
+only cross-service effect is _shaping_ traffic: `sendSuccess` defines the envelope
 clients parse, and the `AppError` taxonomy is what `appErrorHandler` translates
 into status codes, so the same error type produces the same HTTP response in every
 service.
 
 ## Environment variables and configuration
 
-| Variable | Default | Effect |
-| :--- | :--- | :--- |
-| `LOG_LEVEL` | `info` | Winston level (`error`, `warn`, `info`, `http`, `debug`, …) |
+| Variable    | Default | Effect                                                      |
+| :---------- | :------ | :---------------------------------------------------------- |
+| `LOG_LEVEL` | `info`  | Winston level (`error`, `warn`, `info`, `http`, `debug`, …) |
 
-No other configuration. This package is where the *convention* is enforced, not
+No other configuration. This package is where the _convention_ is enforced, not
 where specific variables are declared; each service declares its own in
 `constants.ts` / `env.config.ts`.
 
 ## Dependencies and prerequisites
 
-| Dependency | Role |
-| :--- | :--- |
-| `winston` ^3 | Logging |
+| Dependency   | Role                                                   |
+| :----------- | :----------------------------------------------------- |
+| `winston` ^3 | Logging                                                |
 | `express` ^5 | `Response` type for the helpers (type-only at runtime) |
 
 Build before use outside Turborepo: `npx turbo run build --filter=@LCArena/utils`.
@@ -235,14 +243,14 @@ Unit tests are pure Node (`node:test` via `tsx`) with no network or database.
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
+| Symptom                                                               | Cause / handling                                                                                                   |
+| :-------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
 | Service exits at boot with `Missing required environment variable: X` | Working as designed — set `X`, or pass `false` as the second `getEnvVariable` argument if it is genuinely optional |
-| An error returns 500 when a 4xx was expected | A plain `Error` was thrown instead of an `AppError` subclass, or it was wrapped before reaching `appErrorHandler` |
-| A client sees an internal message | `appErrorHandler`'s 500 branch forwards `err.message`; never put secrets in a thrown message |
-| `error: null` / `data: null` in responses | Expected — that is the envelope contract |
-| Log lines carry no metadata | Pass `meta` as the second argument: `logger.info("msg", { … })` |
-| Timestamps are not ISO | Intentional: the format is `YYYY-MM-DD HH:mm:ss` |
+| An error returns 500 when a 4xx was expected                          | A plain `Error` was thrown instead of an `AppError` subclass, or it was wrapped before reaching `appErrorHandler`  |
+| A client sees an internal message                                     | `appErrorHandler`'s 500 branch forwards `err.message`; never put secrets in a thrown message                       |
+| `error: null` / `data: null` in responses                             | Expected — that is the envelope contract                                                                           |
+| Log lines carry no metadata                                           | Pass `meta` as the second argument: `logger.info("msg", { … })`                                                    |
+| Timestamps are not ISO                                                | Intentional: the format is `YYYY-MM-DD HH:mm:ss`                                                                   |
 
 ## Related packages and services
 

@@ -60,7 +60,9 @@ export const RegisterPage: React.FC = () => {
       return;
     }
     if (!otp.trim() || otp.trim().length !== 6) {
-      setError("Please provide the 6-digit verification code sent to your email.");
+      setError(
+        "Please provide the 6-digit verification code sent to your email.",
+      );
       return;
     }
 
@@ -88,7 +90,9 @@ export const RegisterPage: React.FC = () => {
         className="w-full max-w-md bg-paper-3 border border-rule-2 rounded-sm p-6 sm:p-8 shadow-[6px_6px_0_0_rgba(33,30,25,0.10)] space-y-6"
       >
         <div className="text-center space-y-1">
-          <h1 className="text-2xl font-serif font-bold text-ink">Create an Account</h1>
+          <h1 className="text-2xl font-serif font-bold text-ink">
+            Create an Account
+          </h1>
           <p className="text-xs text-ink-3">
             Join LCArena to compete, track your ratings and solve challenges.
           </p>

@@ -80,10 +80,13 @@ const md = MarkdownIt({
 }) as MarkdownItInstance;
 
 // LaTeX math: $$...$$ and $...$ -> <span class="math"> (KaTeX placeholder).
-md.use(texmath as any, {
-  delimiters: "dollars",
-  engine: katexEngine,
-} as any);
+md.use(
+  texmath as any,
+  {
+    delimiters: "dollars",
+    engine: katexEngine,
+  } as any,
+);
 
 // Syntax highlighting for fenced code blocks via highlight.js.
 const defaultFence = md.renderer.rules.fence;
@@ -92,7 +95,7 @@ md.renderer.rules.fence = function (
   idx: number,
   _options: any,
   _env: any,
-  self: any
+  self: any,
 ): string {
   const token = tokens[idx];
   const lang = token.info ? token.info.trim() : "";
@@ -103,12 +106,12 @@ md.renderer.rules.fence = function (
 
   if (lang && hljs.getLanguage(lang)) {
     const highlighted = hljs.highlight(code, { language: lang });
-    return `<pre><code class="hljs language-${(MarkdownIt as any).utils.escapeHtml(
-      lang
-    )}">${highlighted.value}</code></pre>`;
+    return `<pre><code class="hljs language-${(
+      MarkdownIt as any
+    ).utils.escapeHtml(lang)}">${highlighted.value}</code></pre>`;
   }
   return `<pre><code class="language-${(MarkdownIt as any).utils.escapeHtml(
-    lang
+    lang,
   )}">${escaped}</code></pre>`;
 } as any;
 
@@ -204,7 +207,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         }
       });
     },
-    [onLinkClick]
+    [onLinkClick],
   );
 
   useEffect(() => {

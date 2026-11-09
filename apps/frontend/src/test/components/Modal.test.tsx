@@ -8,7 +8,7 @@ describe("Modal component", () => {
     render(
       <Modal isOpen={false} onClose={() => {}}>
         Modal Content
-      </Modal>
+      </Modal>,
     );
     expect(screen.queryByText("Modal Content")).not.toBeInTheDocument();
   });
@@ -22,11 +22,13 @@ describe("Modal component", () => {
         description="Are you sure you want to proceed?"
       >
         <p>Detailed body content</p>
-      </Modal>
+      </Modal>,
     );
 
     expect(screen.getByText("Confirm Submission")).toBeInTheDocument();
-    expect(screen.getByText("Are you sure you want to proceed?")).toBeInTheDocument();
+    expect(
+      screen.getByText("Are you sure you want to proceed?"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Detailed body content")).toBeInTheDocument();
   });
 
@@ -35,7 +37,7 @@ describe("Modal component", () => {
     render(
       <Modal isOpen={true} onClose={handleClose} title="Test Modal">
         Content
-      </Modal>
+      </Modal>,
     );
 
     fireEvent.click(screen.getByLabelText("Close modal"));
@@ -47,7 +49,7 @@ describe("Modal component", () => {
     render(
       <Modal isOpen={true} onClose={handleClose} title="Test Modal">
         Content
-      </Modal>
+      </Modal>,
     );
 
     fireEvent.click(screen.getByTestId("modal-backdrop"));
@@ -59,7 +61,7 @@ describe("Modal component", () => {
     render(
       <Modal isOpen={true} onClose={handleClose} title="Test Modal">
         Content
-      </Modal>
+      </Modal>,
     );
 
     fireEvent.keyDown(window, { key: "Escape" });

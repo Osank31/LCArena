@@ -16,7 +16,8 @@ export function parseVerdict(status?: ExecutionResult): VerdictInfo {
   if (!status || status.status === "PENDING") {
     return {
       verdict: "Pending",
-      badgeClass: "bg-transparent text-ink-3 border border-dashed border-rule-2",
+      badgeClass:
+        "bg-transparent text-ink-3 border border-dashed border-rule-2",
       bgClass: "bg-transparent",
       textClass: "text-ink-3",
       summary: "Judging solution in ephemeral Docker container...",

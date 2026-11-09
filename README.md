@@ -40,17 +40,17 @@ names and payloads, and the documented gaps.
 
 ## Technology stack
 
-| Layer | Technology |
-| :--- | :--- |
-| Monorepo | Turborepo 2 + npm workspaces (Node ≥ 24, npm ≥ 11) |
-| API services | TypeScript, Express 5, Zod 4, Mongoose 9 |
-| Gateway auth | `jsonwebtoken` (access + refresh), Redis sessions/JTI blacklist/OTPs, `http-proxy-middleware` |
-| Queue | RabbitMQ 3.13 (`amqplib`) |
-| Storage | S3-compatible via `@aws-sdk/client-s3` (MinIO locally, Cloudflare R2 in production) |
-| Sandbox | `dockerode` + ephemeral containers: `gcc:latest`, `eclipse-temurin`, `python:3.11-slim`, `node:20-slim` |
-| Frontend | React 19, Vite 8, TypeScript, Tailwind CSS v4, Monaco, Vitest |
-| AI | Python 3.12, FastAPI, LangChain, Anthropic Claude Sonnet |
-| Data | MongoDB 7, Redis 7 |
+| Layer        | Technology                                                                                              |
+| :----------- | :------------------------------------------------------------------------------------------------------ |
+| Monorepo     | Turborepo 2 + npm workspaces (Node ≥ 24, npm ≥ 11)                                                      |
+| API services | TypeScript, Express 5, Zod 4, Mongoose 9                                                                |
+| Gateway auth | `jsonwebtoken` (access + refresh), Redis sessions/JTI blacklist/OTPs, `http-proxy-middleware`           |
+| Queue        | RabbitMQ 3.13 (`amqplib`)                                                                               |
+| Storage      | S3-compatible via `@aws-sdk/client-s3` (MinIO locally, Cloudflare R2 in production)                     |
+| Sandbox      | `dockerode` + ephemeral containers: `gcc:latest`, `eclipse-temurin`, `python:3.11-slim`, `node:20-slim` |
+| Frontend     | React 19, Vite 8, TypeScript, Tailwind CSS v4, Monaco, Vitest                                           |
+| AI           | Python 3.12, FastAPI, LangChain, Anthropic Claude Sonnet                                                |
+| Data         | MongoDB 7, Redis 7                                                                                      |
 
 ## Repository structure
 
@@ -80,25 +80,25 @@ LCArena/
 
 ### Services
 
-| Component | Port | README |
-| :--- | :--- | :--- |
-| API Gateway | 3000 | [apps/apis/gateway](apps/apis/gateway/README.md) |
-| Problem service | 3001 | [apps/apis/problem](apps/apis/problem/README.md) |
-| Submission service | 3002 | [apps/apis/submission](apps/apis/submission/README.md) |
-| Mail service | 3003 | [apps/apis/mail](apps/apis/mail/README.md) |
-| Execution worker | 3004 | [apps/apis/execution](apps/apis/execution/README.md) |
+| Component             | Port | README                                                                       |
+| :-------------------- | :--- | :--------------------------------------------------------------------------- |
+| API Gateway           | 3000 | [apps/apis/gateway](apps/apis/gateway/README.md)                             |
+| Problem service       | 3001 | [apps/apis/problem](apps/apis/problem/README.md)                             |
+| Submission service    | 3002 | [apps/apis/submission](apps/apis/submission/README.md)                       |
+| Mail service          | 3003 | [apps/apis/mail](apps/apis/mail/README.md)                                   |
+| Execution worker      | 3004 | [apps/apis/execution](apps/apis/execution/README.md)                         |
 | AI suggestion service | 8000 | [apps/apis/ai-suggestion-service](apps/apis/ai-suggestion-service/README.md) |
-| Frontend | 5173 | [apps/frontend](apps/frontend/README.md) |
+| Frontend              | 5173 | [apps/frontend](apps/frontend/README.md)                                     |
 
 ### Shared packages
 
-| Package | README |
-| :--- | :--- |
-| `@LCArena/config` | [packages/backend/config](packages/backend/config/README.md) |
-| `@LCArena/models` | [packages/backend/models](packages/backend/models/README.md) |
+| Package                | README                                                                 |
+| :--------------------- | :--------------------------------------------------------------------- |
+| `@LCArena/config`      | [packages/backend/config](packages/backend/config/README.md)           |
+| `@LCArena/models`      | [packages/backend/models](packages/backend/models/README.md)           |
 | `@LCArena/middlewares` | [packages/backend/middlewares](packages/backend/middlewares/README.md) |
-| `@LCArena/utils` | [packages/backend/utils](packages/backend/utils/README.md) |
-| `@LCArena/execution` | [packages/backend/execution](packages/backend/execution/README.md) |
+| `@LCArena/utils`       | [packages/backend/utils](packages/backend/utils/README.md)             |
+| `@LCArena/execution`   | [packages/backend/execution](packages/backend/execution/README.md)     |
 
 ### Guides
 

@@ -66,14 +66,14 @@ depth on `/health`.
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| HTTP | `express` ^5 |
-| Validation | `zod` ^4 (`sendOtpEmailSchema`) |
-| Mail | `nodemailer` ^10 (`createTransport`, `sendMail`) |
-| Async delivery | `dispatcher.ts` — bounded in-memory queue, configurable concurrency, bounded retries with linear backoff |
-| DI for tests | `createApp(mailer, { token, dispatcher })` and `createMailer(transport, from)` accept injected collaborators |
-| Dev SMTP sink | `smtp-server` (not used by Docker) |
+| Concern        | Choice                                                                                                       |
+| :------------- | :----------------------------------------------------------------------------------------------------------- |
+| HTTP           | `express` ^5                                                                                                 |
+| Validation     | `zod` ^4 (`sendOtpEmailSchema`)                                                                              |
+| Mail           | `nodemailer` ^10 (`createTransport`, `sendMail`)                                                             |
+| Async delivery | `dispatcher.ts` — bounded in-memory queue, configurable concurrency, bounded retries with linear backoff     |
+| DI for tests   | `createApp(mailer, { token, dispatcher })` and `createMailer(transport, from)` accept injected collaborators |
+| Dev SMTP sink  | `smtp-server` (not used by Docker)                                                                           |
 
 ## Directory structure
 
@@ -130,21 +130,21 @@ The rendered email (`templates.ts`):
 Success envelope: `{ status, message, success, data, error: null }`.
 Errors: `{ success: false, message }` (plus `errors[]` for Zod failures).
 
-| Method | Path | Auth | Body | Success |
-| :--- | :--- | :--- | :--- | :--- |
-| `GET` | `/health` | none | — | 200 `{ message: "Mail Service Healthy" }` |
-| `POST` | `/otp` | `x-mail-service-token` **when `MAIL_SERVICE_TOKEN` is set** | `{ email, otp }` | 202 `"OTP email queued for delivery"`, `data: { queued: true }` |
+| Method | Path      | Auth                                                        | Body             | Success                                                         |
+| :----- | :-------- | :---------------------------------------------------------- | :--------------- | :-------------------------------------------------------------- |
+| `GET`  | `/health` | none                                                        | —                | 200 `{ message: "Mail Service Healthy" }`                       |
+| `POST` | `/otp`    | `x-mail-service-token` **when `MAIL_SERVICE_TOKEN` is set** | `{ email, otp }` | 202 `"OTP email queued for delivery"`, `data: { queued: true }` |
 
 Validation (`sendOtpEmailSchema`): `email` is trimmed, lowercased and must be a
 valid address; `otp` is trimmed and must match `/^\d{6}$/`.
 
 Errors:
 
-| Condition | Status | Body |
-| :--- | :--- | :--- |
-| Token configured and header missing/wrong | 401 | `{ success: false, message: "Invalid or missing mail service token" }` |
-| Invalid body | 400 | `{ success: false, message: "Validation Error", errors: [...] }` |
-| Queue full (`MAIL_QUEUE_MAX_SIZE`) or service shutting down | 503 | `{ success: false, message: "Mail delivery queue is saturated, retry shortly" }` |
+| Condition                                                   | Status | Body                                                                             |
+| :---------------------------------------------------------- | :----- | :------------------------------------------------------------------------------- |
+| Token configured and header missing/wrong                   | 401    | `{ success: false, message: "Invalid or missing mail service token" }`           |
+| Invalid body                                                | 400    | `{ success: false, message: "Validation Error", errors: [...] }`                 |
+| Queue full (`MAIL_QUEUE_MAX_SIZE`) or service shutting down | 503    | `{ success: false, message: "Mail delivery queue is saturated, retry shortly" }` |
 
 SMTP failures no longer surface as HTTP errors: the message was already
 acknowledged with `202`. They appear in the logs (`Email delivery failed;
@@ -152,11 +152,11 @@ retrying` / `… giving up`) and in queue depth on `/health`.
 
 ## Inter-service communication
 
-| Direction | Mechanism | Details |
-| :--- | :--- | :--- |
-| In | HTTP `POST /otp` | From the gateway's `mailClient.dispatchOtp` (`axios.post`, 10s timeout, un-awaited) → `202` |
-| In | HTTP `GET /health` | Compose healthcheck / `scripts/docker/health.mjs`; also reports `{ queued, inFlight }` |
-| Out | SMTP | nodemailer, lazy connection, `connectionTimeout`/`greetingTimeout` 10s, `socketTimeout` 20s, off the request path |
+| Direction | Mechanism          | Details                                                                                                           |
+| :-------- | :----------------- | :---------------------------------------------------------------------------------------------------------------- |
+| In        | HTTP `POST /otp`   | From the gateway's `mailClient.dispatchOtp` (`axios.post`, 10s timeout, un-awaited) → `202`                       |
+| In        | HTTP `GET /health` | Compose healthcheck / `scripts/docker/health.mjs`; also reports `{ queued, inFlight }`                            |
+| Out       | SMTP               | nodemailer, lazy connection, `connectionTimeout`/`greetingTimeout` 10s, `socketTimeout` 20s, off the request path |
 
 No database, no Redis, no RabbitMQ, no outbound HTTP.
 
@@ -165,23 +165,23 @@ No database, no Redis, no RabbitMQ, no outbound HTTP.
 Every variable is optional so the service can boot and report healthy before
 credentials are supplied. All are read through `getEnvVariable(name, false)`.
 
-| Variable | Default | Purpose |
-| :--- | :--- | :--- |
-| `PORT` | `3003` | HTTP port |
-| `MAIL_HOST` | `localhost` | SMTP relay host |
-| `MAIL_PORT` | `587` | SMTP port (`465` with secure, `25`/`1025` plain) |
-| `MAIL_SECURE` | `false` | `"true"` → implicit TLS; anything else → STARTTLS/plain |
-| `MAIL_USER` | *(undefined)* | SMTP username. **When unset, no `auth` block is sent at all** (local relays and tests accept anonymous mail) |
-| `MAIL_PASSWORD` | *(undefined)* | SMTP password / provider API key |
-| `MAIL_FROM` | `LCArena <no-reply@lcarena.local>` | `From` header |
-| `MAIL_CONNECTION_TIMEOUT_MS` | `10000` | Connect **and** greeting timeout (one delivery attempt, not an HTTP budget) |
-| `MAIL_QUEUE_CONCURRENCY` | `2` | Deliveries attempted in parallel |
-| `MAIL_QUEUE_MAX_SIZE` | `500` | Messages allowed to wait; beyond this `/otp` answers `503` |
-| `MAIL_MAX_ATTEMPTS` | `3` | Attempts per message before it is dropped with an error log |
-| `MAIL_RETRY_DELAY_MS` | `500` | Base delay; attempt *n* waits *n* × this value |
-| `MAIL_DRAIN_TIMEOUT_MS` | `10000` | How long `SIGTERM` waits for the queue to empty |
-| `MAIL_SERVICE_TOKEN` | *(undefined)* | Shared secret required in `x-mail-service-token` |
-| `LOG_LEVEL` | `info` | Winston level |
+| Variable                     | Default                            | Purpose                                                                                                      |
+| :--------------------------- | :--------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| `PORT`                       | `3003`                             | HTTP port                                                                                                    |
+| `MAIL_HOST`                  | `localhost`                        | SMTP relay host                                                                                              |
+| `MAIL_PORT`                  | `587`                              | SMTP port (`465` with secure, `25`/`1025` plain)                                                             |
+| `MAIL_SECURE`                | `false`                            | `"true"` → implicit TLS; anything else → STARTTLS/plain                                                      |
+| `MAIL_USER`                  | _(undefined)_                      | SMTP username. **When unset, no `auth` block is sent at all** (local relays and tests accept anonymous mail) |
+| `MAIL_PASSWORD`              | _(undefined)_                      | SMTP password / provider API key                                                                             |
+| `MAIL_FROM`                  | `LCArena <no-reply@lcarena.local>` | `From` header                                                                                                |
+| `MAIL_CONNECTION_TIMEOUT_MS` | `10000`                            | Connect **and** greeting timeout (one delivery attempt, not an HTTP budget)                                  |
+| `MAIL_QUEUE_CONCURRENCY`     | `2`                                | Deliveries attempted in parallel                                                                             |
+| `MAIL_QUEUE_MAX_SIZE`        | `500`                              | Messages allowed to wait; beyond this `/otp` answers `503`                                                   |
+| `MAIL_MAX_ATTEMPTS`          | `3`                                | Attempts per message before it is dropped with an error log                                                  |
+| `MAIL_RETRY_DELAY_MS`        | `500`                              | Base delay; attempt _n_ waits _n_ × this value                                                               |
+| `MAIL_DRAIN_TIMEOUT_MS`      | `10000`                            | How long `SIGTERM` waits for the queue to empty                                                              |
+| `MAIL_SERVICE_TOKEN`         | _(undefined)_                      | Shared secret required in `x-mail-service-token`                                                             |
+| `LOG_LEVEL`                  | `info`                             | Winston level                                                                                                |
 
 > ⚠️ **Set `MAIL_SERVICE_TOKEN`** in any environment where the service is
 > reachable beyond the gateway. Without it `/otp` is an **open email sender**:
@@ -237,15 +237,15 @@ completes, `503` when saturated).
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| `401 "Invalid or missing mail service token"` | `MAIL_SERVICE_TOKEN` is set on this service but the caller did not send a matching header — check that the gateway has the same value |
-| `400 Validation Error` | `email` malformed or `otp` is not exactly 6 digits |
-| `202` but no mail arrives | The relay rejected/failed the message; look for `Email delivery failed; giving up` in the logs. `MAIL_SECURE` mismatched for the port (classic: 465 with `secure=false`) is a common cause |
-| `503 "Mail delivery queue is saturated"` | The relay is slower than the incoming OTP rate. Raise `MAIL_QUEUE_MAX_SIZE`/`MAIL_QUEUE_CONCURRENCY` or fix the relay; a drain in progress also answers 503 |
-| Service is healthy but no mail arrives | Expected if the relay is unconfigured; the gateway swallows delivery failures by design. Check `docker compose logs gateway` for `Failed to deliver OTP email` |
-| Boot log warns "the /otp endpoint is unauthenticated" | `MAIL_SERVICE_TOKEN` is unset. Fine for local-only, unacceptable anywhere reachable |
-| Unauthenticated relay rejected | Set `MAIL_USER`/`MAIL_PASSWORD`; when `MAIL_USER` is empty no `auth` is sent at all |
+| Symptom                                               | Cause / handling                                                                                                                                                                           |
+| :---------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `401 "Invalid or missing mail service token"`         | `MAIL_SERVICE_TOKEN` is set on this service but the caller did not send a matching header — check that the gateway has the same value                                                      |
+| `400 Validation Error`                                | `email` malformed or `otp` is not exactly 6 digits                                                                                                                                         |
+| `202` but no mail arrives                             | The relay rejected/failed the message; look for `Email delivery failed; giving up` in the logs. `MAIL_SECURE` mismatched for the port (classic: 465 with `secure=false`) is a common cause |
+| `503 "Mail delivery queue is saturated"`              | The relay is slower than the incoming OTP rate. Raise `MAIL_QUEUE_MAX_SIZE`/`MAIL_QUEUE_CONCURRENCY` or fix the relay; a drain in progress also answers 503                                |
+| Service is healthy but no mail arrives                | Expected if the relay is unconfigured; the gateway swallows delivery failures by design. Check `docker compose logs gateway` for `Failed to deliver OTP email`                             |
+| Boot log warns "the /otp endpoint is unauthenticated" | `MAIL_SERVICE_TOKEN` is unset. Fine for local-only, unacceptable anywhere reachable                                                                                                        |
+| Unauthenticated relay rejected                        | Set `MAIL_USER`/`MAIL_PASSWORD`; when `MAIL_USER` is empty no `auth` is sent at all                                                                                                        |
 
 ## Related services
 

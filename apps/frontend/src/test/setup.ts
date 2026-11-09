@@ -1,7 +1,7 @@
-import '@testing-library/jest-dom/vitest';
-import { afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
-import { backendStatus } from '../services/backendStatus';
+import "@testing-library/jest-dom/vitest";
+import { afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import { backendStatus } from "../services/backendStatus";
 
 // Cleanup after each test
 afterEach(() => {
@@ -14,7 +14,7 @@ afterEach(() => {
 });
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
@@ -39,7 +39,7 @@ Object.defineProperty(window, 'matchMedia', {
 window.scrollTo = vi.fn();
 
 // Mock pointer capture for JSDOM
-if (typeof Element !== 'undefined') {
+if (typeof Element !== "undefined") {
   Element.prototype.setPointerCapture = vi.fn();
   Element.prototype.releasePointerCapture = vi.fn();
   Element.prototype.hasPointerCapture = vi.fn().mockReturnValue(false);

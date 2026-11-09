@@ -15,7 +15,8 @@ export const SubmissionHistoryTab: React.FC<SubmissionHistoryTabProps> = ({
   submissions,
   isLoading = false,
 }) => {
-  const [selectedSubmission, setSelectedSubmission] = useState<ISubmission | null>(null);
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<ISubmission | null>(null);
 
   if (submissions.length === 0 && !isLoading) {
     return (
@@ -28,7 +29,10 @@ export const SubmissionHistoryTab: React.FC<SubmissionHistoryTabProps> = ({
   }
 
   return (
-    <div className="h-full overflow-y-auto p-4 space-y-3" data-testid="submissions-list">
+    <div
+      className="h-full overflow-y-auto p-4 space-y-3"
+      data-testid="submissions-list"
+    >
       <div className="divide-y divide-rule">
         {submissions.map((sub) => {
           const info = parseVerdict(sub.status);

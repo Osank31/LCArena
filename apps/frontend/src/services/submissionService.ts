@@ -15,7 +15,7 @@ export const submissionService = {
         const parts = token.split(".");
         if (parts.length === 3) {
           const payload = JSON.parse(
-            atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
+            atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")),
           );
           if (payload.userId) return payload.userId;
           if (payload.id) return payload.id;
@@ -28,10 +28,12 @@ export const submissionService = {
   },
 
   /** Submit code for evaluation */
-  async createSubmission(payload: CreateSubmissionPayload): Promise<ISubmission> {
+  async createSubmission(
+    payload: CreateSubmissionPayload,
+  ): Promise<ISubmission> {
     const response = await apiClient.post<ApiResponse<ISubmission>>(
       "/api/submissions",
-      payload
+      payload,
     );
     const submission = response.data?.data;
     if (submission) {
@@ -43,7 +45,7 @@ export const submissionService = {
   /** Fetch status and execution details of a submission */
   async getSubmission(submissionId: string): Promise<ISubmission> {
     const response = await apiClient.get<ApiResponse<ISubmission>>(
-      `/api/submissions/${submissionId}`
+      `/api/submissions/${submissionId}`,
     );
     return response.data?.data;
   },
@@ -53,7 +55,7 @@ export const submissionService = {
     submissionId: string,
     onProgress?: (submission: ISubmission) => void,
     maxAttempts = 20,
-    intervalMs = 1500
+    intervalMs = 1500,
   ): Promise<ISubmission> {
     let attempts = 0;
 
@@ -87,7 +89,9 @@ export const submissionService = {
 
       const key = `lcarena_submissions_${effectiveUserId}`;
       const existingRaw = localStorage.getItem(key);
-      const existing: ISubmission[] = existingRaw ? JSON.parse(existingRaw) : [];
+      const existing: ISubmission[] = existingRaw
+        ? JSON.parse(existingRaw)
+        : [];
 
       const filtered = existing.filter((s) => s._id !== submissionWithUser._id);
       const updated = [submissionWithUser, ...filtered].slice(0, 50); // Keep last 50

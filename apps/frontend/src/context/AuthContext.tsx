@@ -11,10 +11,7 @@ import {
   RegisterCredentials,
   UserProfile,
 } from "../types/auth.types";
-import {
-  getStoredToken,
-  setStoredToken,
-} from "../services/apiClient";
+import { getStoredToken, setStoredToken } from "../services/apiClient";
 import { authService } from "../services/authService";
 
 interface AuthContextValue {

@@ -123,12 +123,14 @@ The input string is provided as a sequence of characters \`s\`. Return the rever
       {
         input: 's = "hello"',
         output: '"olleh"',
-        explanation: 'The reversed sequence of characters for "hello" is "olleh".',
+        explanation:
+          'The reversed sequence of characters for "hello" is "olleh".',
       },
       {
         input: 's = "LCArena"',
         output: '"anerACL"',
-        explanation: "Characters are reversed while preserving individual casing.",
+        explanation:
+          "Characters are reversed while preserving individual casing.",
       },
       {
         input: 's = "racecar"',
@@ -226,7 +228,8 @@ An input string is valid if:
       {
         input: 's = "()"',
         output: "true",
-        explanation: "The round bracket is closed immediately with matching type.",
+        explanation:
+          "The round bracket is closed immediately with matching type.",
       },
       {
         input: 's = "()[]{}"',
@@ -236,7 +239,8 @@ An input string is valid if:
       {
         input: 's = "(]"',
         output: "false",
-        explanation: "Mismatched bracket types: round opener with square closer.",
+        explanation:
+          "Mismatched bracket types: round opener with square closer.",
       },
     ],
     constraints: [
@@ -329,7 +333,8 @@ A subarray is a contiguous non-empty sequence of elements within an array.`,
       {
         input: "nums = [-2,1,-3,4,-1,2,1,-5,4]",
         output: "6",
-        explanation: "The contiguous subarray [4,-1,2,1] has the largest sum = 6.",
+        explanation:
+          "The contiguous subarray [4,-1,2,1] has the largest sum = 6.",
       },
       {
         input: "nums = [1]",
@@ -339,13 +344,11 @@ A subarray is a contiguous non-empty sequence of elements within an array.`,
       {
         input: "nums = [5,4,-1,7,8]",
         output: "23",
-        explanation: "The contiguous subarray [5,4,-1,7,8] has the largest sum = 23.",
+        explanation:
+          "The contiguous subarray [5,4,-1,7,8] has the largest sum = 23.",
       },
     ],
-    constraints: [
-      "1 <= nums.length <= 10^5",
-      "-10^4 <= nums[i] <= 10^4",
-    ],
+    constraints: ["1 <= nums.length <= 10^5", "-10^4 <= nums[i] <= 10^4"],
     starterTemplates: {
       cpp: `#include <bits/stdc++.h>
 using namespace std;
@@ -427,7 +430,9 @@ export function getSampleProblems(): ParsedProblem[] {
 /**
  * Finds a sample problem by ID, slug, or index.
  */
-export function getSampleProblemById(idOrSlug: string): ParsedProblem | undefined {
+export function getSampleProblemById(
+  idOrSlug: string,
+): ParsedProblem | undefined {
   if (!idOrSlug) return undefined;
   const target = idOrSlug.trim().toLowerCase();
 

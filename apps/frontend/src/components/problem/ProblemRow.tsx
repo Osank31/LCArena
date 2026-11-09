@@ -52,7 +52,12 @@ export const ProblemRow: React.FC<ProblemRowProps> = ({
           {/* Tags */}
           <div className="flex flex-wrap gap-1 mt-1.5 ml-6">
             {problem.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="outline" size="sm" className="text-[10px] py-0 px-1.5">
+              <Badge
+                key={tag}
+                variant="outline"
+                size="sm"
+                className="text-[10px] py-0 px-1.5"
+              >
                 {tag}
               </Badge>
             ))}

@@ -34,7 +34,12 @@ export const ProblemFilters: React.FC<ProblemFiltersProps> = ({
   onReset,
   availableTags,
 }) => {
-  const difficulties: ("All" | Difficulty)[] = ["All", "Easy", "Medium", "Hard"];
+  const difficulties: ("All" | Difficulty)[] = [
+    "All",
+    "Easy",
+    "Medium",
+    "Hard",
+  ];
 
   const hasActiveFilters =
     filters.search !== "" ||

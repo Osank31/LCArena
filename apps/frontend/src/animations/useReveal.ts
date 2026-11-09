@@ -53,7 +53,7 @@ export interface RevealOptions {
  * animation ticker stalls.
  */
 export function useReveal<T extends HTMLElement = HTMLDivElement>(
-  options: RevealOptions = {}
+  options: RevealOptions = {},
 ) {
   const scope = useRef<T>(null);
   const {
@@ -123,7 +123,7 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(
 
       return () => cleanups.forEach((cancel) => cancel());
     },
-    { scope, dependencies: deps }
+    { scope, dependencies: deps },
   );
 
   return scope;
@@ -145,7 +145,7 @@ export interface EntranceOptions {
  * panels. The returned ref must be attached to the element being revealed.
  */
 export function useEntrance<T extends HTMLElement = HTMLDivElement>(
-  options: EntranceOptions = {}
+  options: EntranceOptions = {},
 ) {
   const scope = useRef<T>(null);
   const {
@@ -177,12 +177,9 @@ export function useEntrance<T extends HTMLElement = HTMLDivElement>(
       if (typeof scale === "number") toVars.scale = 1;
 
       gsap.fromTo(element, fromVars, toVars);
-      return scheduleVisibilityFallback(
-        element,
-        (duration + delay) * 1000
-      );
+      return scheduleVisibilityFallback(element, (duration + delay) * 1000);
     },
-    { scope, dependencies: deps }
+    { scope, dependencies: deps },
   );
 
   return scope;
@@ -194,7 +191,7 @@ export function useEntrance<T extends HTMLElement = HTMLDivElement>(
  * disturbed while it initializes.
  */
 export function useWorkspaceReveal(
-  deps: unknown[] = []
+  deps: unknown[] = [],
 ): RefObject<HTMLDivElement | null> {
   return useReveal({
     selector: "[data-workspace-reveal]",

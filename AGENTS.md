@@ -8,6 +8,7 @@
 ## 1. Project Overview & Mission
 
 **LCArena** is a distributed, containerized online judge and competitive programming platform designed for high concurrency, security, and extensibility. It includes:
+
 - An **API Gateway** managing authentication, session state, rate limiting, and reverse-proxying.
 - **Isolated Domain Microservices** for Problem management, Submission intake, Email, and Real-time WebSocket notifications.
 - A **Dockerized Sandboxed Code Execution Engine** executing untrusted code (C++, Java, Python, JavaScript) inside ephemeral Docker containers under strict resource and time limits.
@@ -90,6 +91,7 @@ flowchart TD
 The Gateway is the perimeter security boundary and single public HTTP ingress point for application traffic.
 
 #### Responsibilities:
+
 1. **Reverse Proxying (`http-proxy-middleware` via `proxy.factory.ts`)**:
    - Routes `/api/problems/*` to `PROBLEM_SERVICE_URL` (`:3001`).
    - Routes `/api/submissions/*` to `SUBMISSION_SERVICE_URL` (`:3002`).
@@ -176,21 +178,24 @@ Ingress point for user code submissions.
 The sandboxed code execution core. Evaluates untrusted user code against test cases in isolated containers using Dockerode.
 
 #### Architecture:
+
 - **Base Class (`Executor`)**:
   - Manages Docker image lifecycle (`pullImage`).
   - Executes shell commands within running containers (`runCommand`) via Docker Exec and demultiplexed stdout/stderr streams.
   - Packs test cases from disk into a POSIX tar archive (`tar-stream`) and injects them into the container's `/workspace` (`copyTestCasesToContainer`).
   - Synthesizes an automated bash test harness (`generateRunnerScript`).
 - **Language-Specific Implementations**:
-  | Language | Executor Class | Docker Image | Wrapper Strategy | Compile / Syntax Command | Run Command |
-  | :--- | :--- | :--- | :--- | :--- | :--- |
-  | **C++** | `CPPExecutor` | `gcc:latest` | Wraps `#include "Solution.cpp"` with boilerplate `Main.cpp` reading standard input and invoking `Solution::solve`. | `g++ -O3 -std=c++17 Main.cpp -o ./solution` | `./solution` |
-  | **Java** | `JavaExecutor` | `eclipse-temurin` | Wraps user `Solution` with a `Main.java` reading tokens via `Scanner` and invoking `sol.solve`. | `javac Main.java Solution.java` | `java Main` |
-  | **Python** | `PythonExecutor` | `python:3.11-slim` | Wraps user `Solution` with `main.py` reading `sys.stdin` and invoking `sol.solve`. | `python -m py_compile solution.py` | `python main.py` |
-  | **JavaScript** | `JSExecutor` | `node:20-slim` | Wraps `Solution` class with `main.js` reading standard input via `fs.readFileSync(0)`. | `node -c solution.js` | `node main.js` |
+  | Language       | Executor Class   | Docker Image       | Wrapper Strategy                                                                                                   | Compile / Syntax Command                    | Run Command      |
+  | :------------- | :--------------- | :----------------- | :----------------------------------------------------------------------------------------------------------------- | :------------------------------------------ | :--------------- |
+  | **C++**        | `CPPExecutor`    | `gcc:latest`       | Wraps `#include "Solution.cpp"` with boilerplate `Main.cpp` reading standard input and invoking `Solution::solve`. | `g++ -O3 -std=c++17 Main.cpp -o ./solution` | `./solution`     |
+  | **Java**       | `JavaExecutor`   | `eclipse-temurin`  | Wraps user `Solution` with a `Main.java` reading tokens via `Scanner` and invoking `sol.solve`.                    | `javac Main.java Solution.java`             | `java Main`      |
+  | **Python**     | `PythonExecutor` | `python:3.11-slim` | Wraps user `Solution` with `main.py` reading `sys.stdin` and invoking `sol.solve`.                                 | `python -m py_compile solution.py`          | `python main.py` |
+  | **JavaScript** | `JSExecutor`     | `node:20-slim`     | Wraps `Solution` class with `main.js` reading standard input via `fs.readFileSync(0)`.                             | `node -c solution.js`                       | `node main.js`   |
 
 #### Test Harness & Runner Script (`generateRunnerScript`):
+
 Inside the container, a temporary `runner.sh` script is generated:
+
 1. **Compilation Check**: Runs `compileCmd`. If exit code != 0, returns immediately with:
    ```json
    { "status": "COMPILE_ERROR", "compileError": "<compiler_output>" }
@@ -271,13 +276,13 @@ FastAPI microservice acting as an intelligent Copilot for the Monaco code editor
 
 Turborepo links internal packages via npm workspaces:
 
-| Package | Purpose & Key Exports |
-| :--- | :--- |
-| `@LCArena/config` | Singleton infrastructure connections: `dbConnect`, `getRedisClient`, `connectToQueue`, `channel`, `queue`, plus S3-compatible object storage SDK (`getS3Client`, `ensureBucketExists`, `putObject`, `getObject`, `listObjects`, `deleteObjectsWithPrefix`, `getProblemTestCasePrefix`, `getTestCaseInputKey`, `getTestCaseOutputKey`). |
-| `@LCArena/models` | Mongoose models & interfaces: `User`, `IUser`, `UserType`, `Problem`, `IProblem`, `Submission`, `ISubmission`, `ELanguage`. |
-| `@LCArena/middlewares` | Express middleware suite: `userValidation`, `roleValidation`, `appErrorHandler`, `AuthenticatedUser` type augmentation. |
-| `@LCArena/utils` | Shared primitives: `AppError` taxonomy (`BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `InternalServerError`), `sendSuccess`, `sendError`, `logger` (Winston), `getEnvVariable`. |
-| `@LCArena/execution` | Language execution interfaces and implementations: `Executor`, `CPPExecutor`, `JavaExecutor`, `PythonExecutor`, `JSExecutor`, `ExecutionResult`, plus judging output comparison policy (`compareOutputs`). |
+| Package                | Purpose & Key Exports                                                                                                                                                                                                                                                                                                                  |
+| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@LCArena/config`      | Singleton infrastructure connections: `dbConnect`, `getRedisClient`, `connectToQueue`, `channel`, `queue`, plus S3-compatible object storage SDK (`getS3Client`, `ensureBucketExists`, `putObject`, `getObject`, `listObjects`, `deleteObjectsWithPrefix`, `getProblemTestCasePrefix`, `getTestCaseInputKey`, `getTestCaseOutputKey`). |
+| `@LCArena/models`      | Mongoose models & interfaces: `User`, `IUser`, `UserType`, `Problem`, `IProblem`, `Submission`, `ISubmission`, `ELanguage`.                                                                                                                                                                                                            |
+| `@LCArena/middlewares` | Express middleware suite: `userValidation`, `roleValidation`, `appErrorHandler`, `AuthenticatedUser` type augmentation.                                                                                                                                                                                                                |
+| `@LCArena/utils`       | Shared primitives: `AppError` taxonomy (`BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `InternalServerError`), `sendSuccess`, `sendError`, `logger` (Winston), `getEnvVariable`.                                                                                                          |
+| `@LCArena/execution`   | Language execution interfaces and implementations: `Executor`, `CPPExecutor`, `JavaExecutor`, `PythonExecutor`, `JSExecutor`, `ExecutionResult`, plus judging output comparison policy (`compareOutputs`).                                                                                                                             |
 
 ---
 
@@ -286,6 +291,7 @@ Turborepo links internal packages via npm workspaces:
 ### 5.1 MongoDB Schemas
 
 #### User Schema (`users`)
+
 ```typescript
 {
   name: { type: String, required: true, trim: true },
@@ -301,6 +307,7 @@ Turborepo links internal packages via npm workspaces:
 ```
 
 #### Problem Schema (`problems`)
+
 ```typescript
 {
   description: { type: String, required: true },
@@ -315,6 +322,7 @@ Turborepo links internal packages via npm workspaces:
 ```
 
 #### Submission Schema (`submissions`)
+
 ```typescript
 {
   problemId: { type: mongoose.Schema.Types.ObjectId, ref: "Problem", required: true },
@@ -347,6 +355,7 @@ Evaluation_Test_Cases/Test_Cases_<PROBLEM_ID>/test_case_NNN/output.ans
 ### 5.3 Output Comparison & Judging Policy (`compareOutputs`)
 
 Output comparison normalizes line breaks and whitespace while strictly verifying semantic tokens:
+
 - Converts CRLF (`\r\n`) and CR (`\r`) to LF (`\n`).
 - Trims trailing whitespace from each line.
 - Strips trailing blank lines at the end of the file.
@@ -354,11 +363,11 @@ Output comparison normalizes line breaks and whitespace while strictly verifying
 
 ### 5.4 Redis Key Topology & Policies
 
-| Key Pattern | Data Type | Value | TTL | Purpose |
-| :--- | :--- | :--- | :--- | :--- |
-| `session:<userId>` | String | `<refreshToken>` | 7 days (604800s) | Tracks currently active refresh token for session rotation & revocation. |
-| `revoked_access:<jti>` | String | `"1"` | Remaining JWT life | Instant blacklist for logged-out access tokens. |
-| `otp:<email>` | String | `123456` (6-digit) | 5 minutes (300s) | Ephemeral OTP code for email verification & passwordless auth. |
+| Key Pattern            | Data Type | Value              | TTL                | Purpose                                                                  |
+| :--------------------- | :-------- | :----------------- | :----------------- | :----------------------------------------------------------------------- |
+| `session:<userId>`     | String    | `<refreshToken>`   | 7 days (604800s)   | Tracks currently active refresh token for session rotation & revocation. |
+| `revoked_access:<jti>` | String    | `"1"`              | Remaining JWT life | Instant blacklist for logged-out access tokens.                          |
+| `otp:<email>`          | String    | `123456` (6-digit) | 5 minutes (300s)   | Ephemeral OTP code for email verification & passwordless auth.           |
 
 ### 5.5 RabbitMQ Queues & Payloads
 
@@ -375,22 +384,22 @@ Output comparison normalizes line breaks and whitespace while strictly verifying
 
 ## 6. Network Topology & Port Matrix
 
-| Service | Port | Protocol | Purpose / Public Exposure |
-| :--- | :--- | :--- | :--- |
-| **API Gateway** | `3000` | HTTP | **Public Entry Point**. Authenticates, handles sessions, proxies downstream. |
-| **Problem Service** | `3001` | HTTP | Internal only. Handles problem catalog & testcase uploads. |
-| **Submission Service** | `3002` | HTTP | Internal only. Manages code submissions. |
-| **Mail Service** | `3003` | HTTP | Internal only. Email dispatching via Nodemailer. |
-| **Execution Worker** | `3004` | HTTP (`/health`) | Internal only. Consumes submissions, runs Docker sandboxes. |
-| **Sockets Service** | `3007` | WS / HTTP | **Public Entry Point**. Real-time submission status push notifications. |
-| **AI Suggestion Service**| `8000` | HTTP | **Public / Direct**. Code completion engine for Monaco Editor. |
-| **MinIO API** | `9000` | HTTP / S3 | Local S3-compatible object storage (ports 9002 in integration tests). |
-| **MinIO Console** | `9001` | HTTP | MinIO web management console (`minioadmin` / `minioadmin`). |
-| **Frontend** | `5173` | HTTP | Client web browser interface (Vite dev server). |
-| **MongoDB** | `27017`| TCP | Primary persistent database. |
-| **Redis** | `6379` | TCP | Caching, session store, token blacklist, OTP storage. |
-| **RabbitMQ AMQP** | `5672` | AMQP | Message broker for asynchronous submission queue. |
-| **RabbitMQ Management**| `15672`| HTTP | RabbitMQ Web Management UI (`guest` / `guest`). |
+| Service                   | Port    | Protocol         | Purpose / Public Exposure                                                    |
+| :------------------------ | :------ | :--------------- | :--------------------------------------------------------------------------- |
+| **API Gateway**           | `3000`  | HTTP             | **Public Entry Point**. Authenticates, handles sessions, proxies downstream. |
+| **Problem Service**       | `3001`  | HTTP             | Internal only. Handles problem catalog & testcase uploads.                   |
+| **Submission Service**    | `3002`  | HTTP             | Internal only. Manages code submissions.                                     |
+| **Mail Service**          | `3003`  | HTTP             | Internal only. Email dispatching via Nodemailer.                             |
+| **Execution Worker**      | `3004`  | HTTP (`/health`) | Internal only. Consumes submissions, runs Docker sandboxes.                  |
+| **Sockets Service**       | `3007`  | WS / HTTP        | **Public Entry Point**. Real-time submission status push notifications.      |
+| **AI Suggestion Service** | `8000`  | HTTP             | **Public / Direct**. Code completion engine for Monaco Editor.               |
+| **MinIO API**             | `9000`  | HTTP / S3        | Local S3-compatible object storage (ports 9002 in integration tests).        |
+| **MinIO Console**         | `9001`  | HTTP             | MinIO web management console (`minioadmin` / `minioadmin`).                  |
+| **Frontend**              | `5173`  | HTTP             | Client web browser interface (Vite dev server).                              |
+| **MongoDB**               | `27017` | TCP              | Primary persistent database.                                                 |
+| **Redis**                 | `6379`  | TCP              | Caching, session store, token blacklist, OTP storage.                        |
+| **RabbitMQ AMQP**         | `5672`  | AMQP             | Message broker for asynchronous submission queue.                            |
+| **RabbitMQ Management**   | `15672` | HTTP             | RabbitMQ Web Management UI (`guest` / `guest`).                              |
 
 ---
 
@@ -462,6 +471,7 @@ cd apps/apis/submission && TEST_USER_ID=<valid_user_id> npm run test:load
 ### 9.1 Adding a New Programming Language to the Execution Engine
 
 To add language support (e.g., Rust):
+
 1. Add language enum entry to `ELanguage` in `packages/backend/models/src/submission.model.ts` (e.g., `rust = "rust"`).
 2. Create `RustExecutor` subclassing `Executor` in `packages/backend/execution/src/executors/RustExecutor.ts`:
    - Set `IMAGE_NAME = "rust:latest"`.
@@ -473,6 +483,7 @@ To add language support (e.g., Rust):
 ### 9.2 Adding a New Downstream Microservice
 
 When adding a new microservice (e.g., Contest Service):
+
 1. Create `apps/apis/contest` with its own `package.json` named `@LCArena/contest` and `tsconfig.json`.
 2. Add workspace entry and port (e.g., `:3004`).
 3. In `apps/apis/gateway/src/config/services.config.ts`, add the service definition (`CONTEST_SERVICE_URL`).

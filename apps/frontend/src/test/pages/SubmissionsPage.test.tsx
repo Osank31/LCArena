@@ -57,16 +57,20 @@ describe("SubmissionsPage component", () => {
         <BrowserRouter>
           <SubmissionsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("Submission History")).toBeInTheDocument();
     expect(screen.getByText("No submissions found")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /browse problems/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /browse problems/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders table with submissions and status badges", async () => {
-    vi.spyOn(submissionService, "getLocalSubmissions").mockReturnValue(mockSubmissions);
+    vi.spyOn(submissionService, "getLocalSubmissions").mockReturnValue(
+      mockSubmissions,
+    );
     vi.spyOn(problemService, "getAllProblems").mockResolvedValue([
       {
         id: "prob_1",
@@ -90,25 +94,29 @@ describe("SubmissionsPage component", () => {
         <BrowserRouter>
           <SubmissionsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("Submission History")).toBeInTheDocument();
     expect(screen.getAllByText("Accepted").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Wrong Answer").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Wrong Answer").length).toBeGreaterThanOrEqual(
+      1,
+    );
     expect(screen.getByText("cpp")).toBeInTheDocument();
     expect(screen.getByText("py")).toBeInTheDocument();
   });
 
   it("filters submissions by status and language", async () => {
-    vi.spyOn(submissionService, "getLocalSubmissions").mockReturnValue(mockSubmissions);
+    vi.spyOn(submissionService, "getLocalSubmissions").mockReturnValue(
+      mockSubmissions,
+    );
 
     render(
       <AuthProvider>
         <BrowserRouter>
           <SubmissionsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     const statusFilter = screen.getByLabelText(/filter by verdict status/i);
@@ -128,26 +136,32 @@ describe("SubmissionsPage component", () => {
     fireEvent.click(resetBtn);
 
     expect(screen.getAllByText("Accepted").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Wrong Answer").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Wrong Answer").length).toBeGreaterThanOrEqual(
+      1,
+    );
   });
 
   it("opens modal and displays submitted code when View is clicked", async () => {
-    vi.spyOn(submissionService, "getLocalSubmissions").mockReturnValue(mockSubmissions);
+    vi.spyOn(submissionService, "getLocalSubmissions").mockReturnValue(
+      mockSubmissions,
+    );
 
     render(
       <AuthProvider>
         <BrowserRouter>
           <SubmissionsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     const viewButtons = screen.getAllByRole("button", { name: /view/i });
     fireEvent.click(viewButtons[0]);
 
-    expect(await screen.findByText(/submitted source code:/i)).toBeInTheDocument();
     expect(
-      screen.getByText((content) => content.includes("#include <iostream>"))
+      await screen.findByText(/submitted source code:/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText((content) => content.includes("#include <iostream>")),
     ).toBeInTheDocument();
   });
 });

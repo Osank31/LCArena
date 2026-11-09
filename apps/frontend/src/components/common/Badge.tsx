@@ -15,7 +15,8 @@ export const Badge: React.FC<BadgeProps> = ({
   size = "md",
   className = "",
 }) => {
-  const sizeClasses = size === "sm" ? "px-1.5 py-0.5 text-xs" : "px-2.5 py-1 text-xs font-medium";
+  const sizeClasses =
+    size === "sm" ? "px-1.5 py-0.5 text-xs" : "px-2.5 py-1 text-xs font-medium";
 
   // Near-monochrome "stamp" treatments: distinction comes from weight,
   // rule style and ink inversion rather than hue.
@@ -50,14 +51,21 @@ export const DifficultyBadge: React.FC<{
   };
 
   return (
-    <Badge variant={variantMap[difficulty] || "default"} size={size} className={className}>
+    <Badge
+      variant={variantMap[difficulty] || "default"}
+      size={size}
+      className={className}
+    >
       {difficulty}
     </Badge>
   );
 };
 
-export const RoleBadge: React.FC<{ role?: UserRole }> = ({ role = "Regular" }) => {
-  const variant = role === "Admin" ? "danger" : role === "Premium" ? "warning" : "info";
+export const RoleBadge: React.FC<{ role?: UserRole }> = ({
+  role = "Regular",
+}) => {
+  const variant =
+    role === "Admin" ? "danger" : role === "Premium" ? "warning" : "info";
 
   return (
     <Badge variant={variant} size="sm">

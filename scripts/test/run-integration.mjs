@@ -24,7 +24,10 @@ import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../..",
+);
 const COMPOSE_FILE = path.join(ROOT, "docker-compose.test.yml");
 const COMPOSE_PROJECT = "lcarena-test";
 const ARTIFACTS_DIR = path.join(ROOT, "test-artifacts", "integration");
@@ -144,7 +147,10 @@ const SUITES = {
     {
       name: "submission-service",
       needs: ["submission", "problem", "gateway"],
-      cmd: ["--test", "apps/apis/submission/test/integration/submission.api.test.js"],
+      cmd: [
+        "--test",
+        "apps/apis/submission/test/integration/submission.api.test.js",
+      ],
       env: { ...COMMON_S3_ENV },
     },
     {
@@ -200,7 +206,7 @@ const requested = (valueOf("--suites") || "api,submission-pipeline")
 const unknown = requested.filter((suite) => !SUITES[suite]);
 if (unknown.length > 0) {
   console.error(
-    `Unknown suite(s): ${unknown.join(", ")}. Known suites: ${Object.keys(SUITES).join(", ")}`
+    `Unknown suite(s): ${unknown.join(", ")}. Known suites: ${Object.keys(SUITES).join(", ")}`,
   );
   process.exit(2);
 }
@@ -225,7 +231,9 @@ function run(command, options = {}) {
 
     child.on("close", (code) => resolve(code ?? 1));
     child.on("error", (error) => {
-      console.error(`[integration] failed to run ${command.join(" ")}: ${error.message}`);
+      console.error(
+        `[integration] failed to run ${command.join(" ")}: ${error.message}`,
+      );
       resolve(1);
     });
   });
@@ -235,15 +243,11 @@ function startService(service) {
   fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
   const out = fs.openSync(logFile(service.name), "w");
 
-  const child = spawn(
-    process.execPath,
-    ["--import", "tsx", "src/index.ts"],
-    {
-      cwd: path.join(ROOT, service.dir),
-      env: { ...process.env, ...COMMON_SERVICE_ENV, ...service.env },
-      stdio: ["ignore", out, out],
-    }
-  );
+  const child = spawn(process.execPath, ["--import", "tsx", "src/index.ts"], {
+    cwd: path.join(ROOT, service.dir),
+    env: { ...process.env, ...COMMON_SERVICE_ENV, ...service.env },
+    stdio: ["ignore", out, out],
+  });
 
   children.push({ name: service.name, child });
   started.push(service.name);
@@ -263,7 +267,8 @@ function waitForTcp(port, timeoutMs = 60_000) {
       });
       socket.once("error", () => {
         socket.destroy();
-        if (Date.now() > deadline) reject(new Error(`port ${port} never opened`));
+        if (Date.now() > deadline)
+          reject(new Error(`port ${port} never opened`));
         else setTimeout(attempt, 250);
       });
     };
@@ -297,7 +302,9 @@ function tailLog(name, lines = 25) {
 }
 
 function describeFailure(name) {
-  console.error(`\n--- ${name} log (tail) ---\n${tailLog(name)}\n--- end log ---`);
+  console.error(
+    `\n--- ${name} log (tail) ---\n${tailLog(name)}\n--- end log ---`,
+  );
 }
 
 async function waitForService(service) {
@@ -326,8 +333,16 @@ async function ensureService(name) {
 
 function compose(argsList, options = {}) {
   return run(
-    ["docker", "compose", "-p", COMPOSE_PROJECT, "-f", COMPOSE_FILE, ...argsList],
-    options
+    [
+      "docker",
+      "compose",
+      "-p",
+      COMPOSE_PROJECT,
+      "-f",
+      COMPOSE_FILE,
+      ...argsList,
+    ],
+    options,
   );
 }
 
@@ -355,7 +370,9 @@ async function teardown() {
 
   if (KEEP_INFRA) {
     log("leaving test infrastructure running (--keep):");
-    log(`  docker compose -p ${COMPOSE_PROJECT} -f docker-compose.test.yml down -v`);
+    log(
+      `  docker compose -p ${COMPOSE_PROJECT} -f docker-compose.test.yml down -v`,
+    );
     return;
   }
 
@@ -378,14 +395,18 @@ process.on("SIGTERM", () => void shutdown("SIGTERM", 143));
 async function main() {
   fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
 
-  const dockerCheck = spawnSync("docker", ["version", "--format", "{{.Server.Version}}"], {
-    encoding: "utf8",
-  });
+  const dockerCheck = spawnSync(
+    "docker",
+    ["version", "--format", "{{.Server.Version}}"],
+    {
+      encoding: "utf8",
+    },
+  );
 
   if (dockerCheck.status !== 0) {
     console.error(
       "[integration] Docker is not available. Integration tests need MongoDB, Redis and RabbitMQ " +
-        "containers, plus a working Docker daemon for the execution pipeline."
+        "containers, plus a working Docker daemon for the execution pipeline.",
     );
     process.exit(2);
   }
@@ -394,7 +415,9 @@ async function main() {
   const composeUp = await compose(["up", "-d", "--wait"]);
 
   if (composeUp !== 0) {
-    console.error("[integration] `docker compose up --wait` failed; see the output above.");
+    console.error(
+      "[integration] `docker compose up --wait` failed; see the output above.",
+    );
     process.exit(1);
   }
 
@@ -442,7 +465,7 @@ async function main() {
   console.log("\n=== integration summary ===");
   for (const result of results) {
     console.log(
-      `${result.code === 0 ? "PASS" : "FAIL"}  ${result.name} (${result.suite})`
+      `${result.code === 0 ? "PASS" : "FAIL"}  ${result.name} (${result.suite})`,
     );
   }
 

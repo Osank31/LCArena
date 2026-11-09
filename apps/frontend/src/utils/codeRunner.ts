@@ -13,7 +13,8 @@ export interface TestCaseRunResult {
 }
 
 export interface RunEvaluationResult {
-  status: "SUCCESS" | "WRONG_ANSWER" | "COMPILE_ERROR" | "RUNTIME_ERROR" | "TIMEOUT";
+  status:
+    "SUCCESS" | "WRONG_ANSWER" | "COMPILE_ERROR" | "RUNTIME_ERROR" | "TIMEOUT";
   outputMessage: string;
   totalCases: number;
   passedCases: number;
@@ -99,7 +100,10 @@ export function compareOutputs(actual: any, expected: string): boolean {
 
   // Check JSON structural equality
   try {
-    const jsonActual = typeof actual === "object" && actual !== null ? actual : JSON.parse(normActual);
+    const jsonActual =
+      typeof actual === "object" && actual !== null
+        ? actual
+        : JSON.parse(normActual);
     const jsonExpected = JSON.parse(normExpected);
     return JSON.stringify(jsonActual) === JSON.stringify(jsonExpected);
   } catch {
@@ -114,7 +118,7 @@ export function compareOutputs(actual: any, expected: string): boolean {
  */
 export function checkSyntaxBalance(
   code: string,
-  language: SupportedLanguage
+  language: SupportedLanguage,
 ): { valid: boolean; error?: string } {
   const stack: { char: string; line: number; col: number }[] = [];
   const lines = code.split("\n");
@@ -220,7 +224,7 @@ export function checkSyntaxBalance(
  */
 export function executeJavaScript(
   code: string,
-  examples: ProblemExample[]
+  examples: ProblemExample[],
 ): TestCaseRunResult[] {
   // 1. Syntax check
   try {
@@ -247,7 +251,11 @@ export function executeJavaScript(
     const mockConsole = {
       log: (...a: any[]) =>
         logs.push(
-          a.map((item) => (typeof item === "object" ? JSON.stringify(item) : String(item))).join(" ")
+          a
+            .map((item) =>
+              typeof item === "object" ? JSON.stringify(item) : String(item),
+            )
+            .join(" "),
         ),
       warn: (...a: any[]) => logs.push("[warn] " + a.join(" ")),
       error: (...a: any[]) => logs.push("[error] " + a.join(" ")),
@@ -284,7 +292,7 @@ export function executeJavaScript(
         }
 
         return fn(...args);
-      `
+      `,
       );
 
       const actual = runner(mockConsole, args);
@@ -324,7 +332,7 @@ export function executeJavaScript(
 export function evaluateStaticCode(
   code: string,
   language: SupportedLanguage,
-  examples: ProblemExample[]
+  examples: ProblemExample[],
 ): TestCaseRunResult[] {
   const syntaxCheck = checkSyntaxBalance(code, language);
   if (!syntaxCheck.valid) {
@@ -367,7 +375,7 @@ export function evaluateStaticCode(
 export function runCode(
   code: string,
   language: SupportedLanguage,
-  problem: ParsedProblem
+  problem: ParsedProblem,
 ): RunEvaluationResult {
   const examples =
     problem.examples && problem.examples.length > 0
@@ -393,7 +401,7 @@ export function runCode(
   const passedCases = testResults.filter((r) => r.passed).length;
 
   const hasCompileError = testResults.some(
-    (r) => r.error?.includes("Syntax") || r.error?.includes("Compilation")
+    (r) => r.error?.includes("Syntax") || r.error?.includes("Compilation"),
   );
   const hasRuntimeError = testResults.some((r) => r.error?.includes("Runtime"));
 
@@ -461,14 +469,18 @@ export function formatDemoRunNotice(problem: ParsedProblem): string {
   lines.push("[Online Demo Mode - Code Execution Unavailable]");
   lines.push("");
   lines.push(
-    "Live code execution is disabled in this hosted demo because running"
+    "Live code execution is disabled in this hosted demo because running",
   );
   lines.push(
-    "sandboxed execution servers is expensive for an individual developer."
+    "sandboxed execution servers is expensive for an individual developer.",
   );
   lines.push("");
-  lines.push("To execute code and run automated tests in isolated Docker containers:");
-  lines.push("  1. Clone repository: git clone https://github.com/Osank31/LCArena.git");
+  lines.push(
+    "To execute code and run automated tests in isolated Docker containers:",
+  );
+  lines.push(
+    "  1. Clone repository: git clone https://github.com/Osank31/LCArena.git",
+  );
   lines.push("  2. Start locally: docker compose up");
   lines.push("");
   lines.push("Repository: https://github.com/Osank31/LCArena");
@@ -514,7 +526,9 @@ export function formatOnlineRunNotice(problem: ParsedProblem): string {
   lines.push("[Sample Preview - Live Backend Connected]");
   lines.push("");
   lines.push("Run previews the sample cases below. To compile and grade your");
-  lines.push("solution against the complete test suite in the sandboxed judge,");
+  lines.push(
+    "solution against the complete test suite in the sandboxed judge,",
+  );
   lines.push("press Submit.");
   lines.push("");
 
@@ -546,4 +560,3 @@ export function formatOnlineRunNotice(problem: ParsedProblem): string {
 
   return lines.join("\n");
 }
-

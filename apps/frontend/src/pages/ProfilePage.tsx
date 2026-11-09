@@ -98,7 +98,7 @@ export const ProfilePage: React.FC = () => {
       (s) =>
         s.status &&
         s.status.status === "SUCCESS" &&
-        s.status.passed === s.status.total
+        s.status.passed === s.status.total,
     ).length;
 
     const acceptanceRate =
@@ -146,7 +146,10 @@ export const ProfilePage: React.FC = () => {
     } catch (err: any) {
       setPasswordNotice({
         type: "error",
-        message: err.response?.data?.message || err.message || "Failed to update password.",
+        message:
+          err.response?.data?.message ||
+          err.message ||
+          "Failed to update password.",
       });
     } finally {
       setIsChangingPassword(false);
@@ -163,7 +166,9 @@ export const ProfilePage: React.FC = () => {
       navigate("/");
     } catch (err: any) {
       setDeleteError(
-        err.response?.data?.message || err.message || "Failed to delete account."
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to delete account.",
       );
     } finally {
       setIsDeletingAccount(false);
@@ -188,7 +193,9 @@ export const ProfilePage: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-serif text-xl font-bold text-ink">{user.name}</h1>
+              <h1 className="font-serif text-xl font-bold text-ink">
+                {user.name}
+              </h1>
               <RoleBadge role={user.userRole} />
             </div>
             <p className="text-xs text-ink-3 flex items-center gap-1.5 mt-1 font-mono">
@@ -199,7 +206,9 @@ export const ProfilePage: React.FC = () => {
               <Calendar className="w-3 h-3" />
               <span>
                 Member since{" "}
-                {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "2026"}
+                {user.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString()
+                  : "2026"}
               </span>
             </p>
           </div>
@@ -413,9 +422,12 @@ export const ProfilePage: React.FC = () => {
         {/* Delete Account */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
           <div>
-            <h3 className="font-serif text-sm font-bold text-ink">Danger Zone</h3>
+            <h3 className="font-serif text-sm font-bold text-ink">
+              Danger Zone
+            </h3>
             <p className="text-xs text-ink-3 mt-0.5">
-              Permanently delete your LCArena profile and revoke all active sessions.
+              Permanently delete your LCArena profile and revoke all active
+              sessions.
             </p>
           </div>
           <Button

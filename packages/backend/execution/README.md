@@ -12,13 +12,13 @@ verdict union, and the `compareOutputs` judging helper.
 
 ## Overview
 
-| Export | Purpose |
-| :--- | :--- |
-| `Executor` | Abstract base: image pull, in-container command execution, test-case injection, runner-script synthesis |
-| `CPPExecutor`, `JavaExecutor`, `PythonExecutor`, `JSExecutor` | Per-language wrappers and commands |
-| `TestCasesUnavailableError` | Raised when test cases cannot be read or are empty — an infrastructure failure, never a `SUCCESS` |
-| `ExecutionResult` (+ `ExecutionStatus`, `FailedCases`, `CompileErrorResult`, `ExecutionSuccessResult`, `PendingResult`, `InternalErrorResult`) | The canonical verdict union shared by the worker, the API and the database |
-| `compareOutputs`, `normalizeOutput`, `ComparisonOptions`, `ComparisonResult` | Standalone judging/comparison utility |
+| Export                                                                                                                                         | Purpose                                                                                                 |
+| :--------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| `Executor`                                                                                                                                     | Abstract base: image pull, in-container command execution, test-case injection, runner-script synthesis |
+| `CPPExecutor`, `JavaExecutor`, `PythonExecutor`, `JSExecutor`                                                                                  | Per-language wrappers and commands                                                                      |
+| `TestCasesUnavailableError`                                                                                                                    | Raised when test cases cannot be read or are empty — an infrastructure failure, never a `SUCCESS`       |
+| `ExecutionResult` (+ `ExecutionStatus`, `FailedCases`, `CompileErrorResult`, `ExecutionSuccessResult`, `PendingResult`, `InternalErrorResult`) | The canonical verdict union shared by the worker, the API and the database                              |
+| `compareOutputs`, `normalizeOutput`, `ComparisonOptions`, `ComparisonResult`                                                                   | Standalone judging/comparison utility                                                                   |
 
 ## Architecture
 
@@ -40,13 +40,13 @@ wrapper source, the compile command and the run command.
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| Docker API | `dockerode` ^5 (`createContainer`, `exec`, `putArchive`, `pull`, `stop`, `remove`) |
-| Archive packing | `tar-stream` ^3 |
-| Logging | `@LCArena/utils` (`logger`) |
-| In-container harness | Bash + GNU coreutils (`date +%s%N`, `timeout`, `diff -b -B`) |
-| Module format | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/` |
+| Concern              | Choice                                                                             |
+| :------------------- | :--------------------------------------------------------------------------------- |
+| Docker API           | `dockerode` ^5 (`createContainer`, `exec`, `putArchive`, `pull`, `stop`, `remove`) |
+| Archive packing      | `tar-stream` ^3                                                                    |
+| Logging              | `@LCArena/utils` (`logger`)                                                        |
+| In-container harness | Bash + GNU coreutils (`date +%s%N`, `timeout`, `diff -b -B`)                       |
+| Module format        | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/`                    |
 
 `express`, `winston`, `nodemon` and `prettier` are declared dependencies that
 this package's source does not import.
@@ -79,13 +79,22 @@ workspace instead.
 ```ts
 type ExecutionStatus = "SUCCESS" | "COMPILE_ERROR" | "INTERNAL_ERROR";
 
-interface FailedCases { tle: string[]; re: string[]; wa: string[] }
+interface FailedCases {
+  tle: string[];
+  re: string[];
+  wa: string[];
+}
 
 type ExecutionResult =
   | { status: "PENDING" }
   | { status: "COMPILE_ERROR"; compileError: string }
-  | { status: "SUCCESS"; passed: number; total: number;
-      failedCases: FailedCases; executionTimeMs: any }
+  | {
+      status: "SUCCESS";
+      passed: number;
+      total: number;
+      failedCases: FailedCases;
+      executionTimeMs: any;
+    }
   | { status: "INTERNAL_ERROR"; message: string };
 ```
 
@@ -197,20 +206,20 @@ EOF
 
 Verdict rules, exactly as implemented:
 
-| Condition | Result |
-| :--- | :--- |
-| Compile command returns non-zero | `COMPILE_ERROR` with the compiler output (quotes/newlines escaped via `sed`/`tr`, so multi-line output arrives as one string) |
-| Run exit code `124` (GNU `timeout` killed it) | Case listed in `failedCases.tle` |
-| Run exit code non-zero | Case listed in `failedCases.re` |
-| `diff -b -B ans user.out` matches | Case counted as passed |
-| Otherwise | Case listed in `failedCases.wa` |
+| Condition                                      | Result                                                                                                                              |
+| :--------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| Compile command returns non-zero               | `COMPILE_ERROR` with the compiler output (quotes/newlines escaped via `sed`/`tr`, so multi-line output arrives as one string)       |
+| Run exit code `124` (GNU `timeout` killed it)  | Case listed in `failedCases.tle`                                                                                                    |
+| Run exit code non-zero                         | Case listed in `failedCases.re`                                                                                                     |
+| `diff -b -B ans user.out` matches              | Case counted as passed                                                                                                              |
+| Otherwise                                      | Case listed in `failedCases.wa`                                                                                                     |
 | No case folder has both a `*.in` and a `*.ans` | `SUCCESS` with `total: 0` at the script level — but the worker's `validateTestCaseFolderCompleteness` rejects this before execution |
 
 Per-case timing uses `date +%s%N` (nanoseconds) and is reported in milliseconds.
 `EXECUTION_TIMES` is a bash associative array, so the script requires bash (not
 `sh`) — every image in use has it.
 
-### `compareOutputs` is *not* on the sandbox path
+### `compareOutputs` is _not_ on the sandbox path
 
 The runner compares with **`diff -b -B`**: ignore changes in the amount of
 whitespace, and ignore changes whose lines are entirely blank. The richer
@@ -233,12 +242,12 @@ by default:
 
 ## Language implementations
 
-| Language | Class | Image | Wrapper | Compile | Run |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| C++ | `CPPExecutor` | `gcc:latest` | `Main.cpp` = `<bits/stdc++.h>` + `#include "Solution.cpp"` + a `main()` that repeatedly reads `n` then `n` coordinate pairs and prints `Solution().solve(points)` | `g++ -O3 -std=c++17 "Main.cpp" -o "./solution"` | `./solution` |
-| Java | `JavaExecutor` | `eclipse-temurin` | `Main.java` that reads tokens with a `Scanner` and delegates to `new Solution().solve(...)` | `javac Main.java Solution.java` | `java Main` |
-| Python | `PythonExecutor` | `python:3.11-slim` | `main.py` that reads `sys.stdin.read().split()` and prints `Solution().solve(points)` | `python -m py_compile solution.py` | `python main.py` |
-| JavaScript | `JSExecutor` | `node:20-slim` | `main.js` that reads `fs.readFileSync(0)` and calls `Solution.solve(...)` | `node -c solution.js` | `node main.js` |
+| Language   | Class            | Image              | Wrapper                                                                                                                                                           | Compile                                         | Run              |
+| :--------- | :--------------- | :----------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------- | :--------------- |
+| C++        | `CPPExecutor`    | `gcc:latest`       | `Main.cpp` = `<bits/stdc++.h>` + `#include "Solution.cpp"` + a `main()` that repeatedly reads `n` then `n` coordinate pairs and prints `Solution().solve(points)` | `g++ -O3 -std=c++17 "Main.cpp" -o "./solution"` | `./solution`     |
+| Java       | `JavaExecutor`   | `eclipse-temurin`  | `Main.java` that reads tokens with a `Scanner` and delegates to `new Solution().solve(...)`                                                                       | `javac Main.java Solution.java`                 | `java Main`      |
+| Python     | `PythonExecutor` | `python:3.11-slim` | `main.py` that reads `sys.stdin.read().split()` and prints `Solution().solve(points)`                                                                             | `python -m py_compile solution.py`              | `python main.py` |
+| JavaScript | `JSExecutor`     | `node:20-slim`     | `main.js` that reads `fs.readFileSync(0)` and calls `Solution.solve(...)`                                                                                         | `node -c solution.js`                           | `node main.js`   |
 
 All four follow the same container protocol:
 
@@ -266,14 +275,23 @@ There is no HTTP API. The programmatic surface is:
 
 ```ts
 import {
-  Executor, CPPExecutor, JavaExecutor, PythonExecutor, JSExecutor,
+  Executor,
+  CPPExecutor,
+  JavaExecutor,
+  PythonExecutor,
+  JSExecutor,
   TestCasesUnavailableError,
-  compareOutputs, normalizeOutput,
+  compareOutputs,
+  normalizeOutput,
   type ExecutionResult,
 } from "@LCArena/execution";
 
 const executor: Executor = new JSExecutor("/tmp/isolated-testcases");
-const result: ExecutionResult = await executor.execute(userCode, 5 /* seconds */, "testcases");
+const result: ExecutionResult = await executor.execute(
+  userCode,
+  5 /* seconds */,
+  "testcases",
+);
 ```
 
 - `execute(clientCode, time_limit, testcases_dir)` — `time_limit` is in **seconds**
@@ -288,12 +306,12 @@ const result: ExecutionResult = await executor.execute(userCode, 5 /* seconds */
 This package is a **library**, not a service: it opens no ports and speaks no
 HTTP. Its cross-boundary traffic is all Docker-side.
 
-| Direction | Mechanism | Details |
-| :--- | :--- | :--- |
-| Out | Docker daemon over the local socket | `pull`, `createContainer`, `start`, `putArchive`, `exec`, `stop`, `remove` — the socket path is Docker's own configuration (`DOCKER_HOST`, else the platform default) |
-| Out | Container registry (via the daemon) | First-use pulls of `gcc:latest`, `eclipse-temurin`, `python:3.11-slim`, `node:20-slim` |
-| In | Host filesystem | Reads `testCasesDir` (the worker supplies an isolated per-submission temp directory, never a shared path) |
-| In | Docker exec stdout | The runner's JSON verdict, parsed by `parseRunnerOutput` |
+| Direction | Mechanism                           | Details                                                                                                                                                               |
+| :-------- | :---------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Out       | Docker daemon over the local socket | `pull`, `createContainer`, `start`, `putArchive`, `exec`, `stop`, `remove` — the socket path is Docker's own configuration (`DOCKER_HOST`, else the platform default) |
+| Out       | Container registry (via the daemon) | First-use pulls of `gcc:latest`, `eclipse-temurin`, `python:3.11-slim`, `node:20-slim`                                                                                |
+| In        | Host filesystem                     | Reads `testCasesDir` (the worker supplies an isolated per-submission temp directory, never a shared path)                                                             |
+| In        | Docker exec stdout                  | The runner's JSON verdict, parsed by `parseRunnerOutput`                                                                                                              |
 
 The only in-container channel back to LCArena is that single JSON object on
 stdout; stderr is captured by the runner into per-case `user.err` files and is not
@@ -309,11 +327,11 @@ unit-testable.
 
 ## Dependencies and prerequisites
 
-| Dependency | Role |
-| :--- | :--- |
-| `dockerode` ^5 | Docker API client |
-| `tar-stream` ^3 | Packing the test-case archive |
-| `@LCArena/utils` | `logger` |
+| Dependency                                  | Role                                         |
+| :------------------------------------------ | :------------------------------------------- |
+| `dockerode` ^5                              | Docker API client                            |
+| `tar-stream` ^3                             | Packing the test-case archive                |
+| `@LCArena/utils`                            | `logger`                                     |
 | `nodemon`, `prettier`, `winston`, `express` | Declared but unused by this package's source |
 
 Runtime prerequisites:
@@ -356,16 +374,16 @@ The `src/testcases/` fixture set (40 ICPC-barrier cases) is used by these suites
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| `TestCasesUnavailableError: No test cases found in …` | The host directory was empty or unreadable — fails closed rather than reporting a zero-test pass |
-| `Error: Failed to parse runner output as JSON: …` | The container produced no parsable JSON (usually the wrapper crashed before printing); the worker retries, then records `INTERNAL_ERROR` |
-| `docker: Error response from daemon: … not found` / inspect error | Image missing and the pull failed (registry unreachable), or the daemon is down |
-| Every case reported as RE | The wrapper could not parse the input shape for this problem (see the wrapper caveat) |
-| Compile error text is truncated or mangled | The escaping pipeline (`sed` then `tr`) collapses newlines into spaces by design |
-| `status: "SUCCESS"` but `total: 0` | Only possible when bypassing the worker, which validates case completeness first |
-| Containers left running | `stop()`/`remove()` are in `finally`; leftovers mean the daemon or process died mid-run |
-| Unit tests pass but nothing executes | Expected: the suites stub Docker, so only the worker's `E2E=1` test proves real execution |
+| Symptom                                                           | Cause / handling                                                                                                                         |
+| :---------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| `TestCasesUnavailableError: No test cases found in …`             | The host directory was empty or unreadable — fails closed rather than reporting a zero-test pass                                         |
+| `Error: Failed to parse runner output as JSON: …`                 | The container produced no parsable JSON (usually the wrapper crashed before printing); the worker retries, then records `INTERNAL_ERROR` |
+| `docker: Error response from daemon: … not found` / inspect error | Image missing and the pull failed (registry unreachable), or the daemon is down                                                          |
+| Every case reported as RE                                         | The wrapper could not parse the input shape for this problem (see the wrapper caveat)                                                    |
+| Compile error text is truncated or mangled                        | The escaping pipeline (`sed` then `tr`) collapses newlines into spaces by design                                                         |
+| `status: "SUCCESS"` but `total: 0`                                | Only possible when bypassing the worker, which validates case completeness first                                                         |
+| Containers left running                                           | `stop()`/`remove()` are in `finally`; leftovers mean the daemon or process died mid-run                                                  |
+| Unit tests pass but nothing executes                              | Expected: the suites stub Docker, so only the worker's `E2E=1` test proves real execution                                                |
 
 ## Security notes and gaps
 

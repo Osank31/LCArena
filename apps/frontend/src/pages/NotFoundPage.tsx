@@ -20,7 +20,8 @@ export const NotFoundPage: React.FC = () => {
         Page Not Found
       </h2>
       <p className="text-sm text-ink-3 max-w-sm mb-6">
-        The challenge or route you are looking for does not exist or may have been relocated.
+        The challenge or route you are looking for does not exist or may have
+        been relocated.
       </p>
       <div className="flex gap-3">
         <Link to="/problems">

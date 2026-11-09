@@ -56,16 +56,16 @@ and the only one allowed to write `x-user-id` onto an upstream request.
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| HTTP framework | `express` ^5.2.1 |
-| Proxying | `http-proxy-middleware` ^4 (`proxy.factory.ts`) |
-| Validation | `zod` ^4 (`src/validation/auth.validation.ts`) |
-| Tokens | `jsonwebtoken` ^9 — separate keys for access and refresh |
-| Sessions | `redis` via `@LCArena/config` `redisConnect()` / `getRedisClient()` |
-| Persistence | `mongoose` via `@LCArena/models` `User` |
+| Concern           | Choice                                                                                          |
+| :---------------- | :---------------------------------------------------------------------------------------------- |
+| HTTP framework    | `express` ^5.2.1                                                                                |
+| Proxying          | `http-proxy-middleware` ^4 (`proxy.factory.ts`)                                                 |
+| Validation        | `zod` ^4 (`src/validation/auth.validation.ts`)                                                  |
+| Tokens            | `jsonwebtoken` ^9 — separate keys for access and refresh                                        |
+| Sessions          | `redis` via `@LCArena/config` `redisConnect()` / `getRedisClient()`                             |
+| Persistence       | `mongoose` via `@LCArena/models` `User`                                                         |
 | Errors/HTTP shape | `@LCArena/utils` (`AppError` family, `sendSuccess`), `@LCArena/middlewares` (`appErrorHandler`) |
-| CORS / cookies | `cors`, `cookie-parser` |
+| CORS / cookies    | `cors`, `cookie-parser`                                                                         |
 
 ## Directory structure
 
@@ -143,11 +143,11 @@ apps/apis/gateway/
 
 ### Redis key topology
 
-| Key | Value | TTL | Purpose |
-| :--- | :--- | :--- | :--- |
-| `session:<userId>` | active refresh token | refresh TTL | Rotation + revocation |
-| `revoked_access:<jti>` | `"1"` | remaining access-token life | Instant logout/blacklist |
-| `otp:<email>` | 6-digit code | 300s | Single-use verification code |
+| Key                    | Value                | TTL                         | Purpose                      |
+| :--------------------- | :------------------- | :-------------------------- | :--------------------------- |
+| `session:<userId>`     | active refresh token | refresh TTL                 | Rotation + revocation        |
+| `revoked_access:<jti>` | `"1"`                | remaining access-token life | Instant logout/blacklist     |
+| `otp:<email>`          | 6-digit code         | 300s                        | Single-use verification code |
 
 ## API documentation
 
@@ -157,24 +157,24 @@ All responses use the shared envelope from `@LCArena/utils`:
 
 ### Health
 
-| Method | Path | Auth | Notes |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/health` | none | `{ message: "Gateway Healthy" }` |
+| Method | Path      | Auth | Notes                            |
+| :----- | :-------- | :--- | :------------------------------- |
+| `GET`  | `/health` | none | `{ message: "Gateway Healthy" }` |
 
 ### Auth (`/auth`)
 
-| Method | Path | Auth | Body | Success |
-| :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/auth/send-otp` | none | `{ email }` | 200, `data: null` (mail delivery is queued in the background) |
-| `POST` | `/auth/register` | none | `{ email, password(≥6), name, otp(6 digits) }` | 201, `data: { user, accessToken }` + refresh cookie |
-| `POST` | `/auth/login-otp` | none | `{ email, otp(6 digits) }` | 200, `data: { user, accessToken }` + refresh cookie |
-| `POST` | `/auth/login` | none | `{ email, password }` | 200, `data: { user, accessToken }` + refresh cookie |
-| `POST` | `/auth/refresh` | refresh token | `{ refreshToken? }` (cookie fallback) | 200, `data: { user, accessToken }` + rotated cookie |
-| `POST` | `/auth/logout` | optional | `{ refreshToken? }` | 200, cookie cleared |
-| `GET` | `/auth/me` | access token | — | 200, `data: PublicUser` |
-| `POST` | `/auth/change-password` | access token | `{ currentPassword, newPassword(≥6) }` | 200 |
-| `DELETE` | `/auth/account` | access token | `{ password? }` | 200, cookie cleared |
-| `PATCH` | `/auth/users/:userId/role` | access token + **Admin** | `{ role: "Regular"\|"Admin"\|"Premium" }` | 200, `data: PublicUser` |
+| Method   | Path                       | Auth                     | Body                                           | Success                                                       |
+| :------- | :------------------------- | :----------------------- | :--------------------------------------------- | :------------------------------------------------------------ |
+| `POST`   | `/auth/send-otp`           | none                     | `{ email }`                                    | 200, `data: null` (mail delivery is queued in the background) |
+| `POST`   | `/auth/register`           | none                     | `{ email, password(≥6), name, otp(6 digits) }` | 201, `data: { user, accessToken }` + refresh cookie           |
+| `POST`   | `/auth/login-otp`          | none                     | `{ email, otp(6 digits) }`                     | 200, `data: { user, accessToken }` + refresh cookie           |
+| `POST`   | `/auth/login`              | none                     | `{ email, password }`                          | 200, `data: { user, accessToken }` + refresh cookie           |
+| `POST`   | `/auth/refresh`            | refresh token            | `{ refreshToken? }` (cookie fallback)          | 200, `data: { user, accessToken }` + rotated cookie           |
+| `POST`   | `/auth/logout`             | optional                 | `{ refreshToken? }`                            | 200, cookie cleared                                           |
+| `GET`    | `/auth/me`                 | access token             | —                                              | 200, `data: PublicUser`                                       |
+| `POST`   | `/auth/change-password`    | access token             | `{ currentPassword, newPassword(≥6) }`         | 200                                                           |
+| `DELETE` | `/auth/account`            | access token             | `{ password? }`                                | 200, cookie cleared                                           |
+| `PATCH`  | `/auth/users/:userId/role` | access token + **Admin** | `{ role: "Regular"\|"Admin"\|"Premium" }`      | 200, `data: PublicUser`                                       |
 
 `PublicUser` is `{ id, userId, name, email, profilePicUrl, userType, userRole, roleExpiry }`.
 `toPublicUser()` builds this object field by field — the bcrypt `password` hash
@@ -182,12 +182,12 @@ can never leak, even if the schema gains new sensitive fields.
 
 ### Proxied (`/api/problems`, `/api/submissions`)
 
-| Method | Path | Auth | Upstream |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/problems`, `/api/problems/:id` | none | Problem service |
-| `POST` `PUT` `DELETE` | `/api/problems`, `/api/problems/:id` | access token + **Admin** | Problem service |
-| `POST` | `/api/submissions` | access token | Submission service |
-| `GET` `PUT` | `/api/submissions/:id` | access token + owner/Admin | Submission service |
+| Method                | Path                                 | Auth                       | Upstream           |
+| :-------------------- | :----------------------------------- | :------------------------- | :----------------- |
+| `GET`                 | `/api/problems`, `/api/problems/:id` | none                       | Problem service    |
+| `POST` `PUT` `DELETE` | `/api/problems`, `/api/problems/:id` | access token + **Admin**   | Problem service    |
+| `POST`                | `/api/submissions`                   | access token               | Submission service |
+| `GET` `PUT`           | `/api/submissions/:id`               | access token + owner/Admin | Submission service |
 
 `requireSubmissionOwner` loads the submission's `userId`, answers `400` for a
 non-ObjectId, `404` when missing, and `403` unless the caller is the owner or an
@@ -219,28 +219,28 @@ Admin.
 
 Required (`getEnvVariable(name)` throws at boot when unset or blank):
 
-| Variable | Purpose |
-| :--- | :--- |
-| `PORT` | Listen port; must parse to an integer in 1–65535 or the process throws |
-| `MONGODB_URL` | Mongo connection string |
-| `ACCESS_TOKEN_JWT_KEY` | Signing key for access tokens |
-| `REFRESH_TOKEN_JWT_KEY` | Signing key for refresh tokens (**must differ** from the access key) |
-| `PROBLEM_SERVICE_URL` | e.g. `http://problem:3001` |
-| `SUBMISSION_SERVICE_URL` | e.g. `http://submission:3002` |
+| Variable                 | Purpose                                                                |
+| :----------------------- | :--------------------------------------------------------------------- |
+| `PORT`                   | Listen port; must parse to an integer in 1–65535 or the process throws |
+| `MONGODB_URL`            | Mongo connection string                                                |
+| `ACCESS_TOKEN_JWT_KEY`   | Signing key for access tokens                                          |
+| `REFRESH_TOKEN_JWT_KEY`  | Signing key for refresh tokens (**must differ** from the access key)   |
+| `PROBLEM_SERVICE_URL`    | e.g. `http://problem:3001`                                             |
+| `SUBMISSION_SERVICE_URL` | e.g. `http://submission:3002`                                          |
 
 Optional, with defaults:
 
-| Variable | Default | Purpose |
-| :--- | :--- | :--- |
-| `REDIS_HOST` / `REDIS_PORT` | `localhost` / `6379` | Read by `@LCArena/config` `redisConnect` |
-| `MAIL_SERVICE_URL` | `http://localhost:3003` | Mail service base URL |
-| `MAIL_SERVICE_TOKEN` | *(unset)* | Shared secret sent as `x-mail-service-token` |
-| `ACCESS_TOKEN_TTL_SECONDS` | `900` | Access-token lifetime |
-| `REFRESH_TOKEN_TTL_SECONDS` | `604800` | Refresh-token lifetime **and** cookie `maxAge` |
-| `PROXY_TIMEOUT_MS` | `15000` | Per-service proxy timeout |
-| `CORS_ORIGIN` | `*` | `*` reflects any origin (required for cookie credentials); otherwise a comma-separated allowlist |
-| `NODE_ENV` | *(unset)* | When `production`, the refresh cookie is `secure` |
-| `LOG_LEVEL` | `info` | Winston level |
+| Variable                    | Default                 | Purpose                                                                                          |
+| :-------------------------- | :---------------------- | :----------------------------------------------------------------------------------------------- |
+| `REDIS_HOST` / `REDIS_PORT` | `localhost` / `6379`    | Read by `@LCArena/config` `redisConnect`                                                         |
+| `MAIL_SERVICE_URL`          | `http://localhost:3003` | Mail service base URL                                                                            |
+| `MAIL_SERVICE_TOKEN`        | _(unset)_               | Shared secret sent as `x-mail-service-token`                                                     |
+| `ACCESS_TOKEN_TTL_SECONDS`  | `900`                   | Access-token lifetime                                                                            |
+| `REFRESH_TOKEN_TTL_SECONDS` | `604800`                | Refresh-token lifetime **and** cookie `maxAge`                                                   |
+| `PROXY_TIMEOUT_MS`          | `15000`                 | Per-service proxy timeout                                                                        |
+| `CORS_ORIGIN`               | `*`                     | `*` reflects any origin (required for cookie credentials); otherwise a comma-separated allowlist |
+| `NODE_ENV`                  | _(unset)_               | When `production`, the refresh cookie is `secure`                                                |
+| `LOG_LEVEL`                 | `info`                  | Winston level                                                                                    |
 
 Never commit real JWT keys or SMTP credentials. Generate strong keys and set
 them through the deployment's secret store; `.env.example` documents the names.
@@ -292,25 +292,25 @@ contract and needs MongoDB, Redis and the services running.
 
 `appErrorHandler` maps errors as follows:
 
-| Input | Status | Body |
-| :--- | :--- | :--- |
-| `ZodError` | 400 | `{ success, message: "Validation Error", errors: [{ path, message }] }` |
-| `AppError` subclass | its `statusCode` | `{ success: false, message }` |
-| Error with a 4xx `statusCode`/`status` | that status | `{ success: false, message }` |
-| Mongoose `CastError` | 400 | `{ success: false, message: "Invalid value for <path>" }` |
-| anything else | 500 | `{ success: false, message }` |
+| Input                                  | Status           | Body                                                                    |
+| :------------------------------------- | :--------------- | :---------------------------------------------------------------------- |
+| `ZodError`                             | 400              | `{ success, message: "Validation Error", errors: [{ path, message }] }` |
+| `AppError` subclass                    | its `statusCode` | `{ success: false, message }`                                           |
+| Error with a 4xx `statusCode`/`status` | that status      | `{ success: false, message }`                                           |
+| Mongoose `CastError`                   | 400              | `{ success: false, message: "Invalid value for <path>" }`               |
+| anything else                          | 500              | `{ success: false, message }`                                           |
 
-| Symptom | Likely cause |
-| :--- | :--- |
-| Boot fails immediately | A required env var is missing; `getEnvVariable` names it |
-| `Invalid PORT "..."` | `PORT` is not an integer in 1–65535 |
-| Every auth call 401 | Redis down or `redisConnect` never ran |
-| 401 after a successful login | Access token expired → refresh; or `jti` blacklisted by a logout |
-| 401 on every request after a role change | Unexpected: `authenticate` re-reads the user, so verify MongoDB connectivity |
-| 502/504 on `/api/problems` | Problem service unhealthy / slow (check `PROXY_TIMEOUT_MS`) |
-| OTP never arrives | Mail service unreachable or SMTP misconfigured; the gateway intentionally logs and swallows this (`Failed to deliver OTP email`) |
-| `/auth/send-otp` is slow | Should be ~ms: it only writes Redis. A slow response means Redis, not mail — delivery was decoupled from the request |
-| Refresh cookie "disappears" | Cookie is scoped to `path=/auth`; it is not sent with `/api/*` calls by design |
+| Symptom                                  | Likely cause                                                                                                                     |
+| :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
+| Boot fails immediately                   | A required env var is missing; `getEnvVariable` names it                                                                         |
+| `Invalid PORT "..."`                     | `PORT` is not an integer in 1–65535                                                                                              |
+| Every auth call 401                      | Redis down or `redisConnect` never ran                                                                                           |
+| 401 after a successful login             | Access token expired → refresh; or `jti` blacklisted by a logout                                                                 |
+| 401 on every request after a role change | Unexpected: `authenticate` re-reads the user, so verify MongoDB connectivity                                                     |
+| 502/504 on `/api/problems`               | Problem service unhealthy / slow (check `PROXY_TIMEOUT_MS`)                                                                      |
+| OTP never arrives                        | Mail service unreachable or SMTP misconfigured; the gateway intentionally logs and swallows this (`Failed to deliver OTP email`) |
+| `/auth/send-otp` is slow                 | Should be ~ms: it only writes Redis. A slow response means Redis, not mail — delivery was decoupled from the request             |
+| Refresh cookie "disappears"              | Cookie is scoped to `path=/auth`; it is not sent with `/api/*` calls by design                                                   |
 
 ## Related services
 

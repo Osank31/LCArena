@@ -27,7 +27,10 @@ interface RunOutputMeta {
 
 /** Headline shown above the raw run output, derived from the notice it contains. */
 function getRunOutputMeta(output: string): RunOutputMeta {
-  if (output.includes("Online Demo") || output.includes("Code Execution Unavailable")) {
+  if (
+    output.includes("Online Demo") ||
+    output.includes("Code Execution Unavailable")
+  ) {
     return {
       icon: <Terminal className="w-4 h-4 text-ink" />,
       label: "Notice: Execution Unavailable in Online Demo",
@@ -154,7 +157,9 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
                 </p>
               </div>
             ) : runOutput ? (
-              <div data-output-reveal className="space-y-3">                <div className="flex items-center gap-2 font-serif font-bold text-sm text-ink">
+              <div data-output-reveal className="space-y-3">
+                {" "}
+                <div className="flex items-center gap-2 font-serif font-bold text-sm text-ink">
                   {runMeta?.icon}
                   <span>{runMeta?.label}</span>
                 </div>
@@ -184,7 +189,9 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
                       <h3 className="text-base font-serif font-bold tracking-tight">
                         {verdictInfo.verdict}
                       </h3>
-                      <p className="text-xs opacity-90">{verdictInfo.summary}</p>
+                      <p className="text-xs opacity-90">
+                        {verdictInfo.summary}
+                      </p>
                     </div>
                   </div>
 
@@ -227,7 +234,9 @@ export const OutputConsole: React.FC<OutputConsoleProps> = ({
             ) : (
               <div className="flex flex-col items-center justify-center py-10 text-ink-3 gap-2">
                 <Terminal className="w-8 h-8 opacity-40" />
-                <p className="font-serif">Run code or submit to view execution results.</p>
+                <p className="font-serif">
+                  Run code or submit to view execution results.
+                </p>
               </div>
             )}
           </div>

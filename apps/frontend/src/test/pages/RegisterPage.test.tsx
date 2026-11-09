@@ -18,17 +18,25 @@ describe("RegisterPage component", () => {
         <BrowserRouter>
           <RegisterPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("Create an Account")).toBeInTheDocument();
     expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /send otp/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/6-digit verification code/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /send otp/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/6-digit verification code/i),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /complete registration/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /sign in here/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /complete registration/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /sign in here/i }),
+    ).toBeInTheDocument();
   });
 
   it("validates invalid email before sending OTP", async () => {
@@ -37,12 +45,14 @@ describe("RegisterPage component", () => {
         <BrowserRouter>
           <RegisterPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     fireEvent.click(screen.getByRole("button", { name: /send otp/i }));
     expect(
-      await screen.findByText(/please enter a valid email address to receive your otp/i)
+      await screen.findByText(
+        /please enter a valid email address to receive your otp/i,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -54,7 +64,7 @@ describe("RegisterPage component", () => {
         <BrowserRouter>
           <RegisterPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     fireEvent.change(screen.getByLabelText(/email address/i), {
@@ -63,14 +73,16 @@ describe("RegisterPage component", () => {
     fireEvent.click(screen.getByRole("button", { name: /send otp/i }));
 
     expect(
-      await screen.findByText(/verification code dispatched to your email address!/i)
+      await screen.findByText(
+        /verification code dispatched to your email address!/i,
+      ),
     ).toBeInTheDocument();
     expect(authService.sendOtp).toHaveBeenCalledWith("newuser@example.com");
   });
 
   it("shows error alert if OTP dispatch fails", async () => {
     vi.spyOn(authService, "sendOtp").mockRejectedValueOnce(
-      new Error("Email delivery unavailable")
+      new Error("Email delivery unavailable"),
     );
 
     render(
@@ -78,7 +90,7 @@ describe("RegisterPage component", () => {
         <BrowserRouter>
           <RegisterPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     fireEvent.change(screen.getByLabelText(/email address/i), {
@@ -87,7 +99,7 @@ describe("RegisterPage component", () => {
     fireEvent.click(screen.getByRole("button", { name: /send otp/i }));
 
     expect(
-      await screen.findByText("Email delivery unavailable")
+      await screen.findByText("Email delivery unavailable"),
     ).toBeInTheDocument();
   });
 
@@ -97,10 +109,12 @@ describe("RegisterPage component", () => {
         <BrowserRouter>
           <RegisterPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
-    const form = screen.getByRole("button", { name: /complete registration/i }).closest("form")!;
+    const form = screen
+      .getByRole("button", { name: /complete registration/i })
+      .closest("form")!;
 
     // Empty name
     fireEvent.submit(form);
@@ -111,7 +125,9 @@ describe("RegisterPage component", () => {
       target: { value: "Alice Walker" },
     });
     fireEvent.submit(form);
-    expect(await screen.findByText(/valid email is required/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/valid email is required/i),
+    ).toBeInTheDocument();
 
     // Fill email, short password
     fireEvent.change(screen.getByLabelText(/email address/i), {
@@ -122,7 +138,7 @@ describe("RegisterPage component", () => {
     });
     fireEvent.submit(form);
     expect(
-      await screen.findByText(/password must be at least 6 characters long/i)
+      await screen.findByText(/password must be at least 6 characters long/i),
     ).toBeInTheDocument();
 
     // Valid password, incomplete OTP
@@ -134,7 +150,9 @@ describe("RegisterPage component", () => {
     });
     fireEvent.submit(form);
     expect(
-      await screen.findByText(/please provide the 6-digit verification code sent to your email/i)
+      await screen.findByText(
+        /please provide the 6-digit verification code sent to your email/i,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -154,7 +172,7 @@ describe("RegisterPage component", () => {
         <BrowserRouter>
           <RegisterPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     fireEvent.change(screen.getByLabelText(/full name/i), {
@@ -170,7 +188,9 @@ describe("RegisterPage component", () => {
       target: { value: "123456" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /complete registration/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /complete registration/i }),
+    );
 
     await waitFor(() => {
       expect(authService.register).toHaveBeenCalledWith({
@@ -184,7 +204,7 @@ describe("RegisterPage component", () => {
 
   it("displays server error message when registration fails", async () => {
     vi.spyOn(authService, "register").mockRejectedValueOnce(
-      new Error("User with this email already exists")
+      new Error("User with this email already exists"),
     );
 
     render(
@@ -192,7 +212,7 @@ describe("RegisterPage component", () => {
         <BrowserRouter>
           <RegisterPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     fireEvent.change(screen.getByLabelText(/full name/i), {
@@ -208,10 +228,12 @@ describe("RegisterPage component", () => {
       target: { value: "123456" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /complete registration/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /complete registration/i }),
+    );
 
     expect(
-      await screen.findByText("User with this email already exists")
+      await screen.findByText("User with this email already exists"),
     ).toBeInTheDocument();
   });
 });

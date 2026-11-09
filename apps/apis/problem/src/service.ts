@@ -2,220 +2,214 @@ import { Problem } from "@LCArena/models";
 import mongoose from "mongoose";
 import { processMarkdown } from "./markdown/processing.service";
 import {
-    BadRequestError,
-    InternalServerError,
-    NotFoundError,
-    logger,
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+  logger,
 } from "@LCArena/utils";
 import {
-    ensureBucketExists,
-    getBucketName,
-    getProblemTestCasePrefix,
-    getTestCaseInputKey,
-    getTestCaseOutputKey,
-    putObject,
-    deleteObjectsWithPrefix,
+  ensureBucketExists,
+  getBucketName,
+  getProblemTestCasePrefix,
+  getTestCaseInputKey,
+  getTestCaseOutputKey,
+  putObject,
+  deleteObjectsWithPrefix,
 } from "@LCArena/config";
 import {
-    type createProblemType,
-    type updateProblemType,
-    type TestCaseItem,
+  type createProblemType,
+  type updateProblemType,
+  type TestCaseItem,
 } from "./validation.js";
 
 async function uploadProblemTestCases(
-    problemId: string,
-    testCases: TestCaseItem[]
+  problemId: string,
+  testCases: TestCaseItem[],
 ): Promise<{ prefix: string; storageRef: string; uploadedKeys: string[] }> {
-    await ensureBucketExists();
+  await ensureBucketExists();
 
-    const prefix = getProblemTestCasePrefix(problemId);
-    const bucket = getBucketName();
-    const storageRef = `s3://${bucket}/${prefix}`;
-    const uploadedKeys: string[] = [];
+  const prefix = getProblemTestCasePrefix(problemId);
+  const bucket = getBucketName();
+  const storageRef = `s3://${bucket}/${prefix}`;
+  const uploadedKeys: string[] = [];
 
-    try {
-        for (let i = 0; i < testCases.length; i++) {
-            const index = i + 1;
-            const tc = testCases[i];
-            const inputKey = getTestCaseInputKey(problemId, index);
-            const outputKey = getTestCaseOutputKey(problemId, index);
+  try {
+    for (let i = 0; i < testCases.length; i++) {
+      const index = i + 1;
+      const tc = testCases[i];
+      const inputKey = getTestCaseInputKey(problemId, index);
+      const outputKey = getTestCaseOutputKey(problemId, index);
 
-            // Preserve input and output contents exactly, including whitespace and newlines
-            await putObject(inputKey, tc.input, "text/plain; charset=utf-8");
-            uploadedKeys.push(inputKey);
+      // Preserve input and output contents exactly, including whitespace and newlines
+      await putObject(inputKey, tc.input, "text/plain; charset=utf-8");
+      uploadedKeys.push(inputKey);
 
-            await putObject(outputKey, tc.output, "text/plain; charset=utf-8");
-            uploadedKeys.push(outputKey);
-        }
-
-        logger.info(
-            `Successfully uploaded ${testCases.length} test cases for problem ${problemId} to ${storageRef}`
-        );
-
-        return { prefix, storageRef, uploadedKeys };
-    } catch (error: any) {
-        logger.error(
-            `Failed uploading test cases for problem ${problemId}. Cleaning up uploaded objects...`,
-            error
-        );
-        // Compensating cleanup: remove any objects uploaded during this failed batch
-        await deleteObjectsWithPrefix(prefix).catch((cleanupErr) =>
-            logger.error("Compensating cleanup failed:", cleanupErr)
-        );
-        throw new InternalServerError(
-            `Failed to upload problem test cases to object storage: ${error?.message || error}`
-        );
+      await putObject(outputKey, tc.output, "text/plain; charset=utf-8");
+      uploadedKeys.push(outputKey);
     }
+
+    logger.info(
+      `Successfully uploaded ${testCases.length} test cases for problem ${problemId} to ${storageRef}`,
+    );
+
+    return { prefix, storageRef, uploadedKeys };
+  } catch (error: any) {
+    logger.error(
+      `Failed uploading test cases for problem ${problemId}. Cleaning up uploaded objects...`,
+      error,
+    );
+    // Compensating cleanup: remove any objects uploaded during this failed batch
+    await deleteObjectsWithPrefix(prefix).catch((cleanupErr) =>
+      logger.error("Compensating cleanup failed:", cleanupErr),
+    );
+    throw new InternalServerError(
+      `Failed to upload problem test cases to object storage: ${error?.message || error}`,
+    );
+  }
 }
 
 export const createProblemService = async (data: createProblemType) => {
-    if (data.testCases && data.testCases.length > 0) {
-        const problemId = new mongoose.Types.ObjectId();
-        const idString = String(problemId);
+  if (data.testCases && data.testCases.length > 0) {
+    const problemId = new mongoose.Types.ObjectId();
+    const idString = String(problemId);
 
-        // Upload test cases to S3-compatible storage first
-        const { prefix, storageRef } = await uploadProblemTestCases(
-            idString,
-            data.testCases
-        );
-
-        try {
-            const { canonical: description } = processMarkdown(data.description);
-            const problem = await Problem.create({
-                _id: problemId,
-                description,
-                difficulty: data.difficulty,
-                time_limit: data.time_limit ?? 5000,
-                sampleTestCaseUrl:
-                    data.sampleTestCaseUrl ||
-                    `${storageRef}test_case_001/input.in`,
-                testCasesUrl: data.testCasesUrl || storageRef,
-                testCaseStoragePrefix: prefix,
-                testCasesCount: data.testCases.length,
-            });
-
-            return problem;
-        } catch (dbError: any) {
-            logger.error(
-                `Failed persisting problem ${idString} to database. Cleaning up uploaded test cases...`,
-                dbError
-            );
-            await deleteObjectsWithPrefix(prefix).catch((cleanupErr) =>
-                logger.error("Compensating S3 cleanup failed:", cleanupErr)
-            );
-            throw dbError;
-        }
-    }
-
-    // Fallback path when testCasesUrl is directly supplied
-    const { canonical: fallbackDescription } = processMarkdown(
-        data.description
+    // Upload test cases to S3-compatible storage first
+    const { prefix, storageRef } = await uploadProblemTestCases(
+      idString,
+      data.testCases,
     );
-    return await Problem.create({
-        description: fallbackDescription,
+
+    try {
+      const { canonical: description } = processMarkdown(data.description);
+      const problem = await Problem.create({
+        _id: problemId,
+        description,
         difficulty: data.difficulty,
         time_limit: data.time_limit ?? 5000,
-        sampleTestCaseUrl: data.sampleTestCaseUrl || data.testCasesUrl,
-        testCasesUrl: data.testCasesUrl!,
-        testCasesCount: 0,
-    });
+        sampleTestCaseUrl:
+          data.sampleTestCaseUrl || `${storageRef}test_case_001/input.in`,
+        testCasesUrl: data.testCasesUrl || storageRef,
+        testCaseStoragePrefix: prefix,
+        testCasesCount: data.testCases.length,
+      });
+
+      return problem;
+    } catch (dbError: any) {
+      logger.error(
+        `Failed persisting problem ${idString} to database. Cleaning up uploaded test cases...`,
+        dbError,
+      );
+      await deleteObjectsWithPrefix(prefix).catch((cleanupErr) =>
+        logger.error("Compensating S3 cleanup failed:", cleanupErr),
+      );
+      throw dbError;
+    }
+  }
+
+  // Fallback path when testCasesUrl is directly supplied
+  const { canonical: fallbackDescription } = processMarkdown(data.description);
+  return await Problem.create({
+    description: fallbackDescription,
+    difficulty: data.difficulty,
+    time_limit: data.time_limit ?? 5000,
+    sampleTestCaseUrl: data.sampleTestCaseUrl || data.testCasesUrl,
+    testCasesUrl: data.testCasesUrl!,
+    testCasesCount: 0,
+  });
 };
 
 export const getAllProblemsService = async () => {
-    return await Problem.find();
+  return await Problem.find();
 };
 
 export const getSingleProblemService = async (id: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new BadRequestError("Provided id isn't valid");
-    }
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new BadRequestError("Provided id isn't valid");
+  }
 
-    const problem = await Problem.findById(id);
+  const problem = await Problem.findById(id);
 
-    if (!problem) {
-        throw new NotFoundError("Problem not found");
-    }
+  if (!problem) {
+    throw new NotFoundError("Problem not found");
+  }
 
-    return problem;
+  return problem;
 };
 
 export const updateProblemService = async (
-    id: string,
-    data: updateProblemType
+  id: string,
+  data: updateProblemType,
 ) => {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new BadRequestError("Provided id isn't valid");
-    }
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new BadRequestError("Provided id isn't valid");
+  }
 
-    const existing = await Problem.findById(id);
-    if (!existing) {
-        throw new NotFoundError("Problem not found");
-    }
+  const existing = await Problem.findById(id);
+  if (!existing) {
+    throw new NotFoundError("Problem not found");
+  }
 
-    let storageUpdate: Record<string, any> = {};
+  let storageUpdate: Record<string, any> = {};
 
-    if (data.testCases && data.testCases.length > 0) {
-        const prefix =
-            existing.testCaseStoragePrefix || getProblemTestCasePrefix(id);
+  if (data.testCases && data.testCases.length > 0) {
+    const prefix =
+      existing.testCaseStoragePrefix || getProblemTestCasePrefix(id);
 
-        // Remove old test cases safely
-        await deleteObjectsWithPrefix(prefix).catch((err) =>
-            logger.warn(
-                `Failed removing existing test cases before update for problem ${id}:`,
-                err
-            )
-        );
+    // Remove old test cases safely
+    await deleteObjectsWithPrefix(prefix).catch((err) =>
+      logger.warn(
+        `Failed removing existing test cases before update for problem ${id}:`,
+        err,
+      ),
+    );
 
-        const uploadResult = await uploadProblemTestCases(id, data.testCases);
-        storageUpdate = {
-            testCaseStoragePrefix: uploadResult.prefix,
-            testCasesCount: data.testCases.length,
-            testCasesUrl: uploadResult.storageRef,
-        };
-    }
-
-    const updatePayload: Record<string, any> = {
-        ...data,
-        ...storageUpdate,
+    const uploadResult = await uploadProblemTestCases(id, data.testCases);
+    storageUpdate = {
+      testCaseStoragePrefix: uploadResult.prefix,
+      testCasesCount: data.testCases.length,
+      testCasesUrl: uploadResult.storageRef,
     };
+  }
 
-    // Process Markdown description if it is being updated.
-    if (data.description !== undefined) {
-        const { canonical } = processMarkdown(data.description);
-        updatePayload.description = canonical;
-    }
+  const updatePayload: Record<string, any> = {
+    ...data,
+    ...storageUpdate,
+  };
 
-    // Don't persist raw testCases array directly to MongoDB problem document
-    delete (updatePayload as any).testCases;
+  // Process Markdown description if it is being updated.
+  if (data.description !== undefined) {
+    const { canonical } = processMarkdown(data.description);
+    updatePayload.description = canonical;
+  }
 
-    const updatedProblem = await Problem.findByIdAndUpdate(id, updatePayload, {
-        returnDocument: "after",
-        runValidators: true,
-    });
+  // Don't persist raw testCases array directly to MongoDB problem document
+  delete (updatePayload as any).testCases;
 
-    return updatedProblem;
+  const updatedProblem = await Problem.findByIdAndUpdate(id, updatePayload, {
+    returnDocument: "after",
+    runValidators: true,
+  });
+
+  return updatedProblem;
 };
 
 export const deleteProblemService = async (id: string) => {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new BadRequestError("Invalid id provided");
-    }
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new BadRequestError("Invalid id provided");
+  }
 
-    const deletedProblem = await Problem.findByIdAndDelete(id);
+  const deletedProblem = await Problem.findByIdAndDelete(id);
 
-    if (!deletedProblem) {
-        throw new NotFoundError("Problem not found");
-    }
+  if (!deletedProblem) {
+    throw new NotFoundError("Problem not found");
+  }
 
-    // Safely remove associated test cases from object storage
-    const prefix =
-        deletedProblem.testCaseStoragePrefix || getProblemTestCasePrefix(id);
-    await deleteObjectsWithPrefix(prefix).catch((err) => {
-        logger.warn(
-            `Failed to remove test cases for deleted problem ${id}:`,
-            err
-        );
-    });
+  // Safely remove associated test cases from object storage
+  const prefix =
+    deletedProblem.testCaseStoragePrefix || getProblemTestCasePrefix(id);
+  await deleteObjectsWithPrefix(prefix).catch((err) => {
+    logger.warn(`Failed to remove test cases for deleted problem ${id}:`, err);
+  });
 
-    return deletedProblem;
+  return deletedProblem;
 };

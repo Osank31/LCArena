@@ -40,7 +40,9 @@ describe("processMarkdown", () => {
   });
 
   it("extracts tags from a Topics metadata line", () => {
-    const result = processMarkdown("# T\n\n**Topics:** Array, Hash Table\n\nbody");
+    const result = processMarkdown(
+      "# T\n\n**Topics:** Array, Hash Table\n\nbody",
+    );
     assert.deepEqual(result.metadata.tags, ["Array", "Hash Table"]);
   });
 
@@ -57,7 +59,9 @@ describe("processMarkdown", () => {
   });
 
   it("never throws on malformed input; falls back to raw text", () => {
-    const result = processMarkdown("# only an opening fence\n```cpp\nunclosed\n");
+    const result = processMarkdown(
+      "# only an opening fence\n```cpp\nunclosed\n",
+    );
     assert.ok(result.canonical.length > 0);
     assert.ok(result.html.length > 0);
   });

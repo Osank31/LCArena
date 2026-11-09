@@ -117,7 +117,10 @@ export const backendStatus = {
       }
     };
 
-    window.addEventListener("lcarena:server-connection-error", handleConnectionError);
+    window.addEventListener(
+      "lcarena:server-connection-error",
+      handleConnectionError,
+    );
     window.addEventListener("online", handleBrowserOnline);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -128,7 +131,10 @@ export const backendStatus = {
     }, OFFLINE_RECHECK_MS);
 
     return () => {
-      window.removeEventListener("lcarena:server-connection-error", handleConnectionError);
+      window.removeEventListener(
+        "lcarena:server-connection-error",
+        handleConnectionError,
+      );
       window.removeEventListener("online", handleBrowserOnline);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.clearInterval(intervalId);

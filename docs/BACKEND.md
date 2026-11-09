@@ -10,16 +10,16 @@ frontend is out of scope for every command in this document.
 
 ## 1. What the backend is
 
-| Component | Path | Port | Role |
-| :--- | :--- | :--- | :--- |
-| Gateway | `apps/apis/gateway` | 3000 | Public HTTP entry point: auth, sessions, RBAC, reverse proxy. |
-| Problem | `apps/apis/problem` | 3001 | Problem CRUD. |
-| Submission | `apps/apis/submission` | 3002 | Submission intake; publishes `submission.created`. |
-| Mail | `apps/apis/mail` | 3003 | SMTP delivery of OTP emails; `POST /otp` queues and answers `202`, delivery runs in the background. |
-| Execution worker | `apps/apis/execution` | 3004 (`/health` only) | Consumes `submission.created`, runs code in ephemeral containers, publishes `submission.completed`. |
-| MinIO Storage | Docker container | 9000 (S3 API), 9001 (Console) | S3-compatible test-case object storage (MinIO for dev/testing, Cloudflare R2 compatible). |
-| Sockets | — | — | **Not implemented in this repository.** The AGENTS.md/README references are aspirational; there is no `apps/apis/sockets` workspace. |
-| AI suggestion | `apps/apis/ai-suggestion-service` | 8000 | Python/FastAPI code completion. Own Dockerfile; excluded from the TypeScript test commands. |
+| Component        | Path                              | Port                          | Role                                                                                                                                 |
+| :--------------- | :-------------------------------- | :---------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| Gateway          | `apps/apis/gateway`               | 3000                          | Public HTTP entry point: auth, sessions, RBAC, reverse proxy.                                                                        |
+| Problem          | `apps/apis/problem`               | 3001                          | Problem CRUD.                                                                                                                        |
+| Submission       | `apps/apis/submission`            | 3002                          | Submission intake; publishes `submission.created`.                                                                                   |
+| Mail             | `apps/apis/mail`                  | 3003                          | SMTP delivery of OTP emails; `POST /otp` queues and answers `202`, delivery runs in the background.                                  |
+| Execution worker | `apps/apis/execution`             | 3004 (`/health` only)         | Consumes `submission.created`, runs code in ephemeral containers, publishes `submission.completed`.                                  |
+| MinIO Storage    | Docker container                  | 9000 (S3 API), 9001 (Console) | S3-compatible test-case object storage (MinIO for dev/testing, Cloudflare R2 compatible).                                            |
+| Sockets          | —                                 | —                             | **Not implemented in this repository.** The AGENTS.md/README references are aspirational; there is no `apps/apis/sockets` workspace. |
+| AI suggestion    | `apps/apis/ai-suggestion-service` | 8000                          | Python/FastAPI code completion. Own Dockerfile; excluded from the TypeScript test commands.                                          |
 
 Shared packages live in `packages/backend/*` (`config`, `models`, `middlewares`,
 `utils`, `execution`).
@@ -99,18 +99,18 @@ ports).
 
 ## 5. Root scripts
 
-| Command | What it does |
-| :--- | :--- |
-| `npm run check-types:backend` | `tsc --noEmit` across all backend workspaces. No infrastructure needed. |
-| `npm run build:backend` | Build every backend workspace. No infrastructure needed. |
-| `npm run test:backend` | Unit tests for every backend workspace (Turborepo, backend-filtered). No infrastructure needed. |
-| `npm run test:coverage` | Unit tests with coverage + aggregated reports. No infrastructure needed. |
-| `npm run test:integration` | Starts isolated infra, boots real services, runs the integration/e2e suites. **Needs Docker.** |
-| `npm run test:load` | Load tests. Needs a running backend, or `--infra` (needs Docker). |
-| `npm run test:all:fast` | typecheck → build → unit tests. The CI-friendly path. |
-| `npm run test:all` | `test:all:fast` then `test:integration`. |
-| `npm run seed:problems` | Insert sample problems into MongoDB (idempotent). |
-| `npm run docker:health` | Compose health table. |
+| Command                       | What it does                                                                                    |
+| :---------------------------- | :---------------------------------------------------------------------------------------------- |
+| `npm run check-types:backend` | `tsc --noEmit` across all backend workspaces. No infrastructure needed.                         |
+| `npm run build:backend`       | Build every backend workspace. No infrastructure needed.                                        |
+| `npm run test:backend`        | Unit tests for every backend workspace (Turborepo, backend-filtered). No infrastructure needed. |
+| `npm run test:coverage`       | Unit tests with coverage + aggregated reports. No infrastructure needed.                        |
+| `npm run test:integration`    | Starts isolated infra, boots real services, runs the integration/e2e suites. **Needs Docker.**  |
+| `npm run test:load`           | Load tests. Needs a running backend, or `--infra` (needs Docker).                               |
+| `npm run test:all:fast`       | typecheck → build → unit tests. The CI-friendly path.                                           |
+| `npm run test:all`            | `test:all:fast` then `test:integration`.                                                        |
+| `npm run seed:problems`       | Insert sample problems into MongoDB (idempotent).                                               |
+| `npm run docker:health`       | Compose health table.                                                                           |
 
 All backend selections use Turborepo filters
 (`--filter=./packages/backend/* --filter=./apps/apis/* --filter=!./apps/apis/ai-suggestion-service`),
@@ -173,11 +173,11 @@ listed rather than excluded to make the number look better.
 
 Profiles (`--concurrency` / `--requests` override the numbers):
 
-| Profile | Concurrency | Requests | Use |
-| :--- | ---: | ---: | :--- |
-| `smoke` | 10 | 100 | Fast sanity check. |
-| `normal` | 50 | 1,000 | Expected production-ish load. |
-| `stress` | 200 | 5,000 | Find the breaking point. |
+| Profile  | Concurrency | Requests | Use                           |
+| :------- | ----------: | -------: | :---------------------------- |
+| `smoke`  |          10 |      100 | Fast sanity check.            |
+| `normal` |          50 |    1,000 | Expected production-ish load. |
+| `stress` |         200 |    5,000 | Find the breaking point.      |
 
 Against an already-running backend:
 
@@ -289,11 +289,11 @@ docker compose logs -f execution       # sandbox/execution worker
 
 ## 12. Cleaning up
 
-| Command | Data |
-| :--- | :--- |
-| `npm run docker:down` | **Keeps** Mongo/RabbitMQ volumes. |
-| `npm run docker:down:volumes` | **Destroys** all local database and queue data. |
-| `npm run test:integration` | Creates then removes the isolated `lcarena-test` stack and its data. |
+| Command                       | Data                                                                 |
+| :---------------------------- | :------------------------------------------------------------------- |
+| `npm run docker:down`         | **Keeps** Mongo/RabbitMQ volumes.                                    |
+| `npm run docker:down:volumes` | **Destroys** all local database and queue data.                      |
+| `npm run test:integration`    | Creates then removes the isolated `lcarena-test` stack and its data. |
 
 > ⚠️ `npm run docker:down:volumes` is irreversible. Use it only to reset local
 > development state on purpose, never on a shared machine.

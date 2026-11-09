@@ -22,7 +22,7 @@ describe("Button component", () => {
     render(
       <Button isLoading onClick={handleClick}>
         Loading Button
-      </Button>
+      </Button>,
     );
 
     const btn = screen.getByRole("button");
@@ -51,7 +51,7 @@ describe("Button component", () => {
         rightIcon={<span data-testid="right-icon">R</span>}
       >
         Icon Button
-      </Button>
+      </Button>,
     );
 
     expect(screen.getByTestId("left-icon")).toBeInTheDocument();

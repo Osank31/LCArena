@@ -49,7 +49,11 @@ export const Alert: React.FC<AlertProps> = ({
     >
       {config.icon}
       <div className="flex-1">
-        {title && <h4 className="font-semibold text-xs uppercase tracking-wider mb-0.5">{title}</h4>}
+        {title && (
+          <h4 className="font-semibold text-xs uppercase tracking-wider mb-0.5">
+            {title}
+          </h4>
+        )}
         <div className="text-xs leading-relaxed">{message}</div>
       </div>
       {onDismiss && (

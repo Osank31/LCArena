@@ -1,4 +1,9 @@
-export { MOTION, REVEAL_ATTRIBUTE, REVEAL_SELECTOR, REDUCED_MOTION_QUERY } from "./motion";
+export {
+  MOTION,
+  REVEAL_ATTRIBUTE,
+  REVEAL_SELECTOR,
+  REDUCED_MOTION_QUERY,
+} from "./motion";
 export {
   gsap,
   ScrollTrigger,

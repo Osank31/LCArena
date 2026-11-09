@@ -1,12 +1,12 @@
-import { type UserType } from "@LCArena/models"
+import { type UserType } from "@LCArena/models";
 
 /**
  * The authenticated identity attached to a request by `userValidation` (services)
  * and by `authenticate` (gateway).
  */
 export interface AuthenticatedUser {
-    userId: string
-    userRole?: UserType
+  userId: string;
+  userRole?: UserType;
 }
 
 /**
@@ -20,11 +20,11 @@ export interface AuthenticatedUser {
  * is enough.
  */
 declare global {
-    namespace Express {
-        interface Request {
-            user?: AuthenticatedUser
-        }
+  namespace Express {
+    interface Request {
+      user?: AuthenticatedUser;
     }
+  }
 }
 
-export {}
+export {};

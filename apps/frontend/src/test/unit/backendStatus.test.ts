@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { apiClient } from "../../services/apiClient";
-import { backendStatus, isConnectivityError } from "../../services/backendStatus";
+import {
+  backendStatus,
+  isConnectivityError,
+} from "../../services/backendStatus";
 
 const networkError = () => {
   const error = new Error("Network Error") as Error & { isAxiosError: boolean };

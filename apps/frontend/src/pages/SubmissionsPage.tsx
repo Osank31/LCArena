@@ -16,7 +16,8 @@ export const SubmissionsPage: React.FC = () => {
   const { user } = useAuth();
   const [submissions, setSubmissions] = useState<ISubmission[]>([]);
   const [problems, setProblems] = useState<ParsedProblem[]>([]);
-  const [selectedSubmission, setSelectedSubmission] = useState<ISubmission | null>(null);
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<ISubmission | null>(null);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>("All");
@@ -127,7 +128,10 @@ export const SubmissionsPage: React.FC = () => {
       </div>
 
       {/* Submissions List */}
-      <div data-reveal className="border border-rule rounded-sm bg-paper-2/20 overflow-hidden">
+      <div
+        data-reveal
+        className="border border-rule rounded-sm bg-paper-2/20 overflow-hidden"
+      >
         {filteredSubmissions.length === 0 ? (
           <div className="p-8">
             <EmptyState
@@ -137,7 +141,9 @@ export const SubmissionsPage: React.FC = () => {
                   ? "You haven't submitted any solutions yet. Head over to the Problems catalog to start coding!"
                   : "No submissions match your selected filter criteria."
               }
-              actionText={submissions.length === 0 ? "Browse Problems" : "Clear Filters"}
+              actionText={
+                submissions.length === 0 ? "Browse Problems" : "Clear Filters"
+              }
               onAction={() => {
                 if (submissions.length === 0) {
                   window.location.href = "/problems";
@@ -205,7 +211,9 @@ export const SubmissionsPage: React.FC = () => {
                       </td>
 
                       <td className="py-3.5 px-4 text-right font-mono text-ink-3 hidden sm:table-cell">
-                        {typeof verdict.timeMs === "number" ? `${verdict.timeMs}ms` : "-"}
+                        {typeof verdict.timeMs === "number"
+                          ? `${verdict.timeMs}ms`
+                          : "-"}
                       </td>
 
                       <td className="py-3.5 px-4 text-right text-ink-3 hidden md:table-cell">

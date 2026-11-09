@@ -77,7 +77,9 @@ export const DeveloperApologyBanner: React.FC = () => {
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="text-xs text-ink-3 hover:text-ink inline-flex items-center gap-1 font-mono transition-colors p-1 cursor-pointer"
-          aria-label={isCollapsed ? "Expand apology notice" : "Collapse apology notice"}
+          aria-label={
+            isCollapsed ? "Expand apology notice" : "Collapse apology notice"
+          }
         >
           <span>{isCollapsed ? "Show message" : "Minimize"}</span>
           {isCollapsed ? (
@@ -95,19 +97,21 @@ export const DeveloperApologyBanner: React.FC = () => {
           </p>
 
           <p>
-            Running the code execution servers and supporting infrastructure gets pretty
-            expensive, so for now, LCArena is available as a frontend demo.
+            Running the code execution servers and supporting infrastructure
+            gets pretty expensive, so for now, LCArena is available as a
+            frontend demo.
           </p>
 
           <p>
-            I still want you to explore what I've built! I've added a few sample problems
-            so you can check out the interface, explore the problem-solving experience,
-            and see how the platform is designed.
+            I still want you to explore what I've built! I've added a few sample
+            problems so you can check out the interface, explore the
+            problem-solving experience, and see how the platform is designed.
           </p>
 
           <p>
-            Want to experience LCArena's full potential? Clone the repository, set up
-            the backend locally using Docker Compose, and run it on your own machine.
+            Want to experience LCArena's full potential? Clone the repository,
+            set up the backend locally using Docker Compose, and run it on your
+            own machine.
           </p>
 
           <p className="font-medium text-ink">

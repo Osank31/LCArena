@@ -19,16 +19,22 @@ describe("Input component", () => {
   });
 
   it("renders error message and sets aria-invalid", () => {
-    render(<Input label="Password" error="Password must be at least 6 characters" />);
+    render(
+      <Input label="Password" error="Password must be at least 6 characters" />,
+    );
 
     const input = screen.getByLabelText("Password");
     expect(input).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByText("Password must be at least 6 characters")).toBeInTheDocument();
+    expect(
+      screen.getByText("Password must be at least 6 characters"),
+    ).toBeInTheDocument();
   });
 
   it("renders helper text when no error exists", () => {
     render(<Input label="Code" helperText="Enter 6-digit confirmation code" />);
-    expect(screen.getByText("Enter 6-digit confirmation code")).toBeInTheDocument();
+    expect(
+      screen.getByText("Enter 6-digit confirmation code"),
+    ).toBeInTheDocument();
   });
 
   it("renders leftIcon and rightIcon", () => {
@@ -37,7 +43,7 @@ describe("Input component", () => {
         label="Search"
         leftIcon={<span data-testid="search-left">S</span>}
         rightIcon={<span data-testid="search-right">X</span>}
-      />
+      />,
     );
     expect(screen.getByTestId("search-left")).toBeInTheDocument();
     expect(screen.getByTestId("search-right")).toBeInTheDocument();

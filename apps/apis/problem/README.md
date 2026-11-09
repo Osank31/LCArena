@@ -42,13 +42,13 @@ consumer. They share the key contract implemented in
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| HTTP | `express` ^5 |
-| Validation | `zod` ^4 |
-| Persistence | Mongoose `Problem` model from `@LCArena/models` |
-| Object storage | `@aws-sdk/client-s3` through `@LCArena/config` (`ensureBucketExists`, `putObject`, `deleteObjectsWithPrefix`, `getProblemTestCasePrefix`, `getTestCaseInputKey`, `getTestCaseOutputKey`, `getBucketName`) |
-| Errors/HTTP shape | `@LCArena/utils`, `@LCArena/middlewares` `appErrorHandler` |
+| Concern           | Choice                                                                                                                                                                                                    |
+| :---------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HTTP              | `express` ^5                                                                                                                                                                                              |
+| Validation        | `zod` ^4                                                                                                                                                                                                  |
+| Persistence       | Mongoose `Problem` model from `@LCArena/models`                                                                                                                                                           |
+| Object storage    | `@aws-sdk/client-s3` through `@LCArena/config` (`ensureBucketExists`, `putObject`, `deleteObjectsWithPrefix`, `getProblemTestCasePrefix`, `getTestCaseInputKey`, `getTestCaseOutputKey`, `getBucketName`) |
+| Errors/HTTP shape | `@LCArena/utils`, `@LCArena/middlewares` `appErrorHandler`                                                                                                                                                |
 
 ## Directory structure
 
@@ -116,14 +116,14 @@ Responses use the shared envelope: `{ status, message, success, data, error }`
 on success; `{ success: false, message }` (plus `errors[]` for validation) on
 failure.
 
-| Method | Path | Caller | Body / params | Success |
-| :--- | :--- | :--- | :--- | :--- |
-| `GET` | `/health` | any | — | `{ message: "Problem Service Healthy" }` |
-| `GET` | `/` | public (via gateway) | — | 200, `data: Problem[]` |
-| `GET` | `/:id` | public (via gateway) | ObjectId | 200, `data: Problem` |
-| `POST` | `/` | Admin (gateway) | see below | 201 `"Problem Created Successfully"` |
-| `PUT` | `/:id` | Admin (gateway) | partial body | 200 `"Problem updated successfully"` |
-| `DELETE` | `/:id` | Admin (gateway) | ObjectId | 200 `"Problem deleted successfully"` |
+| Method   | Path      | Caller               | Body / params | Success                                  |
+| :------- | :-------- | :------------------- | :------------ | :--------------------------------------- |
+| `GET`    | `/health` | any                  | —             | `{ message: "Problem Service Healthy" }` |
+| `GET`    | `/`       | public (via gateway) | —             | 200, `data: Problem[]`                   |
+| `GET`    | `/:id`    | public (via gateway) | ObjectId      | 200, `data: Problem`                     |
+| `POST`   | `/`       | Admin (gateway)      | see below     | 201 `"Problem Created Successfully"`     |
+| `PUT`    | `/:id`    | Admin (gateway)      | partial body  | 200 `"Problem updated successfully"`     |
+| `DELETE` | `/:id`    | Admin (gateway)      | ObjectId      | 200 `"Problem deleted successfully"`     |
 
 **Create body**
 
@@ -170,19 +170,19 @@ from Zod, `500` for storage failures.
 
 ## Environment variables and configuration
 
-| Variable | Required | Default | Purpose |
-| :--- | :--- | :--- | :--- |
-| `PORT` | **yes** | — | HTTP port (3001 in Compose) |
-| `MONGODB_URL` | **yes** | — | Mongo connection string |
-| `S3_ENDPOINT` | no | *(unset → real AWS)* | `http://minio:9000` in Compose; R2/S3 endpoint in production |
-| `S3_REGION` | no | `us-east-1` | Use `auto` for Cloudflare R2 |
-| `S3_ACCESS_KEY_ID` | no | `minioadmin` | Falls back to `AWS_ACCESS_KEY_ID` / `AWS_ACCESS_KEY` |
-| `S3_SECRET_ACCESS_KEY` | no | `minioadmin` | Falls back to `AWS_SECRET_ACCESS_KEY` |
-| `S3_BUCKET_NAME` | no | `lcarena-testcases` | Target bucket |
-| `S3_FORCE_PATH_STYLE` | no | `true` when `S3_ENDPOINT` is set | Path-style addressing (required by MinIO) |
-| `AWS_ACCESS_KEY` / `AWS_SECRET_ACCESS_KEY` | no | *(empty)* | Legacy fallbacks read by `getStorageConfig` |
-| `OPENAI_API_KEY` | no | *(empty)* | Passed through by Compose; **not read anywhere in the current problem service source** |
-| `LOG_LEVEL` | no | `info` | Winston level |
+| Variable                                   | Required | Default                          | Purpose                                                                                |
+| :----------------------------------------- | :------- | :------------------------------- | :------------------------------------------------------------------------------------- |
+| `PORT`                                     | **yes**  | —                                | HTTP port (3001 in Compose)                                                            |
+| `MONGODB_URL`                              | **yes**  | —                                | Mongo connection string                                                                |
+| `S3_ENDPOINT`                              | no       | _(unset → real AWS)_             | `http://minio:9000` in Compose; R2/S3 endpoint in production                           |
+| `S3_REGION`                                | no       | `us-east-1`                      | Use `auto` for Cloudflare R2                                                           |
+| `S3_ACCESS_KEY_ID`                         | no       | `minioadmin`                     | Falls back to `AWS_ACCESS_KEY_ID` / `AWS_ACCESS_KEY`                                   |
+| `S3_SECRET_ACCESS_KEY`                     | no       | `minioadmin`                     | Falls back to `AWS_SECRET_ACCESS_KEY`                                                  |
+| `S3_BUCKET_NAME`                           | no       | `lcarena-testcases`              | Target bucket                                                                          |
+| `S3_FORCE_PATH_STYLE`                      | no       | `true` when `S3_ENDPOINT` is set | Path-style addressing (required by MinIO)                                              |
+| `AWS_ACCESS_KEY` / `AWS_SECRET_ACCESS_KEY` | no       | _(empty)_                        | Legacy fallbacks read by `getStorageConfig`                                            |
+| `OPENAI_API_KEY`                           | no       | _(empty)_                        | Passed through by Compose; **not read anywhere in the current problem service source** |
+| `LOG_LEVEL`                                | no       | `info`                           | Winston level                                                                          |
 
 ## Dependencies and prerequisites
 
@@ -220,15 +220,15 @@ back with the MongoDB driver to prove it landed. The load test is read-only.
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| Boot exits immediately | Missing `PORT` or `MONGODB_URL` — `getEnvVariable` names it |
-| `400 "Provided id isn't valid"` | The `:id` param is not a Mongo ObjectId (checked before any query) |
-| `400 Validation Error` + `errors[]` | Zod schema failure; `errors[]` carries `path` and `message` |
-| `500 Failed to upload problem test cases to object storage` | Storage unreachable/bucket creation denied; uploaded objects are cleaned up first |
-| Orphaned S3 objects after a failed create | Should not happen — the compensating `deleteObjectsWithPrefix` runs on both the upload and the DB-write failure paths; check logs for `Compensating ... cleanup failed` |
-| `GET /:id` works but the array is empty | Expected: `getAllProblemsService` is `Problem.find()` with no filter, sort or pagination |
-| Worker reports "No test-case objects found in storage under prefix" | The problem has a `testCasesUrl` the worker cannot resolve, or `testCaseStoragePrefix` is stale |
+| Symptom                                                             | Cause / handling                                                                                                                                                        |
+| :------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Boot exits immediately                                              | Missing `PORT` or `MONGODB_URL` — `getEnvVariable` names it                                                                                                             |
+| `400 "Provided id isn't valid"`                                     | The `:id` param is not a Mongo ObjectId (checked before any query)                                                                                                      |
+| `400 Validation Error` + `errors[]`                                 | Zod schema failure; `errors[]` carries `path` and `message`                                                                                                             |
+| `500 Failed to upload problem test cases to object storage`         | Storage unreachable/bucket creation denied; uploaded objects are cleaned up first                                                                                       |
+| Orphaned S3 objects after a failed create                           | Should not happen — the compensating `deleteObjectsWithPrefix` runs on both the upload and the DB-write failure paths; check logs for `Compensating ... cleanup failed` |
+| `GET /:id` works but the array is empty                             | Expected: `getAllProblemsService` is `Problem.find()` with no filter, sort or pagination                                                                                |
+| Worker reports "No test-case objects found in storage under prefix" | The problem has a `testCasesUrl` the worker cannot resolve, or `testCaseStoragePrefix` is stale                                                                         |
 
 ## Related services
 

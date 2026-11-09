@@ -58,20 +58,22 @@ describe("Online backend experience", () => {
             <Route path="/problems/:id" element={<ProblemDetailPage />} />
           </Routes>
         </MemoryRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
   it("loads the live problem catalog from the backend and hides the apology banner", async () => {
     const getSpy = vi
       .spyOn(apiClient, "get")
-      .mockResolvedValueOnce({ data: { success: true, data: [remoteProblem] } });
+      .mockResolvedValueOnce({
+        data: { success: true, data: [remoteProblem] },
+      });
 
     render(
       <AuthProvider>
         <BrowserRouter>
           <ProblemsPage />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(await screen.findByText("Backend Sum")).toBeInTheDocument();
@@ -85,7 +87,7 @@ describe("Online backend experience", () => {
         <BrowserRouter>
           <Navbar />
         </BrowserRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("Live")).toBeInTheDocument();
@@ -93,7 +95,9 @@ describe("Online backend experience", () => {
   });
 
   it("previews sample cases on Run without the offline demo notice", async () => {
-    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(parsedProblem);
+    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(
+      parsedProblem,
+    );
 
     renderProblemPage();
 
@@ -102,10 +106,12 @@ describe("Online backend experience", () => {
     fireEvent.click(screen.getByRole("button", { name: /run/i }));
 
     expect(
-      (await screen.findAllByText(/Sample Cases \(Preview Only\)/i)).length
+      (await screen.findAllByText(/Sample Cases \(Preview Only\)/i)).length,
     ).toBeGreaterThanOrEqual(1);
     expect(
-      screen.queryByText(/Live code execution is disabled in this hosted demo/i)
+      screen.queryByText(
+        /Live code execution is disabled in this hosted demo/i,
+      ),
     ).not.toBeInTheDocument();
   });
 
@@ -124,9 +130,11 @@ describe("Online backend experience", () => {
       {
         isAxiosError: true,
         response: { status: 500, data: { message: "Judge unavailable" } },
-      }
+      },
     );
-    vi.spyOn(submissionService, "createSubmission").mockRejectedValueOnce(requestError);
+    vi.spyOn(submissionService, "createSubmission").mockRejectedValueOnce(
+      requestError,
+    );
 
     renderProblemPage();
 
@@ -134,10 +142,14 @@ describe("Online backend experience", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /submit/i }));
 
-    expect((await screen.findAllByText(/Judge unavailable/i)).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Submission Failed").length).toBeGreaterThanOrEqual(1);
     expect(
-      screen.queryByText(/Code Execution Unavailable in Online Demo/i)
+      (await screen.findAllByText(/Judge unavailable/i)).length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText("Submission Failed").length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.queryByText(/Code Execution Unavailable in Online Demo/i),
     ).not.toBeInTheDocument();
   });
 });

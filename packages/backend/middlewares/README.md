@@ -11,30 +11,30 @@ augmentation that lets every service agree on the authenticated-caller shape.
 
 ## Overview
 
-| Export | Signature | Purpose |
-| :--- | :--- | :--- |
-| `userValidation` | `(req, res, next) => Promise<void>` | Resolve `x-user-id` → `req.user`, or `401`/`404` |
-| `roleValidation` | `(...allowedRoles) => (req, res, next) => void` | Fail-closed RBAC gate on `req.user.userRole` |
-| `appErrorHandler` | `(err, req, res, next) => Response` | Single error → HTTP mapping for every service |
-| `AuthenticatedUser` | type | `{ userId: string; userRole?: UserType }` |
+| Export              | Signature                                       | Purpose                                          |
+| :------------------ | :---------------------------------------------- | :----------------------------------------------- |
+| `userValidation`    | `(req, res, next) => Promise<void>`             | Resolve `x-user-id` → `req.user`, or `401`/`404` |
+| `roleValidation`    | `(...allowedRoles) => (req, res, next) => void` | Fail-closed RBAC gate on `req.user.userRole`     |
+| `appErrorHandler`   | `(err, req, res, next) => Response`             | Single error → HTTP mapping for every service    |
+| `AuthenticatedUser` | type                                            | `{ userId: string; userRole?: UserType }`        |
 
 ## The two identity models
 
 The repository has **two** distinct ways a request acquires an identity, and this
 package implements both:
 
-| | `userValidation` | gateway's `authenticate` |
-| :--- | :--- | :--- |
-| Used by | Internal services (submission) | The gateway, on its own routes |
-| Input | `x-user-id` header | `Authorization: Bearer <JWT>` |
-| Checks | Header present + user exists in Mongo | Signature, expiry, Redis JTI blacklist, then re-reads the user |
-| Sets | `req.user = { userId, userRole }` | same shape |
-| Result on failure | `401 { message: "Missing user header" }` or `404 User not found` | `401` with a specific message |
+|                   | `userValidation`                                                 | gateway's `authenticate`                                       |
+| :---------------- | :--------------------------------------------------------------- | :------------------------------------------------------------- |
+| Used by           | Internal services (submission)                                   | The gateway, on its own routes                                 |
+| Input             | `x-user-id` header                                               | `Authorization: Bearer <JWT>`                                  |
+| Checks            | Header present + user exists in Mongo                            | Signature, expiry, Redis JTI blacklist, then re-reads the user |
+| Sets              | `req.user = { userId, userRole }`                                | same shape                                                     |
+| Result on failure | `401 { message: "Missing user header" }` or `404 User not found` | `401` with a specific message                                  |
 
 The gateway's `authenticate` is what makes `x-user-id` trustworthy: it strips any
 client-supplied `x-user-id` before proxying and injects the value it verified
 (`proxy.factory.ts`). `userValidation` therefore exists to make internal services
-*practically* safe when reached only through the gateway — it is **not** a
+_practically_ safe when reached only through the gateway — it is **not** a
 cryptographic boundary, and a direct call to a downstream port with a forged
 `x-user-id` for an existing user will succeed. Keep the downstream ports internal.
 
@@ -56,14 +56,14 @@ flowchart LR
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| HTTP | `express` ^5 (middleware signatures and `Response`) |
-| Validation errors | `zod` ^4 (`ZodError` detection) |
-| Errors / logging | `@LCArena/utils` (`AppError` family, `logger`) |
-| Persistence | `@LCArena/models` (`User` lookup, `UserType`) |
-| Tests | `node:test` with `--experimental-test-module-mocks` (the suites mock `@LCArena/models`) |
-| Module format | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/` |
+| Concern           | Choice                                                                                  |
+| :---------------- | :-------------------------------------------------------------------------------------- |
+| HTTP              | `express` ^5 (middleware signatures and `Response`)                                     |
+| Validation errors | `zod` ^4 (`ZodError` detection)                                                         |
+| Errors / logging  | `@LCArena/utils` (`AppError` family, `logger`)                                          |
+| Persistence       | `@LCArena/models` (`User` lookup, `UserType`)                                           |
+| Tests             | `node:test` with `--experimental-test-module-mocks` (the suites mock `@LCArena/models`) |
+| Module format     | ESM (`"type": "module"`), NodeNext resolution, `tsc` to `dist/`                         |
 
 `@LCArena/config` is a declared dependency that no source file in this package
 imports.
@@ -95,16 +95,16 @@ That is why `roleValidation.ts` and `express-request.ts` both end with `export {
 ### `userValidation`
 
 ```ts
-const rawUserId = req.headers["x-user-id"]
+const rawUserId = req.headers["x-user-id"];
 if (!rawUserId || typeof rawUserId !== "string")
-    return res.status(401).json({ message: "Missing user header" })
+  return res.status(401).json({ message: "Missing user header" });
 
-const userId = rawUserId.replace(/"/g, "")   // tolerates a quoted header value
-const user = await User.findById(userId)
-if (!user) throw new NotFoundError("User not found")
+const userId = rawUserId.replace(/"/g, ""); // tolerates a quoted header value
+const user = await User.findById(userId);
+if (!user) throw new NotFoundError("User not found");
 
-req.user = { userId, userRole: user.userType }
-next()
+req.user = { userId, userRole: user.userType };
+next();
 ```
 
 Notes: the `401` is written **directly** (bypassing `appErrorHandler`, so it is
@@ -122,7 +122,7 @@ when the role is not in the allowlist. Denials go through `next(error)` so
 Usage (gateway):
 
 ```ts
-router.post("/", authenticate, roleValidation(UserType.Admin), problemProxy)
+router.post("/", authenticate, roleValidation(UserType.Admin), problemProxy);
 ```
 
 ### `appErrorHandler`
@@ -154,14 +154,14 @@ described by the status codes and bodies in the table above.
 ## Inter-service communication
 
 None directly. Its effect on inter-service traffic is that `userValidation`
-consumes the `x-user-id` header the gateway injects — the *only* channel of
+consumes the `x-user-id` header the gateway injects — the _only_ channel of
 verified identity between the edge and the internal services.
 
-| Header | Producer | Consumer |
-| :--- | :--- | :--- |
-| `x-user-id` | gateway `proxy.factory` (verified) | `userValidation` in submission |
-| `x-forwarded-for`, `x-forwarded-proto`, `x-forwarded-host` | gateway `proxy.factory` | informational |
-| `authorization` | client | gateway only — **stripped** before proxying |
+| Header                                                     | Producer                           | Consumer                                    |
+| :--------------------------------------------------------- | :--------------------------------- | :------------------------------------------ |
+| `x-user-id`                                                | gateway `proxy.factory` (verified) | `userValidation` in submission              |
+| `x-forwarded-for`, `x-forwarded-proto`, `x-forwarded-host` | gateway `proxy.factory`            | informational                               |
+| `authorization`                                            | client                             | gateway only — **stripped** before proxying |
 
 ## Environment variables and configuration
 
@@ -169,12 +169,12 @@ None. The package reads no environment variables and has no configuration surfac
 
 ## Dependencies and prerequisites
 
-| Dependency | Role |
-| :--- | :--- |
-| `express` ^5 | Types |
-| `zod` ^4 | `ZodError` detection |
-| `@LCArena/utils` | `AppError` family, `logger` |
-| `@LCArena/models` | `User` lookup, `UserType` |
+| Dependency        | Role                                                          |
+| :---------------- | :------------------------------------------------------------ |
+| `express` ^5      | Types                                                         |
+| `zod` ^4          | `ZodError` detection                                          |
+| `@LCArena/utils`  | `AppError` family, `logger`                                   |
+| `@LCArena/models` | `User` lookup, `UserType`                                     |
 | `@LCArena/config` | Declared dependency; **not imported** by any source file here |
 
 Build before use outside Turborepo.
@@ -207,15 +207,15 @@ npm test        # unit suite with module mocks; no infrastructure
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| `401 { message: "Missing user header" }` | `x-user-id` absent. This body has no `success` field — it is the only handler that writes its own response |
-| `404 User not found` from an internal service | The gateway injected an id that no longer exists in this service's database (e.g. pointing at a different Mongo) |
-| `401 "…userValidation must run before roleValidation"` | Middleware order is wrong on the route |
-| `403 Role '<role>' is not allowed to access this path` | Working as intended; check the route's `roleValidation(...)` allowlist |
-| Validation errors arrive as 500 in one service | `appErrorHandler` is not mounted last, or the error is wrapped and loses `ZodError`/`AppError` identity before reaching it |
-| `req.user` is `undefined` in TypeScript | Import `AuthenticatedUser` (or anything) from `@LCArena/middlewares` so the global augmentation is in the program |
-| Tests fail with "Cannot find module @LCArena/models" | Build the workspace packages first — the suites mock real module specifiers |
+| Symptom                                                | Cause / handling                                                                                                           |
+| :----------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| `401 { message: "Missing user header" }`               | `x-user-id` absent. This body has no `success` field — it is the only handler that writes its own response                 |
+| `404 User not found` from an internal service          | The gateway injected an id that no longer exists in this service's database (e.g. pointing at a different Mongo)           |
+| `401 "…userValidation must run before roleValidation"` | Middleware order is wrong on the route                                                                                     |
+| `403 Role '<role>' is not allowed to access this path` | Working as intended; check the route's `roleValidation(...)` allowlist                                                     |
+| Validation errors arrive as 500 in one service         | `appErrorHandler` is not mounted last, or the error is wrapped and loses `ZodError`/`AppError` identity before reaching it |
+| `req.user` is `undefined` in TypeScript                | Import `AuthenticatedUser` (or anything) from `@LCArena/middlewares` so the global augmentation is in the program          |
+| Tests fail with "Cannot find module @LCArena/models"   | Build the workspace packages first — the suites mock real module specifiers                                                |
 
 ## Related packages and services
 

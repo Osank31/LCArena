@@ -15,14 +15,14 @@
  * until the user explicitly saves).
  */
 
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MarkdownRenderer } from "../markdown/MarkdownRenderer";
-import { extractTitle, extractSlug, extractTags, hasBalancedFences } from "../../lib/markdown";
+import {
+  extractTitle,
+  extractSlug,
+  extractTags,
+  hasBalancedFences,
+} from "../../lib/markdown";
 
 interface ProblemEditorProps {
   /** Initial problem (for edit mode) or undefined (create mode). */
@@ -127,7 +127,9 @@ export const ProblemEditor: React.FC<ProblemEditorProps> = ({
   // These are suggestions only — the user can override them.
   useEffect(() => {
     const suggestedTitle = extractTitle(form.description);
-    const suggestedSlug = suggestedTitle ? extractSlug(suggestedTitle) : undefined;
+    const suggestedSlug = suggestedTitle
+      ? extractSlug(suggestedTitle)
+      : undefined;
     const suggestedTags = extractTags(form.description);
     setForm((prev) => ({
       ...prev,
@@ -157,7 +159,12 @@ export const ProblemEditor: React.FC<ProblemEditorProps> = ({
     }
     setErrors(next);
     return Object.keys(next).length === 0;
-  }, [form.description, form.sampleTestCaseUrl, form.testCasesUrl, form.difficulty]);
+  }, [
+    form.description,
+    form.sampleTestCaseUrl,
+    form.testCasesUrl,
+    form.difficulty,
+  ]);
 
   // Warnings: never block save, just inform.
   useEffect(() => {
@@ -169,36 +176,33 @@ export const ProblemEditor: React.FC<ProblemEditorProps> = ({
     setWarnings(next);
   }, [form.description]);
 
-  const handleChange = useCallback(
-    (key: string, value: string) => {
-      setForm((prev) => ({ ...prev, [key]: value }));
-      setSubmitError(null);
-    },
-    []
-  );
+  const handleChange = useCallback((key: string, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setSubmitError(null);
+  }, []);
 
-  const handleTagsChange = useCallback(
-    (tags: string[]) => {
-      setForm((prev) => ({ ...prev, tags }));
-      setSubmitError(null);
-    },
-    []
-  );
+  const handleTagsChange = useCallback((tags: string[]) => {
+    setForm((prev) => ({ ...prev, tags }));
+    setSubmitError(null);
+  }, []);
 
   const handleDifficultyChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       setForm((prev) => ({ ...prev, difficulty: e.target.value as any }));
       setSubmitError(null);
     },
-    []
+    [],
   );
 
   const handleTimeLimitChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({ ...prev, time_limit: Number(e.target.value) || 5000 }));
+      setForm((prev) => ({
+        ...prev,
+        time_limit: Number(e.target.value) || 5000,
+      }));
       setSubmitError(null);
     },
-    []
+    [],
   );
 
   const handleSubmit = useCallback(
@@ -212,7 +216,7 @@ export const ProblemEditor: React.FC<ProblemEditorProps> = ({
         description: form.description, // raw Markdown preserved exactly
       });
     },
-    [form, validate, onSave]
+    [form, validate, onSave],
   );
 
   const handleCancel = useCallback(() => {
@@ -232,7 +236,9 @@ export const ProblemEditor: React.FC<ProblemEditorProps> = ({
         </h2>
         <span
           className={`px-2 py-0.5 rounded-sm text-xs font-mono ${
-            isEdit ? "bg-paper-3 text-ink border border-rule" : "bg-paper-3 text-ink-2 border border-rule"
+            isEdit
+              ? "bg-paper-3 text-ink border border-rule"
+              : "bg-paper-3 text-ink-2 border border-rule"
           }`}
         >
           {isEdit ? "EDIT" : "CREATE"}
@@ -341,11 +347,15 @@ export const ProblemEditor: React.FC<ProblemEditorProps> = ({
             <input
               className="w-full border border-rule rounded-sm px-3 py-2 bg-paper text-ink focus:border-rule-2 outline-none"
               value={form.sampleTestCaseUrl}
-              onChange={(e) => handleChange("sampleTestCaseUrl", e.target.value)}
+              onChange={(e) =>
+                handleChange("sampleTestCaseUrl", e.target.value)
+              }
               disabled={isSaving}
             />
             {errors.sampleTestCaseUrl && (
-              <p className="pt-1 text-xs text-ink">{errors.sampleTestCaseUrl}</p>
+              <p className="pt-1 text-xs text-ink">
+                {errors.sampleTestCaseUrl}
+              </p>
             )}
           </div>
           <div>
@@ -389,13 +399,15 @@ export const ProblemEditor: React.FC<ProblemEditorProps> = ({
                   e.target.value
                     .split(",")
                     .map((t) => t.trim())
-                    .filter(Boolean)
+                    .filter(Boolean),
                 )
               }
               disabled={isSaving}
               placeholder="array, hash-table, string"
             />
-            {errors.tags && <p className="pt-1 text-xs text-ink">{errors.tags}</p>}
+            {errors.tags && (
+              <p className="pt-1 text-xs text-ink">{errors.tags}</p>
+            )}
           </div>
         </div>
 
@@ -419,7 +431,11 @@ export const ProblemEditor: React.FC<ProblemEditorProps> = ({
             disabled={isSaving || hasErrors}
             className="px-6 py-2 rounded-sm text-paper bg-ink border border-ink hover:bg-paper-2 hover:text-ink disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            {isSaving ? "Saving…" : isEdit ? "Update Problem" : "Create Problem"}
+            {isSaving
+              ? "Saving…"
+              : isEdit
+                ? "Update Problem"
+                : "Create Problem"}
           </button>
         </div>
       </footer>

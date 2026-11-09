@@ -17,7 +17,7 @@ export const useBackendStatus = (): BackendStatusState => {
   const status = useSyncExternalStore(
     backendStatus.subscribe,
     backendStatus.getStatus,
-    backendStatus.getStatus
+    backendStatus.getStatus,
   );
 
   return {

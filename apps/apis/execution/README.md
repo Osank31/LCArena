@@ -57,21 +57,21 @@ flowchart TD
   consumers cannot overwrite a terminal result; the loser logs
   `lost-finalize-race` and returns without publishing.
 - **Infrastructure failures never masquerade as verdicts.** Docker/storage/
-  persistence problems are *thrown* and handled by the retry policy. Only genuine
+  persistence problems are _thrown_ and handled by the retry policy. Only genuine
   execution verdicts are persisted here, and exhausted retries produce an
   explicit `INTERNAL_ERROR` rather than leaving a submission stuck on `PENDING`.
 
 ## Technology stack
 
-| Concern | Choice |
-| :--- | :--- |
-| Runtime | Node ≥ 24, `express` ^5 (health only) |
-| Queue | `amqplib` via `@LCArena/config` (`channel`, `queue`, `connectToQueue`, `closeQueue`) |
-| Persistence | Mongoose `Submission` / `Problem` from `@LCArena/models` |
-| Object storage | `@LCArena/config` `listObjects`, `getObject`, `getProblemTestCasePrefix` |
-| Archives | `yauzl` (zip), `tar-stream` + `zlib` (tar/tar.gz) |
-| Sandbox | `dockerode` via `@LCArena/execution` executors |
-| Validation | `zod` ^4 |
+| Concern        | Choice                                                                               |
+| :------------- | :----------------------------------------------------------------------------------- |
+| Runtime        | Node ≥ 24, `express` ^5 (health only)                                                |
+| Queue          | `amqplib` via `@LCArena/config` (`channel`, `queue`, `connectToQueue`, `closeQueue`) |
+| Persistence    | Mongoose `Submission` / `Problem` from `@LCArena/models`                             |
+| Object storage | `@LCArena/config` `listObjects`, `getObject`, `getProblemTestCasePrefix`             |
+| Archives       | `yauzl` (zip), `tar-stream` + `zlib` (tar/tar.gz)                                    |
+| Sandbox        | `dockerode` via `@LCArena/execution` executors                                       |
+| Validation     | `zod` ^4                                                                             |
 
 ## Directory structure
 
@@ -135,15 +135,15 @@ flowchart TD
 
 `processSubmission(message, deps)`:
 
-| Step | Behaviour |
-| :--- | :--- |
-| Load submission | Missing → `{ outcome: "skipped", reason: "submission-not-found" }` (no error, message is acked) |
-| Already terminal | Re-publish `submission.completed` from the **stored** verdict → `skipped / already-finalized` |
-| Load problem | Missing → persist `INTERNAL_ERROR("Referenced problem could not be loaded")`, publish, return `executed / problem-not-found` |
-| Acquire test cases | `deps.acquireTestCases(problem)` — throws on failure (infrastructure) |
-| Run executor | Inside `try { … } finally { await acquired.cleanup() }` so the workspace is always removed |
-| Persist verdict | Conditional update; `null` means another consumer won → `skipped / lost-finalize-race` |
-| Publish completion | `buildCompletionPayload(finalized, verdict)` |
+| Step               | Behaviour                                                                                                                    |
+| :----------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| Load submission    | Missing → `{ outcome: "skipped", reason: "submission-not-found" }` (no error, message is acked)                              |
+| Already terminal   | Re-publish `submission.completed` from the **stored** verdict → `skipped / already-finalized`                                |
+| Load problem       | Missing → persist `INTERNAL_ERROR("Referenced problem could not be loaded")`, publish, return `executed / problem-not-found` |
+| Acquire test cases | `deps.acquireTestCases(problem)` — throws on failure (infrastructure)                                                        |
+| Run executor       | Inside `try { … } finally { await acquired.cleanup() }` so the workspace is always removed                                   |
+| Persist verdict    | Conditional update; `null` means another consumer won → `skipped / lost-finalize-race`                                       |
+| Publish completion | `buildCompletionPayload(finalized, verdict)`                                                                                 |
 
 Time limit conversion (`timeLimitSeconds`): uses `problem.time_limit` (ms) when
 it is a number `> 0`, else `DEFAULT_TIME_LIMIT_MS = 5000`; then
@@ -156,17 +156,30 @@ First failing case (`firstFailedTestCase`) follows the precedence
 Production `EvaluationDeps` (`evaluation.ts`):
 
 ```ts
-loadSubmission:  (id) => Submission.findById(id)
-loadProblem:     (id) => Problem.findById(id)
-acquireTestCases:(problem) => acquireTestCases({ testCasesUrl, testCaseStoragePrefix,
-                                                 problemId, maxBytes, maxEntries })
-runExecutor:     (lang, code, secs, dir) => createExecutor(lang, dir).execute(code, secs, "testcases")
-persistVerdict:  (id, status) => Submission.findOneAndUpdate(
-                     { _id: id, "status.status": "PENDING" },
-                     { $set: { status } },
-                     { returnDocument: "after" })
-publishCompletion: (payload) => channel.sendToQueue("submission.completed",
-                     Buffer.from(JSON.stringify(payload)), { persistent: true })
+loadSubmission: (id) => Submission.findById(id);
+loadProblem: (id) => Problem.findById(id);
+acquireTestCases: (problem) =>
+  acquireTestCases({
+    testCasesUrl,
+    testCaseStoragePrefix,
+    problemId,
+    maxBytes,
+    maxEntries,
+  });
+runExecutor: (lang, code, secs, dir) =>
+  createExecutor(lang, dir).execute(code, secs, "testcases");
+persistVerdict: (id, status) =>
+  Submission.findOneAndUpdate(
+    { _id: id, "status.status": "PENDING" },
+    { $set: { status } },
+    { returnDocument: "after" },
+  );
+publishCompletion: (payload) =>
+  channel.sendToQueue(
+    "submission.completed",
+    Buffer.from(JSON.stringify(payload)),
+    { persistent: true },
+  );
 ```
 
 ### Test-case acquisition (`testCases.ts`)
@@ -212,7 +225,7 @@ Each executor:
 
 1. `pullImage` (inspect first; pull only on 404).
 2. `createContainer({ Image, Cmd: ["/bin/bash","-c","tail -f /dev/null"],
-   WorkingDir: "/workspace", HostConfig: {} })`, then `start()`.
+WorkingDir: "/workspace", HostConfig: {} })`, then `start()`.
 3. `copyTestCasesToContainer` — packs the workspace into a `tar-stream` archive
    and `putArchive(..., { path: "/workspace" })`, so the container sees
    `/workspace/testcases/...`. Fails closed with `TestCasesUnavailableError` when
@@ -222,12 +235,12 @@ Each executor:
 5. Runs `./runner.sh` and parses its stdout as JSON.
 6. `finally`: `container.stop()` + `container.remove()` — cleanup is guaranteed.
 
-| Language | Image | Compile / syntax command | Run command |
-| :--- | :--- | :--- | :--- |
-| C++ | `gcc:latest` | `g++ -O3 -std=c++17 "Main.cpp" -o "./solution"` | `./solution` |
-| Java | `eclipse-temurin` | `javac Main.java Solution.java` | `java Main` |
-| Python | `python:3.11-slim` | `python -m py_compile solution.py` | `python main.py` |
-| JavaScript | `node:20-slim` | `node -c solution.js` | `node main.js` |
+| Language   | Image              | Compile / syntax command                        | Run command      |
+| :--------- | :----------------- | :---------------------------------------------- | :--------------- |
+| C++        | `gcc:latest`       | `g++ -O3 -std=c++17 "Main.cpp" -o "./solution"` | `./solution`     |
+| Java       | `eclipse-temurin`  | `javac Main.java Solution.java`                 | `java Main`      |
+| Python     | `python:3.11-slim` | `python -m py_compile solution.py`              | `python main.py` |
+| JavaScript | `node:20-slim`     | `node -c solution.js`                           | `node main.js`   |
 
 ### The generated runner (`Executor.generateRunnerScript`)
 
@@ -268,9 +281,9 @@ human-facing verdict from those arrays.
 
 This service exposes **no submission API**. Its only HTTP surface is:
 
-| Method | Path | Response |
-| :--- | :--- | :--- |
-| `GET` | `/health` | `200 { "message": "Execution Service Healthy" }` |
+| Method | Path      | Response                                         |
+| :----- | :-------- | :----------------------------------------------- |
+| `GET`  | `/health` | `200 { "message": "Execution Service Healthy" }` |
 
 Its real interface is the message contract.
 
@@ -278,14 +291,14 @@ Its real interface is the message contract.
 
 Validated by `submissionCreatedMessageSchema` (`src/validation.ts`):
 
-| Field | Rule |
-| :--- | :--- |
-| `submissionId` | string that `mongoose.Types.ObjectId.isValid` accepts |
-| `userId` | string, ObjectId-valid |
-| `problemId` | string, ObjectId-valid |
-| `code` | string, min 1 |
-| `language` | `z.nativeEnum(ELanguage)` — `"py" \| "cpp" \| "java" \| "js"` |
-| `status` | `z.unknown().optional()` — present on the wire, deliberately never trusted |
+| Field          | Rule                                                                       |
+| :------------- | :------------------------------------------------------------------------- |
+| `submissionId` | string that `mongoose.Types.ObjectId.isValid` accepts                      |
+| `userId`       | string, ObjectId-valid                                                     |
+| `problemId`    | string, ObjectId-valid                                                     |
+| `code`         | string, min 1                                                              |
+| `language`     | `z.nativeEnum(ELanguage)` — `"py" \| "cpp" \| "java" \| "js"`              |
+| `status`       | `z.unknown().optional()` — present on the wire, deliberately never trusted |
 
 ### Outbound — `submission.completed`
 
@@ -314,29 +327,29 @@ Built by `buildCompletionPayload(submission, status)`; published `persistent` to
 
 ## Inter-service communication
 
-| Direction | Mechanism | Details |
-| :--- | :--- | :--- |
-| In | RabbitMQ | `submission.created`, `prefetch(1)`, `noAck: false` |
-| Out | RabbitMQ | `submission.completed` (persistent); `submission.created` for retries; `submission.created.dead` for parked messages |
-| In/Out | MongoDB | Reads `Submission`/`Problem`; conditional writes to `Submission.status` |
-| Out | S3-compatible storage | `listObjects` + `getObject` under the problem prefix |
-| Out | Docker daemon (host socket) | Creates, execs in, stops and removes ephemeral containers |
-| In | Docker Hub | `pullImage` on first use of `gcc:latest`, `eclipse-temurin`, `python:3.11-slim`, `node:20-slim` |
+| Direction | Mechanism                   | Details                                                                                                              |
+| :-------- | :-------------------------- | :------------------------------------------------------------------------------------------------------------------- |
+| In        | RabbitMQ                    | `submission.created`, `prefetch(1)`, `noAck: false`                                                                  |
+| Out       | RabbitMQ                    | `submission.completed` (persistent); `submission.created` for retries; `submission.created.dead` for parked messages |
+| In/Out    | MongoDB                     | Reads `Submission`/`Problem`; conditional writes to `Submission.status`                                              |
+| Out       | S3-compatible storage       | `listObjects` + `getObject` under the problem prefix                                                                 |
+| Out       | Docker daemon (host socket) | Creates, execs in, stops and removes ephemeral containers                                                            |
+| In        | Docker Hub                  | `pullImage` on first use of `gcc:latest`, `eclipse-temurin`, `python:3.11-slim`, `node:20-slim`                      |
 
 No HTTP calls to other LCArena services, no Redis, no WebSockets.
 
 ## Environment variables and configuration
 
-| Variable | Required | Default | Purpose |
-| :--- | :--- | :--- | :--- |
-| `MONGODB_URL` | **yes** | — | Submissions / problems database |
-| `RABBITMQ_URL` | no | `amqp://localhost` | Broker connection |
-| `PORT` | no | `3004` | Health endpoint only |
-| `EXECUTION_MAX_ATTEMPTS` | no | `3` | Attempts before dead-lettering and recording `INTERNAL_ERROR` |
-| `EXECUTION_MAX_TESTCASES_BYTES` | no | `67108864` (64 MiB) | Download / expansion cap |
-| `EXECUTION_MAX_TESTCASES_ENTRIES` | no | `10000` | Archive entry cap |
-| `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_FORCE_PATH_STYLE` | no | see [config README](../../../packages/backend/config/README.md) | Object storage |
-| `LOG_LEVEL` | no | `info` | Winston level |
+| Variable                                                                                                        | Required | Default                                                         | Purpose                                                       |
+| :-------------------------------------------------------------------------------------------------------------- | :------- | :-------------------------------------------------------------- | :------------------------------------------------------------ |
+| `MONGODB_URL`                                                                                                   | **yes**  | —                                                               | Submissions / problems database                               |
+| `RABBITMQ_URL`                                                                                                  | no       | `amqp://localhost`                                              | Broker connection                                             |
+| `PORT`                                                                                                          | no       | `3004`                                                          | Health endpoint only                                          |
+| `EXECUTION_MAX_ATTEMPTS`                                                                                        | no       | `3`                                                             | Attempts before dead-lettering and recording `INTERNAL_ERROR` |
+| `EXECUTION_MAX_TESTCASES_BYTES`                                                                                 | no       | `67108864` (64 MiB)                                             | Download / expansion cap                                      |
+| `EXECUTION_MAX_TESTCASES_ENTRIES`                                                                               | no       | `10000`                                                         | Archive entry cap                                             |
+| `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_FORCE_PATH_STYLE` | no       | see [config README](../../../packages/backend/config/README.md) | Object storage                                                |
+| `LOG_LEVEL`                                                                                                     | no       | `info`                                                          | Winston level                                                 |
 
 Docker-related privileges are configuration, not env vars: Compose runs this
 container as `root` with `/var/run/docker.sock` mounted, and documents
@@ -418,20 +431,20 @@ Environment overrides: `MONGODB_URL` (default
 
 ## Error handling and troubleshooting
 
-| Symptom | Cause / handling |
-| :--- | :--- |
-| Submission stuck on `PENDING` | Worker down; or the message was lost because `submission.created` is not durable |
-| Verdict `INTERNAL_ERROR` with "Evaluation failed after repeated attempts" | `EXECUTION_MAX_ATTEMPTS` exhausted; the message is on `submission.created.dead` with `x-park-reason: retries-exhausted` |
-| Verdict `INTERNAL_ERROR` with "Referenced problem could not be loaded" | `problemId` no longer exists |
-| Messages accumulate on `submission.created.dead` with `x-park-reason: malformed` | Publisher sent a payload that fails `submissionCreatedMessageSchema` (bad ObjectId, empty `code`, unknown `language`) |
-| Every run throws immediately | Docker socket not mounted / daemon unreachable |
-| First evaluation is very slow | Language image is being pulled |
-| `TestCasesUnavailableError: No test cases found in …` | The workspace was empty; also raised when an archive has no usable case folder |
-| `TestCaseSourceError: Test case 'x' is incomplete: missing …` | A case folder lacked `*.in` or `*.ans` |
-| `Rejected archive entry escaping the destination` | A malicious archive tried path traversal — rejected by design |
-| `Test-case archive expands beyond the size limit` / `contains too many entries` | Raise `EXECUTION_MAX_TESTCASES_BYTES` / `EXECUTION_MAX_TESTCASES_ENTRIES` only if you trust the source |
-| `lost-finalize-race` in the logs | Two consumers processed the same submission; the first writer wins and owns the completion event |
-| Container left behind | Should not happen — `stop()`/`remove()` run in `finally`. Check for containers named from the language images if the daemon itself died mid-run |
+| Symptom                                                                          | Cause / handling                                                                                                                                |
+| :------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Submission stuck on `PENDING`                                                    | Worker down; or the message was lost because `submission.created` is not durable                                                                |
+| Verdict `INTERNAL_ERROR` with "Evaluation failed after repeated attempts"        | `EXECUTION_MAX_ATTEMPTS` exhausted; the message is on `submission.created.dead` with `x-park-reason: retries-exhausted`                         |
+| Verdict `INTERNAL_ERROR` with "Referenced problem could not be loaded"           | `problemId` no longer exists                                                                                                                    |
+| Messages accumulate on `submission.created.dead` with `x-park-reason: malformed` | Publisher sent a payload that fails `submissionCreatedMessageSchema` (bad ObjectId, empty `code`, unknown `language`)                           |
+| Every run throws immediately                                                     | Docker socket not mounted / daemon unreachable                                                                                                  |
+| First evaluation is very slow                                                    | Language image is being pulled                                                                                                                  |
+| `TestCasesUnavailableError: No test cases found in …`                            | The workspace was empty; also raised when an archive has no usable case folder                                                                  |
+| `TestCaseSourceError: Test case 'x' is incomplete: missing …`                    | A case folder lacked `*.in` or `*.ans`                                                                                                          |
+| `Rejected archive entry escaping the destination`                                | A malicious archive tried path traversal — rejected by design                                                                                   |
+| `Test-case archive expands beyond the size limit` / `contains too many entries`  | Raise `EXECUTION_MAX_TESTCASES_BYTES` / `EXECUTION_MAX_TESTCASES_ENTRIES` only if you trust the source                                          |
+| `lost-finalize-race` in the logs                                                 | Two consumers processed the same submission; the first writer wins and owns the completion event                                                |
+| Container left behind                                                            | Should not happen — `stop()`/`remove()` run in `finally`. Check for containers named from the language images if the daemon itself died mid-run |
 
 ## Security notes
 

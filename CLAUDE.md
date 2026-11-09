@@ -8,23 +8,23 @@ LCArena is a distributed, containerized online judge. It serves a problem catalo
 
 Run from the repo root unless noted. Root scripts use Turborepo; backend selections exclude the frontend and the Python AI service via the filter `--filter=./packages/backend/* --filter=./apps/apis/* --filter=!./apps/apis/ai-suggestion-service`.
 
-| Goal | Command |
-|------|---------|
-| Start all workspaces | `npm run dev` |
-| Build everything | `npm run build` |
-| Build backend only (packages + TS services) | `npm run build:backend` |
-| Type-check everything | `npm run check-types` |
-| Type-check backend only | `npm run check-types:backend` |
-| Lint (ESLint — only the frontend defines it) | `npm run lint` |
-| Format (Prettier) | `npm run format` |
-| All backend unit tests (no infra needed) | `npm run test:backend` |
-| One backend workspace's unit tests | `npm run test:backend -- --filter=@LCArena/utils` |
-| Frontend tests (Vitest) | `npm --prefix apps/frontend test` |
-| One frontend test file | `npm --prefix apps/frontend test -- src/test/unit/apiClient.test.ts` |
-| CI-friendly fast path (typecheck → build → backend unit → frontend test) | `npm run test:all:fast` |
-| Integration + e2e (boots isolated Docker Compose stack) | `npm run test:integration` |
-| Coverage across backend workspaces | `npm run test:coverage` |
-| Full test suite (fast + integration) | `npm run test:all` |
+| Goal                                                                     | Command                                                              |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| Start all workspaces                                                     | `npm run dev`                                                        |
+| Build everything                                                         | `npm run build`                                                      |
+| Build backend only (packages + TS services)                              | `npm run build:backend`                                              |
+| Type-check everything                                                    | `npm run check-types`                                                |
+| Type-check backend only                                                  | `npm run check-types:backend`                                        |
+| Lint (ESLint — only the frontend defines it)                             | `npm run lint`                                                       |
+| Format (Prettier)                                                        | `npm run format`                                                     |
+| All backend unit tests (no infra needed)                                 | `npm run test:backend`                                               |
+| One backend workspace's unit tests                                       | `npm run test:backend -- --filter=@LCArena/utils`                    |
+| Frontend tests (Vitest)                                                  | `npm --prefix apps/frontend test`                                    |
+| One frontend test file                                                   | `npm --prefix apps/frontend test -- src/test/unit/apiClient.test.ts` |
+| CI-friendly fast path (typecheck → build → backend unit → frontend test) | `npm run test:all:fast`                                              |
+| Integration + e2e (boots isolated Docker Compose stack)                  | `npm run test:integration`                                           |
+| Coverage across backend workspaces                                       | `npm run test:coverage`                                              |
+| Full test suite (fast + integration)                                     | `npm run test:all`                                                   |
 
 ### Backend unit tests — single file
 
@@ -61,15 +61,15 @@ Public entry point: `http://localhost:3000`. Frontend dev: `cd apps/frontend && 
 
 ### Services and ports
 
-| Service | Workspace | Port | Role |
-|---------|-----------|------|------|
-| API Gateway | `apps/apis/gateway` | 3000 | Public entry: auth, sessions, RBAC, reverse proxy, header sanitization |
-| Problem | `apps/apis/problem` | 3001 | Problem CRUD + markdown problem descriptions + test-case uploads |
-| Submission | `apps/apis/submission` | 3002 | Submission intake; publishes `submission.created` to RabbitMQ |
-| Mail | `apps/apis/mail` | 3003 | SMTP/OTP email delivery; `POST /otp` answers 202, delivers in background |
-| Execution worker | `apps/apis/execution` | 3004 | `/health` only; consumes `submission.created`, runs Docker sandboxes |
-| AI suggestion | `apps/apis/ai-suggestion-service` | 8000 | Python/FastAPI + Anthropic Claude; fill-in-the-middle code completion |
-| Frontend | `apps/frontend` | 5173 | React SPA, Vite, Monaco Editor |
+| Service          | Workspace                         | Port | Role                                                                     |
+| ---------------- | --------------------------------- | ---- | ------------------------------------------------------------------------ |
+| API Gateway      | `apps/apis/gateway`               | 3000 | Public entry: auth, sessions, RBAC, reverse proxy, header sanitization   |
+| Problem          | `apps/apis/problem`               | 3001 | Problem CRUD + markdown problem descriptions + test-case uploads         |
+| Submission       | `apps/apis/submission`            | 3002 | Submission intake; publishes `submission.created` to RabbitMQ            |
+| Mail             | `apps/apis/mail`                  | 3003 | SMTP/OTP email delivery; `POST /otp` answers 202, delivers in background |
+| Execution worker | `apps/apis/execution`             | 3004 | `/health` only; consumes `submission.created`, runs Docker sandboxes     |
+| AI suggestion    | `apps/apis/ai-suggestion-service` | 8000 | Python/FastAPI + Anthropic Claude; fill-in-the-middle code completion    |
+| Frontend         | `apps/frontend`                   | 5173 | React SPA, Vite, Monaco Editor                                           |
 
 Infrastructure: MongoDB 7, Redis 7, RabbitMQ 3.13, MinIO (S3-compatible), host Docker socket (execution sandboxes). All infra bound to `127.0.0.1` in Compose.
 
@@ -128,6 +128,7 @@ Verdicts: `SUCCESS` (Accepted), `COMPILE_ERROR`, `WA`, `RE`, `TLE`, `INTERNAL_ER
 ## Verification
 
 After making changes:
+
 1. `npm run check-types:backend` — typecheck all backend workspaces
 2. `npm run build:backend` — build all backend workspaces
 3. `npm run test:backend` — run all backend unit tests (no infra)

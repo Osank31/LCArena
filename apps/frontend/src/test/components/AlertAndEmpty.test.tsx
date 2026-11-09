@@ -31,11 +31,13 @@ describe("EmptyState component", () => {
         description="Try a different search query"
         actionText="Clear Filter"
         onAction={handleAction}
-      />
+      />,
     );
 
     expect(screen.getByText("No Results")).toBeInTheDocument();
-    expect(screen.getByText("Try a different search query")).toBeInTheDocument();
+    expect(
+      screen.getByText("Try a different search query"),
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Clear Filter"));
     expect(handleAction).toHaveBeenCalledTimes(1);

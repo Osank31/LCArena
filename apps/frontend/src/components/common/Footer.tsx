@@ -16,10 +16,16 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-6 text-xs text-ink-3 font-mono">
-          <Link to="/problems" className="hover:text-ink underline-offset-4 hover:underline transition-colors">
+          <Link
+            to="/problems"
+            className="hover:text-ink underline-offset-4 hover:underline transition-colors"
+          >
             Problems
           </Link>
-          <Link to="/submissions" className="hover:text-ink underline-offset-4 hover:underline transition-colors">
+          <Link
+            to="/submissions"
+            className="hover:text-ink underline-offset-4 hover:underline transition-colors"
+          >
             Submissions
           </Link>
           <span className="flex items-center gap-1.5 text-ink-3">

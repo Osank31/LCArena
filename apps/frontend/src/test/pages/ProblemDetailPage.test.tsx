@@ -18,7 +18,8 @@ const mockProblem: ParsedProblem = {
   timeLimit: 5000,
   tags: ["String", "Dynamic Programming"],
   statement: "Given a string s, return the longest palindromic substring in s.",
-  rawDescription: "Given a string s, return the longest palindromic substring in s.",
+  rawDescription:
+    "Given a string s, return the longest palindromic substring in s.",
   starterTemplates: {},
   sampleTestCaseUrl: "https://example.com/sample",
   testCasesUrl: "https://example.com/tests",
@@ -29,7 +30,10 @@ const mockProblem: ParsedProblem = {
       explanation: '"aba" is also a valid answer.',
     },
   ],
-  constraints: ["1 <= s.length <= 1000", "s consist of only digits and English letters."],
+  constraints: [
+    "1 <= s.length <= 1000",
+    "s consist of only digits and English letters.",
+  ],
 };
 
 describe("ProblemDetailPage component", () => {
@@ -46,20 +50,26 @@ describe("ProblemDetailPage component", () => {
             <Route path="/problems/:id" element={<ProblemDetailPage />} />
           </Routes>
         </MemoryRouter>
-      </AuthProvider>
+      </AuthProvider>,
     );
   };
 
   it("loads and renders problem description, examples, and editor pane", async () => {
-    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(mockProblem);
+    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(
+      mockProblem,
+    );
 
     renderWithRouter();
 
     // Verify problem header and title
-    expect(await screen.findAllByText("Longest Palindromic Substring")).toHaveLength(2);
+    expect(
+      await screen.findAllByText("Longest Palindromic Substring"),
+    ).toHaveLength(2);
     expect(screen.getAllByText("Medium").length).toBeGreaterThanOrEqual(1);
     expect(
-      screen.getByText(/given a string s, return the longest palindromic substring in s/i)
+      screen.getByText(
+        /given a string s, return the longest palindromic substring in s/i,
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText(/s = "babad"/i)).toBeInTheDocument();
     expect(screen.getByText(/1 <= s.length <= 1000/i)).toBeInTheDocument();
@@ -67,22 +77,30 @@ describe("ProblemDetailPage component", () => {
 
   it("displays error banner when problem fails to load", async () => {
     vi.spyOn(problemService, "getProblemById").mockRejectedValueOnce(
-      new Error("Problem not found in catalog")
+      new Error("Problem not found in catalog"),
     );
 
     renderWithRouter("invalid_id");
 
     expect(await screen.findByText("Problem Not Found")).toBeInTheDocument();
-    expect(screen.getByText("Problem not found in catalog")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /back to problems catalog/i })).toBeInTheDocument();
+    expect(
+      screen.getByText("Problem not found in catalog"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /back to problems catalog/i }),
+    ).toBeInTheDocument();
   });
 
   it("allows switching language and updating editor code", async () => {
-    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(mockProblem);
+    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(
+      mockProblem,
+    );
 
     renderWithRouter();
 
-    expect(await screen.findAllByText("Longest Palindromic Substring")).toHaveLength(2);
+    expect(
+      await screen.findAllByText("Longest Palindromic Substring"),
+    ).toHaveLength(2);
 
     const langSelect = screen.getByLabelText(/select programming language/i);
     expect(langSelect).toHaveValue("cpp");
@@ -92,11 +110,15 @@ describe("ProblemDetailPage component", () => {
   });
 
   it("opens reset confirmation modal and restores template on confirm", async () => {
-    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(mockProblem);
+    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(
+      mockProblem,
+    );
 
     renderWithRouter();
 
-    expect(await screen.findAllByText("Longest Palindromic Substring")).toHaveLength(2);
+    expect(
+      await screen.findAllByText("Longest Palindromic Substring"),
+    ).toHaveLength(2);
 
     const resetBtn = screen.getByRole("button", { name: /reset code/i });
     fireEvent.click(resetBtn);
@@ -106,37 +128,55 @@ describe("ProblemDetailPage component", () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(screen.queryByText("Reset Code Template?")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Reset Code Template?"),
+      ).not.toBeInTheDocument();
     });
   });
 
   it("handles Run button click against sample cases", async () => {
-    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(mockProblem);
+    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(
+      mockProblem,
+    );
 
     renderWithRouter();
 
-    expect(await screen.findAllByText("Longest Palindromic Substring")).toHaveLength(2);
+    expect(
+      await screen.findAllByText("Longest Palindromic Substring"),
+    ).toHaveLength(2);
 
     const runBtn = screen.getByRole("button", { name: /run/i });
     fireEvent.click(runBtn);
 
     // After evaluation finishes
     expect(
-      (await screen.findAllByText(/tested against sample input/i, {}, { timeout: 3000 })).length
+      (
+        await screen.findAllByText(
+          /tested against sample input/i,
+          {},
+          { timeout: 3000 },
+        )
+      ).length,
     ).toBeGreaterThanOrEqual(1);
   });
 
   it("prompts sign-in modal when unauthenticated user clicks Submit", async () => {
-    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(mockProblem);
+    vi.spyOn(problemService, "getProblemById").mockResolvedValueOnce(
+      mockProblem,
+    );
 
     renderWithRouter();
 
-    expect(await screen.findAllByText("Longest Palindromic Substring")).toHaveLength(2);
+    expect(
+      await screen.findAllByText("Longest Palindromic Substring"),
+    ).toHaveLength(2);
 
     const submitBtn = screen.getByRole("button", { name: /submit/i });
     fireEvent.click(submitBtn);
 
-    expect(await screen.findByText("Sign In to Submit Solutions")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Sign In to Submit Solutions"),
+    ).toBeInTheDocument();
   });
 
   it("submits code and polls verdict when authenticated", async () => {
@@ -180,11 +220,15 @@ describe("ProblemDetailPage component", () => {
 
     renderWithRouter();
 
-    expect(await screen.findAllByText("Longest Palindromic Substring")).toHaveLength(2);
+    expect(
+      await screen.findAllByText("Longest Palindromic Substring"),
+    ).toHaveLength(2);
 
     // Authenticated state is set via authService session
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /submit/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /submit/i }),
+      ).toBeInTheDocument();
     });
 
     const submitBtn = screen.getByRole("button", { name: /submit/i });
@@ -198,7 +242,7 @@ describe("ProblemDetailPage component", () => {
       });
       expect(submissionService.pollVerdict).toHaveBeenCalledWith(
         "sub_new_99",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -234,7 +278,9 @@ describe("ProblemDetailPage component", () => {
 
     renderWithRouter("prob_detail_1");
 
-    expect(await screen.findAllByText("Longest Palindromic Substring")).toHaveLength(2);
+    expect(
+      await screen.findAllByText("Longest Palindromic Substring"),
+    ).toHaveLength(2);
 
     // Switch to submissions tab
     const submissionsTab = screen.getByRole("tab", { name: /submissions/i });

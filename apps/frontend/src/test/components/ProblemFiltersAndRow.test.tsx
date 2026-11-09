@@ -25,7 +25,7 @@ describe("ProblemFilters component", () => {
         onChange={handleChange}
         onReset={() => {}}
         availableTags={["Array", "String"]}
-      />
+      />,
     );
 
     const searchInput = screen.getByPlaceholderText(/search problems/i);
@@ -41,7 +41,7 @@ describe("ProblemFilters component", () => {
         onChange={handleChange}
         onReset={() => {}}
         availableTags={["Array", "String"]}
-      />
+      />,
     );
 
     fireEvent.click(screen.getByText("Easy"));
@@ -56,7 +56,7 @@ describe("ProblemFilters component", () => {
         onChange={handleChange}
         onReset={() => {}}
         availableTags={["Array", "String"]}
-      />
+      />,
     );
 
     const tagSelect = screen.getByLabelText(/filter by topic tag/i);
@@ -72,7 +72,7 @@ describe("ProblemFilters component", () => {
         onChange={() => {}}
         onReset={handleReset}
         availableTags={["Array"]}
-      />
+      />,
     );
 
     const resetBtn = screen.getByText("Reset");
@@ -106,7 +106,7 @@ describe("ProblemRow component", () => {
             <ProblemRow problem={sampleProblem} index={1} isSolved={false} />
           </tbody>
         </table>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("Two Sum")).toBeInTheDocument();
@@ -126,7 +126,7 @@ describe("ProblemRow component", () => {
             <ProblemRow problem={sampleProblem} index={1} isSolved={true} />
           </tbody>
         </table>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByTestId("solved-icon")).toBeInTheDocument();
