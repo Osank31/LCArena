@@ -17,14 +17,11 @@ Run from the repo root unless noted. Root scripts use Turborepo; backend selecti
 | Type-check backend only                                                  | `npm run check-types:backend`                                        |
 | Lint (ESLint — only the frontend defines it)                             | `npm run lint`                                                       |
 | Format (Prettier)                                                        | `npm run format`                                                     |
-| All backend unit tests (no infra needed)                                 | `npm run test:backend`                                               |
-| One backend workspace's unit tests                                       | `npm run test:backend -- --filter=@LCArena/utils`                    |
-| Frontend tests (Vitest)                                                  | `npm --prefix apps/frontend test`                                    |
-| One frontend test file                                                   | `npm --prefix apps/frontend test -- src/test/unit/apiClient.test.ts` |
-| CI-friendly fast path (typecheck → build → backend unit → frontend test) | `npm run test:all:fast`                                              |
-| Integration + e2e (boots isolated Docker Compose stack)                  | `npm run test:integration`                                           |
-| Coverage across backend workspaces                                       | `npm run test:coverage`                                              |
-| Full test suite (fast + integration)                                     | `npm run test:all`                                                   |
+| CI-friendly fast path (typecheck → build only; no unit tests remain)     | `npm run test:all:fast`                                              |
+
+| Coverage across backend workspaces **(no-op)** — all workspaces skipped  | `npm run test:coverage` *(no `test/unit` dirs to cover)*             |
+| Full test suite **(REMOVED)** — fast/integration tests deleted           | `npm run test:all` *(nothing to run)*                                |
+| Seed sample problems into MongoDB (idempotent)                           | `npm run seed:problems`                                              |
 
 ### Backend unit tests — single file
 
