@@ -9,9 +9,7 @@
     "types": "./dist/index.d.ts",
     "scripts": {
         "build": "tsc",
-        "check-types": "tsc --noEmit",
-        "test": "npm run test:unit",
-        "test:unit": "node --experimental-test-module-mocks --import tsx --test \"test/unit/*.test.ts\""
+        "check-types": "tsc --noEmit"
     },
     "dependencies": {
         "@LCArena/config": "^1.0.0",

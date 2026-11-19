@@ -13,6 +13,7 @@ import { ProblemsPage } from './pages/ProblemsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { RegisterPage } from './pages/RegisterPage';
 import { SubmissionsPage } from './pages/SubmissionsPage';
+import ArchitectureCanvas from './components/architecture/ArchitectureCanvas';
 
 // Inner layout component to conditionally omit footer on full-screen IDE workspace
 export const AppLayout: React.FC = () => {
@@ -28,12 +29,14 @@ export const AppLayout: React.FC = () => {
 
     const isWorkspace =
         location.pathname.startsWith('/problems/') && location.pathname !== '/problems';
+    const isArchitecture = location.pathname === '/architecture';
+    const hideFooter = isWorkspace || isArchitecture;
 
     return (
         <div className="min-h-screen flex flex-col bg-paper text-ink">
             <ServerStatusModal />
             <Navbar />
-            <main className="flex-1 flex flex-col">
+            <main className="flex-1 flex flex-col min-h-0">
                 <Routes>
                     {/* The problems catalog is the landing page for the platform. */}
                     <Route path="/" element={<Navigate to="/problems" replace />} />
@@ -50,10 +53,11 @@ export const AppLayout: React.FC = () => {
                         }
                     />
                     <Route path="/submissions" element={<SubmissionsPage />} />
+                    <Route path="/architecture" element={<ArchitectureCanvas />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </main>
-            {!isWorkspace && <Footer />}
+            {!hideFooter && <Footer />}
         </div>
     );
 };

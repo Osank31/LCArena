@@ -17,29 +17,15 @@ Run from the repo root unless noted. Root scripts use Turborepo; backend selecti
 | Type-check backend only                                                  | `npm run check-types:backend`                                        |
 | Lint (ESLint — only the frontend defines it)                             | `npm run lint`                                                       |
 | Format (Prettier)                                                        | `npm run format`                                                     |
-| CI-friendly fast path (typecheck → build only; no unit tests remain)     | `npm run test:all:fast`                                              |
 
-| Coverage across backend workspaces **(no-op)** — all workspaces skipped  | `npm run test:coverage` *(no `test/unit` dirs to cover)*             |
-| Full test suite **(REMOVED)** — fast/integration tests deleted           | `npm run test:all` *(nothing to run)*                                |
 | Seed sample problems into MongoDB (idempotent)                           | `npm run seed:problems`                                              |
-
-### Backend unit tests — single file
-
-Backend unit tests use Node's built-in `node:test` runner via `tsx`, live in `test/unit/*.test.ts`, and need no MongoDB/Redis/RabbitMQ/Docker. Run from the workspace directory:
-
-```sh
-node --import tsx --test test/unit/<file>.test.ts
-# or via npm
-npm run test:unit -- --test test/unit/<file>.test.ts
-```
-
-The `middlewares` package uses an extra flag: `node --experimental-test-module-mocks --import tsx --test "test/unit/*.test.ts"`.
 
 ### Integration / load tests
 
-- `npm run test:integration` boots isolated infra (Mongo 27018, Redis 6380, RabbitMQ 5673, MinIO 9002) via `docker-compose.test.yml`, runs real services on ports 3100–3104, then tears the stack down. Use `--suites=api` for HTTP-only contracts.
-- `npm run test:load -- --profile=smoke --target=problem` runs k6 load tests against a running backend (`--infra` boots isolated infra itself). Profiles: smoke/baseline/stepped/stress/spike/soak/recovery/endpoints/services/lifecycle.
-- `npm run seed:problems` inserts sample problems into MongoDB (idempotent).
+No test infrastructure remains in the repository — the `test/unit`, `test/integration`, and `tests/load` directories were removed. The `test:*` scripts were deleted from all workspace `package.json` files.
+
+To restore testing, add unit test files under `test/unit/` (per workspace) and re-add the corresponding `test:unit` scripts, or re-create `tests/load/` and the load-test runner.
+
 
 ### Docker stack
 
@@ -128,8 +114,7 @@ After making changes:
 
 1. `npm run check-types:backend` — typecheck all backend workspaces
 2. `npm run build:backend` — build all backend workspaces
-3. `npm run test:backend` — run all backend unit tests (no infra)
-4. `npm --prefix apps/frontend test` — run frontend Vitest suite
-5. For full confidence: `npm run test:all:fast` (CI-friendly path)
+
+No unit/integration test suites remain in the repository (the `test/*` directories and scripts were removed). `npm run test:all:fast` and the frontend Vitest suite were removed along with them.
 
 When running services outside Docker, point URLs at `localhost` with the published ports (`MONGODB_URL`, `REDIS_HOST`, `REDIS_PORT`, `RABBITMQ_URL`, `PROBLEM_SERVICE_URL`, `SUBMISSION_SERVICE_URL`). Inside Compose, always use service names (`mongo`, `redis`, `rabbitmq`, `problem`, `submission`), never `localhost`.

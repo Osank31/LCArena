@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { History, LayoutGrid, LogOut, Menu, User, X } from 'lucide-react';
+import {
+    History,
+    LayoutGrid,
+    LogOut,
+    Menu,
+    User,
+    X,
+    Layout,
+} from 'lucide-react';
 import { useEntrance } from '../../animations';
 import { useAuth } from '../../context/AuthContext';
 import { useBackendStatus } from '../../hooks/useBackendStatus';
@@ -57,6 +65,10 @@ export const Navbar: React.FC = () => {
                         <NavLink to="/submissions" className={navLinkClass}>
                             <History className="w-3.5 h-3.5" />
                             <span>Submissions</span>
+                        </NavLink>
+                        <NavLink to="/architecture" className={navLinkClass}>
+                            <Layout className="w-3.5 h-3.5" />
+                            <span>Architecture</span>
                         </NavLink>
                     </nav>
                 </div>

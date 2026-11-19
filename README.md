@@ -34,9 +34,9 @@ flowchart TD
     style Void fill:#ffe0e0,stroke:#c00,stroke-dasharray: 5 5
 ```
 
-Read **[docs/SUBMISSION_EVALUATION_FLOW.md](docs/SUBMISSION_EVALUATION_FLOW.md)**
-for the complete traced lifecycle — every stage, every verdict, the exact event
-names and payloads, and the documented gaps.
+The submission lifecycle is traced in [AGENTS.md](AGENTS.md) (architecture and
+security invariants) and [CLAUDE.md](CLAUDE.md) (commands and verification). The
+language-execution E2E suite is a documented gap — see the Testing section below.
 
 ## Technology stack
 
@@ -71,9 +71,6 @@ LCArena/
 │   ├── middlewares/               # userValidation, roleValidation, appErrorHandler
 │   ├── utils/                     # AppError taxonomy, response envelope, logger, env
 │   └── execution/                 # Executor base + language executors, verdict types
-├── docs/                          # BACKEND.md, SUBMISSION_EVALUATION_FLOW.md, deploy guide
-├── scripts/                       # docker health, seeding, test/coverage runners
-└── tests/load/                    # load-test suite and reports
 ```
 
 ## Documentation
@@ -102,10 +99,10 @@ LCArena/
 
 ### Guides
 
-- **[docs/SUBMISSION_EVALUATION_FLOW.md](docs/SUBMISSION_EVALUATION_FLOW.md)** — the end-to-end submission lifecycle, notification analysis and known gaps. Start here to understand how a verdict reaches a user.
-- [docs/BACKEND.md](docs/BACKEND.md) — operations: environment, health checks, every test command, load profiles, cleanup and troubleshooting.
-- [docs/FRONTEND_DEPLOY_AWS.md](docs/FRONTEND_DEPLOY_AWS.md) — deploying the SPA.
 - [AGENTS.md](AGENTS.md) — system design and the security invariants agents must uphold. **Note:** it describes a Sockets service on port 3007 that is not implemented in this repository.
+- [CLAUDE.md](CLAUDE.md) — project commands, verification steps, and architecture notes (type-check, build, unit tests, integration tests, Docker stack).
+- [TESTING_DOCUMENTATION.md](TESTING_DOCUMENTATION.md) — full test command reference, load-test profiles, coverage gates, and cleanup instructions.
+- [Performance.md](Performance.md) — load-test results and performance tuning notes.
 
 ## Getting started
 
@@ -128,7 +125,7 @@ npm run docker:health     # per-service health table (exit 1 if unhealthy)
 ```
 
 The public entry point is <http://localhost:3000>. The full port matrix, Compose
-variables and security notes are in [docs/BACKEND.md](docs/BACKEND.md).
+variables and security notes are in [CLAUDE.md](CLAUDE.md).
 
 Services crash at boot if a required environment variable is missing, and
 `getEnvVariable()` names the missing variable in the log.
@@ -154,44 +151,13 @@ Point its URLs at `localhost` with the published ports (`MONGODB_URL`,
 
 ## Running tests
 
-Backend selections use Turborepo filters that **exclude the frontend and the
-Python service**.
+No unit, integration, or load test suites remain in the repository — the
+`test/unit`, `test/integration`, and `tests/load` directories and their
+`test:*` npm scripts were removed from every workspace.
 
-```sh
-# Unit tests: pure Node, no MongoDB/Redis/RabbitMQ/Docker needed
-npm run test:backend
-npm run test:backend -- --filter=@LCArena/utils       # one workspace
-npm run test:coverage                                  # + aggregated coverage reports
-
-# Typecheck and build every backend workspace
-npm run check-types:backend
-npm run build:backend
-
-# Integration: boots isolated infra (Mongo 27018, Redis 6380, RabbitMQ 5673)
-# and real services, then runs the API + submission-pipeline suites. Needs Docker.
-npm run test:integration
-npm run test:integration -- --suites=api               # HTTP contracts only
-
-# Everything fast: typecheck -> build -> unit tests
-npm run test:all:fast
-npm run test:all                                       # + integration
-
-# Load tests (smoke 10/100, normal 50/1000, stress 200/5000)
-npm run seed:problems
-TEST_PROBLEM_ID=<id> npm run test:load -- --profile=smoke --target=problem
-npm run test:load -- --infra --profile=smoke --target=all
-```
-
-Per-service suites, the opt-in Docker E2E test and frontend Vitest suites are
-documented in each service README, and the full command reference is in
-[docs/BACKEND.md](docs/BACKEND.md).
-
-The execution worker's end-to-end test is opt-in and is the only automated proof
-of the full pipeline including sandboxed Docker execution:
-
-```sh
-cd apps/apis/execution && E2E=1 npm run test:integration
-```
+To restore testing, add unit test files under `test/unit/` (per workspace)
+and re-add `test:unit` scripts, or re-create `tests/load/` and the
+load-test runner. Until then, `npm run test:*` commands are unavailable.
 
 ## Other root scripts
 
@@ -225,7 +191,3 @@ These are enforced in code and must not be weakened:
   `127.0.0.1` in the development Compose file. The execution worker mounts the
   host Docker socket, which is **development-only** and must never be treated as a
   production security boundary.
-
-Known hardening gaps in the sandbox (no memory/CPU limits, no network isolation)
-and in the notification path are documented in
-[docs/SUBMISSION_EVALUATION_FLOW.md](docs/SUBMISSION_EVALUATION_FLOW.md#10-gaps-race-conditions-and-reliability-issues).

@@ -1,7 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Editor, { type BeforeMount, type OnMount } from '@monaco-editor/react';
 import axios from 'axios';
-import { Minus, Plus } from 'lucide-react';
+import {
+    AlertCircle,
+    Check,
+    Copy,
+    CornerDownLeft,
+    Loader2,
+    Minus,
+    Plus,
+    Sparkles,
+    X,
+} from 'lucide-react';
 import { SupportedLanguage } from '../../types/submission.types';
 
 interface CodeEditorPaneProps {
@@ -146,8 +156,19 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
     onFontSizeChange,
 }) => {
     const monacoLang = LANGUAGE_MAP[language] || 'plaintext';
-    const abortControllerRef = useRef<AbortController | null>(null);
-    const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const editorRef = useRef<any>(null);
+    const monacoRef = useRef<any>(null);
+
+    // AI suggestion states (button-driven, zero background typing calls)
+    const [isGenerating, setIsGenerating] = useState<boolean>(false);
+    const [activeSuggestion, setActiveSuggestion] = useState<string | null>(null);
+    const [suggestionMeta, setSuggestionMeta] = useState<{
+        model?: string;
+        tokens?: number;
+        latencyMs?: number;
+    } | null>(null);
+    const [aiError, setAiError] = useState<string | null>(null);
+    const [isCopied, setIsCopied] = useState<boolean>(false);
 
     // Manage internal font size state synced with localStorage
     const [internalFontSize, setInternalFontSize] = useState<number>(() => {
@@ -192,68 +213,156 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
         updateFontSize(DEFAULT_FONT_SIZE);
     };
 
-    // Debounced AI completion request
-    const fetchSuggestions = useCallback(
-        async (code: string, offset: number) => {
-            if (!aiEnabled) return;
+    // User-triggered AI Suggestion request via UI button (no unprompted token consumption)
+    const handleFetchAiSuggestion = async () => {
+        setIsGenerating(true);
+        setAiError(null);
+        setActiveSuggestion(null);
 
-            abortControllerRef.current?.abort();
-            const controller = new AbortController();
-            abortControllerRef.current = controller;
+        try {
+            let code = value;
+            let row = 0;
+            let col = 0;
+            let prefix = code;
+            let suffix = '';
 
-            try {
-                const prefix = code.slice(0, offset);
-                const suffix = code.slice(offset);
-
-                await axios.post(
-                    `${AI_BASE_URL}/suggestions`,
-                    {
-                        prefix,
-                        suffix,
-                        language_id: monacoLang,
-                        cursor_position: { row: 1, col: 1 },
-                    },
-                    { signal: controller.signal },
-                );
-            } catch (err) {
-                if (!axios.isCancel(err)) {
-                    // Ignore suggestion errors gracefully
+            if (editorRef.current) {
+                const model = editorRef.current.getModel();
+                const position = editorRef.current.getPosition();
+                if (model && position) {
+                    code = model.getValue();
+                    const offset = model.getOffsetAt(position);
+                    prefix = code.slice(0, offset);
+                    suffix = code.slice(offset);
+                    row = position.lineNumber - 1;
+                    col = position.column - 1;
                 }
             }
-        },
-        [aiEnabled, monacoLang],
-    );
 
-    const handleEditorMount: OnMount = (editor) => {
-        editor.onDidChangeCursorPosition((e) => {
-            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-            debounceTimerRef.current = setTimeout(() => {
-                const model = editor.getModel();
-                if (!model) return;
-                const offset = model.getOffsetAt(e.position);
-                fetchSuggestions(model.getValue(), offset);
-            }, 500);
-        });
+            if (!code.trim()) {
+                setAiError('Please write some code before requesting a suggestion.');
+                setIsGenerating(false);
+                return;
+            }
+
+            const response = await axios.post(`${AI_BASE_URL}/suggestions`, {
+                prefix,
+                suffix,
+                language_id: monacoLang,
+                cursor_position: {
+                    row: Math.max(0, row),
+                    col: Math.max(0, col),
+                },
+                editor_info: 'LCArena-Monaco',
+            });
+
+            const choices = response.data?.choices || [];
+            if (choices.length > 0 && choices[0]?.insert_text) {
+                setActiveSuggestion(choices[0].insert_text);
+                setSuggestionMeta({
+                    model: response.data?.model,
+                    tokens: response.data?.usage?.total_tokens,
+                    latencyMs: response.data?.latency_ms,
+                });
+            } else {
+                setAiError(
+                    'No suggestion could be generated for the current context. Try adding more code context or positioning the cursor.',
+                );
+            }
+        } catch (err: any) {
+            setAiError(
+                err.response?.data?.detail ||
+                    'Failed to generate AI suggestion. Please check your network connection.',
+            );
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
-    useEffect(() => {
-        return () => {
-            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-            abortControllerRef.current?.abort();
-        };
-    }, []);
+    // User button: Insert suggestion into code editor at the current cursor position
+    const handleInsertAtCursor = () => {
+        if (!activeSuggestion) return;
+
+        if (editorRef.current && monacoRef.current) {
+            const position = editorRef.current.getPosition() || { lineNumber: 1, column: 1 };
+            const selection = editorRef.current.getSelection();
+            const range =
+                selection && !selection.isEmpty()
+                    ? selection
+                    : new monacoRef.current.Range(
+                          position.lineNumber,
+                          position.column,
+                          position.lineNumber,
+                          position.column,
+                      );
+
+            editorRef.current.executeEdits('ai-suggestion', [
+                {
+                    range,
+                    text: activeSuggestion,
+                    forceMoveMarkers: true,
+                },
+            ]);
+            editorRef.current.focus();
+        } else {
+            onChange(value + (value.endsWith('\n') ? '' : '\n') + activeSuggestion);
+        }
+        setActiveSuggestion(null);
+    };
+
+    // User button: Copy suggestion to clipboard
+    const handleCopySuggestion = async () => {
+        if (!activeSuggestion) return;
+        try {
+            await navigator.clipboard.writeText(activeSuggestion);
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 2000);
+        } catch {
+            // Clipboard fallback
+        }
+    };
+
+    const handleEditorMount: OnMount = (editor, monaco) => {
+        editorRef.current = editor;
+        monacoRef.current = monaco;
+    };
 
     return (
         <div
             className="w-full h-full relative bg-paper flex flex-col"
             data-testid="code-editor-container"
         >
-            {/* Editor top toolbar with font size controls */}
+            {/* Editor top toolbar with AI Suggestion Button and Font Size Controls */}
             <div className="flex items-center justify-between px-3 py-1.5 bg-paper-2 border-b border-rule text-xs text-ink-3 select-none shrink-0">
-                <div className="flex items-center gap-2">
-                    <span className="font-mono text-[11px] uppercase tracking-widest text-ink-2">
+                <div className="flex items-center gap-3">
+                    <span className="font-mono text-[11px] uppercase tracking-widest text-ink-2 font-semibold">
                         {monacoLang}
                     </span>
+
+                    {/* Button-driven AI Suggestion Trigger (zero unprompted token cost) */}
+                    <button
+                        onClick={handleFetchAiSuggestion}
+                        disabled={isGenerating}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-mono transition cursor-pointer border active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+                            aiEnabled
+                                ? 'bg-ink text-paper border-ink hover:bg-ink-2'
+                                : 'bg-paper text-ink border-rule-2 hover:border-ink hover:bg-paper-3'
+                        }`}
+                        title="Click to generate an AI code suggestion based on current code"
+                        aria-label="Get AI Suggestion"
+                    >
+                        {isGenerating ? (
+                            <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                <span>Thinking...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>Get AI Suggestion</span>
+                            </>
+                        )}
+                    </button>
                 </div>
 
                 {/* Font size increase / decrease buttons */}
@@ -289,6 +398,92 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
                     </button>
                 </div>
             </div>
+
+            {/* AI Suggestion Display Panel (with dedicated Insert, Copy & Dismiss buttons) */}
+            {activeSuggestion && (
+                <div
+                    className="bg-paper-2 border-b border-rule px-3.5 py-2.5 flex flex-col gap-2 shrink-0 shadow-xs"
+                    data-testid="ai-suggestion-panel"
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="w-3.5 h-3.5 text-ink-2" />
+                            <span className="font-mono text-xs font-semibold text-ink">
+                                AI Suggestion
+                            </span>
+                            {suggestionMeta?.model && (
+                                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-paper-3 text-ink-3 border border-rule-2">
+                                    {suggestionMeta.model}
+                                </span>
+                            )}
+                            {suggestionMeta?.latencyMs !== undefined && (
+                                <span className="text-[10px] font-mono text-ink-3">
+                                    {suggestionMeta.latencyMs}ms
+                                </span>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => setActiveSuggestion(null)}
+                            className="text-ink-3 hover:text-ink p-1 rounded hover:bg-paper-3 transition cursor-pointer"
+                            title="Dismiss suggestion"
+                            aria-label="Dismiss suggestion"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+
+                    {/* Suggestion Code Preview */}
+                    <pre className="font-mono text-xs bg-paper-3 border border-rule-2 rounded p-2.5 text-ink overflow-x-auto max-h-36 whitespace-pre leading-relaxed">
+                        <code>{activeSuggestion}</code>
+                    </pre>
+
+                    {/* Action Buttons to Insert or Copy the suggestion */}
+                    <div className="flex items-center justify-between gap-2 pt-0.5">
+                        <span className="text-[11px] font-mono text-ink-3 hidden sm:inline">
+                            Review suggestion and click Insert to apply to your code.
+                        </span>
+                        <div className="flex items-center gap-2 ml-auto">
+                            <button
+                                onClick={handleCopySuggestion}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono text-ink-2 bg-paper-3 border border-rule hover:border-ink hover:text-ink transition cursor-pointer active:scale-95"
+                                title="Copy code to clipboard"
+                            >
+                                {isCopied ? (
+                                    <Check className="w-3.5 h-3.5 text-green-700" />
+                                ) : (
+                                    <Copy className="w-3.5 h-3.5" />
+                                )}
+                                <span>{isCopied ? 'Copied!' : 'Copy'}</span>
+                            </button>
+                            <button
+                                onClick={handleInsertAtCursor}
+                                className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono text-paper bg-ink hover:bg-ink-2 border border-ink transition cursor-pointer active:scale-95 font-semibold"
+                                title="Insert this code at cursor position"
+                            >
+                                <CornerDownLeft className="w-3.5 h-3.5" />
+                                <span>Insert at Cursor</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Error Message if AI generation fails */}
+            {aiError && (
+                <div className="bg-paper-3 border-b border-rule px-3 py-2 flex items-center justify-between text-xs text-ink-2 font-mono shrink-0">
+                    <div className="flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-ink" />
+                        <span>{aiError}</span>
+                    </div>
+                    <button
+                        onClick={() => setAiError(null)}
+                        className="text-ink-3 hover:text-ink p-1 rounded transition cursor-pointer"
+                        title="Dismiss error"
+                    >
+                        <X className="w-3 h-3" />
+                    </button>
+                </div>
+            )}
 
             <div className="flex-1 overflow-hidden">
                 <Editor

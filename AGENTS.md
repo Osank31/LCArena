@@ -449,20 +449,11 @@ docker compose up -d  # Start MongoDB, Redis, RabbitMQ, and services
 
 ### 8.3 Running Tests
 
-Each API service contains dedicated end-to-end API suites and load tests using Node.js built-in test runner (`node:test`):
-
-```sh
-# Gateway End-to-End Suite (Exercises full auth, RBAC, and proxying)
-cd apps/apis/gateway && npm test
-
-# Problem Service Suite
-cd apps/apis/problem && npm test
-cd apps/apis/problem && npm run test:load
-
-# Submission Service Suite
-cd apps/apis/submission && npm test
-cd apps/apis/submission && TEST_USER_ID=<valid_user_id> npm run test:load
-```
+No unit, integration, or load test suites remain in the repository — the
+`test/unit`, `test/integration`, and `tests/load` directories and their
+`test:*` npm scripts were removed from every workspace. To restore testing,
+add unit test files under `test/unit/` (per workspace) and re-add `test:unit`
+scripts, or re-create `tests/load/` and the load-test runner.
 
 ---
 

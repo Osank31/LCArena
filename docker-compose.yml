@@ -68,6 +68,7 @@ services:
             start_period: 30s
 
     minio:
+        container_name: lcarena-minio
         image: coollabsio/minio:latest
         restart: unless-stopped
         command: ['server', '/data', '--console-address', ':9001']
@@ -321,6 +322,7 @@ services:
             - '127.0.0.1:${AI_SUGGESTION_HOST_PORT:-8000}:8000'
         environment:
             ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+            ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-4-5-20250929}
         healthcheck:
             test:
                 [
