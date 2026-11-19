@@ -12,7 +12,7 @@ export interface AcquiredTestCases {
 }
 
 /**
- * The `submission.completed` payload contract (see AGENTS.md §5.3).
+ * The `submission.completed` payload contract (see README.md §3.5).
  */
 export interface SubmissionCompletedPayload {
     submissionId: string;

@@ -129,7 +129,7 @@ The throw happens at **module load** in every `constants.ts`/`env.config.ts`
 because those files call it at the top level — which is why a service with a
 missing required variable dies immediately at boot with a clear message instead of
 failing on the first request. This is the intended behaviour and is documented in
-[`docs/BACKEND.md`](../../../docs/BACKEND.md) troubleshooting.
+[README.md](../../../README.md).
 
 ### `logger`
 
@@ -152,7 +152,7 @@ used by `scripts/docker/health.mjs` for the health report.
 
 Never log an OTP, password, token or test-case body: the existing code goes out of
 its way to avoid this (`otp.service.ts`, `mailer.ts`), and keeping it that way is
-part of the security invariants in `AGENTS.md`.
+part of the security invariants in [README.md](../../../README.md#5-security-invariants).
 
 ## Public API
 
@@ -257,4 +257,4 @@ Unit tests are pure Node (`node:test` via `tsx`) with no network or database.
 - [`@LCArena/middlewares`](../middlewares/README.md) — turns these errors into HTTP responses.
 - [`@LCArena/config`](../config/README.md) — uses `logger` and `InternalServerError`.
 - [`@LCArena/models`](../models/README.md), [`@LCArena/execution`](../execution/README.md) — both depend on this package.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md).
+- [README.md](../../../README.md).

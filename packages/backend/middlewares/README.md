@@ -223,4 +223,4 @@ npm test        # unit suite with module mocks; no infrastructure
 - [`@LCArena/models`](../models/README.md) — the `User` lookup and `UserType`.
 - [Gateway](../../../apps/apis/gateway/README.md) — `authenticate`, `notFoundHandler`, `requireSubmissionOwner` all follow this package's `req.user` convention.
 - [Submission service](../../../apps/apis/submission/README.md) — the main `userValidation` consumer.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md).
+- [README.md](../../../README.md).

@@ -281,4 +281,4 @@ connection is opened.
 - [Problem service](../../../apps/apis/problem/README.md) — owns `Problem` writes.
 - [Submission service](../../../apps/apis/submission/README.md) — creates `Submission` documents.
 - [Execution worker](../../../apps/apis/execution/README.md) — writes the verdict back.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md).
+- [README.md](../../../README.md).

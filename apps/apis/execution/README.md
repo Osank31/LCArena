@@ -319,8 +319,7 @@ Built by `buildCompletionPayload(submission, status)`; published `persistent` to
 > ⚠️ **Nobody consumes this queue in this repository.** `submission.completed` is
 > declared, written and asserted — and the E2E test subscribes to it — but no
 > production process reads it. See
-> [`docs/SUBMISSION_EVALUATION_FLOW.md`](../../../docs/SUBMISSION_EVALUATION_FLOW.md)
-> for the full analysis.
+> [README.md](../../README.md) for the full analysis.
 
 ## Inter-service communication
 
@@ -456,7 +455,7 @@ Environment overrides: `MONGODB_URL` (default
   API calls themselves.
 - Mounting `/var/run/docker.sock` is equivalent to root on the host. This is a
   development-only arrangement; see
-  [`docs/BACKEND.md`](../../../docs/BACKEND.md) security notes.
+  [README.md](../../README.md) security notes.
 
 ## Related services
 
@@ -464,4 +463,4 @@ Environment overrides: `MONGODB_URL` (default
 - [Problem service](../problem/README.md) — stores the test cases it reads.
 - [`@LCArena/execution`](../../../packages/backend/execution/README.md) — executors and the `ExecutionResult` contract.
 - [`@LCArena/config`](../../../packages/backend/config/README.md) — queue names and storage helpers.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md) — the authoritative end-to-end trace.
+- [README.md](../../README.md) — the authoritative end-to-end trace.

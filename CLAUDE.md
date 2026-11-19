@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-LCArena is a distributed, containerized online judge. It serves a problem catalogue and a Monaco-based coding workspace, accepts user submissions over HTTP, queues them, executes untrusted code in ephemeral Docker containers, and returns a verdict. The repo is a Turborepo + npm workspaces monorepo (Node ≥ 24, npm ≥ 11).
+LCArena is a distributed, containerized online judge. The full architecture, security invariants, data model, and port matrix live in [README.md](README.md). This file records commands, verification steps, and known gaps.
 
 ## Commands
 
@@ -40,75 +40,7 @@ npm run docker:down:volumes  # stop and destroy Mongo/RabbitMQ data
 
 Public entry point: `http://localhost:3000`. Frontend dev: `cd apps/frontend && npm run dev` (port 5173; proxies `/auth`, `/api`, `/health` to gateway :3000 and `/suggestions` to AI service :8000).
 
-## Architecture — big picture
-
-### Services and ports
-
-| Service          | Workspace                         | Port | Role                                                                     |
-| ---------------- | --------------------------------- | ---- | ------------------------------------------------------------------------ |
-| API Gateway      | `apps/apis/gateway`               | 3000 | Public entry: auth, sessions, RBAC, reverse proxy, header sanitization   |
-| Problem          | `apps/apis/problem`               | 3001 | Problem CRUD + markdown problem descriptions + test-case uploads         |
-| Submission       | `apps/apis/submission`            | 3002 | Submission intake; publishes `submission.created` to RabbitMQ            |
-| Mail             | `apps/apis/mail`                  | 3003 | SMTP/OTP email delivery; `POST /otp` answers 202, delivers in background |
-| Execution worker | `apps/apis/execution`             | 3004 | `/health` only; consumes `submission.created`, runs Docker sandboxes     |
-| AI suggestion    | `apps/apis/ai-suggestion-service` | 8000 | Python/FastAPI + Anthropic Claude; fill-in-the-middle code completion    |
-| Frontend         | `apps/frontend`                   | 5173 | React SPA, Vite, Monaco Editor                                           |
-
-Infrastructure: MongoDB 7, Redis 7, RabbitMQ 3.13, MinIO (S3-compatible), host Docker socket (execution sandboxes). All infra bound to `127.0.0.1` in Compose.
-
-### Submission data flow
-
-```
-Frontend (ProblemDetailPage)
-  └─ handleSubmit → POST /api/submissions  (gateway proxies to submission:3002)
-        └─ Gateway: authenticate → strips client x-user-id/authorization,
-             injects verified x-user-id → fail-closed proxy
-              └─ Submission service: userValidation → creates Submission {status: PENDING}
-                   → publishes submission.created to RabbitMQ → 201 Created
-                        └─ Frontend polls GET /api/submissions/:id (1.5s × 20)
-                             └─ Worker consumes submission.created:
-                                   loadProblem → download test cases from S3/MinIO
-                                   → createExecutor(language) runs code in Docker
-                                     (gcc/temurin/python:3.11/node:20, network=none, timeout)
-                                   → persistVerdict (atomic, only while PENDING)
-                                   → publish submission.completed to RabbitMQ
-                                    → verdict rendered in OutputConsole
-```
-
-Verdicts: `SUCCESS` (Accepted), `COMPILE_ERROR`, `WA`, `RE`, `TLE`, `INTERNAL_ERROR`. Output comparison normalizes CRLF/CR→LF, trims trailing whitespace per line, drops trailing blank lines, preserves token-level differences (`compareOutputs`).
-
-### Shared packages (`packages/backend/`)
-
-- `@LCArena/config` — `dbConnect`, `redisConnect`/`getRedisClient`, RabbitMQ `channel`/`queue`/`connectToQueue`, S3 client (`getS3Client`, `putObject`, `getObject`, key-format helpers `getTestCaseInputKey`/`getTestCaseOutputKey`).
-- `@LCArena/models` — Mongoose schemas `User` (`UserType`: Regular/Admin/Premium), `Problem`, `Submission`; `ELanguage` enum (`py`/`cpp`/`java`/`js`).
-- `@LCArena/middlewares` — `userValidation` (services read `x-user-id`), `roleValidation`, `appErrorHandler`, Express `AuthenticatedUser` augmentation.
-- `@LCArena/utils` — `AppError` taxonomy (`BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `InternalServerError`), `sendSuccess`/`sendError`, `logger` (Winston), `getEnvVariable` (crashes at boot if a required var is missing).
-- `@LCArena/execution` — abstract `Executor`, `CPPExecutor`/`JavaExecutor`/`PythonExecutor`/`JSExecutor` (Dockerode, `timeout`, tar-stream test-case injection), `createExecutor(language)` router, `compareOutputs`/`normalizeOutput`.
-
-### Gateway routing & security invariants
-
-- `createServiceProxy` (proxy.factory.ts, http-proxy-middleware) maps `/api/problems` → problem:3001 and `/api/submissions` → submission:3002. Mail (3003) is called directly, not via the proxy registry.
-- Per-request: strips client `x-user-id` and `authorization`, injects verified `x-user-id` from the JWT. Downstream services never see the raw bearer token and must not trust client headers.
-- `notFoundHandler` is mounted after all routes — unmatched routes/methods fail closed with 404, never forwarded downstream.
-- `authenticate` verifies the JWT, checks the Redis JTI blacklist, re-reads the user from Mongo per request (no stale role trust). Admin-only mutations on problems; submission read/update gated by `requireSubmissionOwner` (owner or Admin).
-- Login returns identical `"Invalid email or password"` for wrong password and nonexistent email. Password hashes never leave the server (`toPublicUser()`). Logout/password change/delete revoke the Redis session and blacklist the access token `jti`.
-- Untrusted code never runs on the host — ephemeral Docker containers under `timeout`, removed in `finally` blocks. The worker mounts the host Docker socket (development-only, effectively host root — not a production boundary).
-
-### Frontend integration points
-
-- Vite proxies `/auth`, `/api`, `/health` → :3000 (gateway) and `/suggestions` → :8000 (AI service).
-- `apiClient` (Axios, `withCredentials`) attaches `Authorization: Bearer <token>` from localStorage, auto-refreshes on 401 via `/auth/refresh`, dispatches `lcarena:server-connection-error` on network failure.
-- Submission flow is poll-based (no WebSocket). Code is persisted per problem+language in localStorage; offline falls back to bundled sample problems.
-
-### Known gaps (documented, do not assume implemented)
-
-- The `sockets` service on port 3007 (WebSocket real-time push) is referenced in AGENTS.md and README but **is not implemented** — there is no `apps/apis/sockets` workspace and no consumer of `submission.completed`. The frontend polls for verdicts instead.
-- `apps/apis/payment` and `apps/apis/sse` directories exist but are empty/unwired.
-- The `language-execution` E2E suite target (`test/integration/languages.e2e.ts`) does not exist — C++/Java/Python sandbox execution lacks E2E coverage.
-- ESLint currently crashes before linting any backend file (TypeScript 6 incompatibility); only the frontend has a working ESLint config.
-- Frontend branch coverage (~75%) is below the 80% Vitest gate.
-
-## Verification
+### Verification
 
 After making changes:
 
@@ -118,3 +50,47 @@ After making changes:
 No unit/integration test suites remain in the repository (the `test/*` directories and scripts were removed). `npm run test:all:fast` and the frontend Vitest suite were removed along with them.
 
 When running services outside Docker, point URLs at `localhost` with the published ports (`MONGODB_URL`, `REDIS_HOST`, `REDIS_PORT`, `RABBITMQ_URL`, `PROBLEM_SERVICE_URL`, `SUBMISSION_SERVICE_URL`). Inside Compose, always use service names (`mongo`, `redis`, `rabbitmq`, `problem`, `submission`), never `localhost`.
+
+## Known gaps
+
+- `sockets` service on port 3007 (WebSocket real-time push) is referenced in docs but **is not implemented** — no `apps/apis/sockets` workspace and no consumer of `submission.completed`. The frontend polls for verdicts instead.
+- `apps/apis/payment` and `apps/apis/sse` directories exist but are empty/unwired.
+- The language-execution E2E suite target (`test/integration/languages.e2e.ts`) does not exist — C++/Java/Python sandbox execution lacks E2E coverage.
+- ESLint currently crashes before linting any backend file (TypeScript 6 incompatibility); only the frontend has a working ESLint config.
+- Frontend branch coverage (~75%) is below the 80% Vitest gate.
+
+## Documentation Synchronization (MANDATORY)
+
+This rule applies to every agent and subagent working in the LCArena repository.
+
+Documentation updates are a required part of completing any coding task, not a separate optional step. Whenever you make changes to the codebase, you must automatically identify and update all relevant documentation files before considering the task complete.
+
+CLAUDE.md must not exceed 200 lines total.
+
+### When to update
+
+Update docs when your change touches: API routes/bodies/status codes; environment variables; RabbitMQ queue names or payloads; database fields/Mongoose schemas/indexes; Zod validation rules; security logic (auth/RBAC/header sanitization); service config (ports, dependencies, env vars); architecture (new/removed service, new infra); commands/scripts/verification steps; known gaps.
+
+### Documentation files
+
+Root: README.md (overview, architecture, tech stack, security invariants), CLAUDE.md (commands, verification, gaps), TESTING_DOCUMENTATION.md (testing, CI, coverage), Performance.md (benchmarks, archived to docs/archive/).
+Services: apps/frontend/README.md, apps/apis/{gateway,problem,submission,execution,mail,ai-suggestion-service}/README.md.
+Packages: packages/backend/{config,models,middlewares,utils,execution}/README.md.
+Config: docker-compose*.yml, .env.example, turbo.json, root package.json, Dockerfile, .github/workflows/backend-ci.yml.
+
+### How to update
+
+1. Identify affected files before finishing implementation.
+2. Update minimally — target only affected sections; preserve existing docs; link instead of duplicating.
+3. Verify against source code/config (ports, env vars, queue names, routes, rules). Do not claim updated if unverified.
+4. If no doc update is needed, state why in your completion report.
+
+### Restrictions
+
+- Never modify generated files (package-lock.json, .turbo/, dist/, coverage/), third-party (node_modules/), secrets (.env), or .codegraph/.
+- Do not update unrelated docs or skip updates because they weren't requested.
+- Changes to this section require explicit user consent; agents must not auto-grant standing permissions to edit CLAUDE.md.
+
+### Completion report
+
+Include: docs updated, what changed, verification performed, any docs not updated and why.

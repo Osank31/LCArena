@@ -125,7 +125,7 @@ each error, and is safe to call when nothing was ever connected.
 > `submissionCreatedDeadLetter` with `{ durable: true }`, and publishes
 > completion messages with `{ persistent: true }`. A submission enqueued just
 > before a broker restart can therefore be lost, whereas completions cannot.
-> See [`docs/SUBMISSION_EVALUATION_FLOW.md`](../../../docs/SUBMISSION_EVALUATION_FLOW.md).
+> See [README.md](../../../README.md).
 
 ### Object storage (`storage.config.ts`)
 
@@ -279,7 +279,7 @@ missing variable falls back to a default rather than throwing.
 | `AWS_ACCESS_KEY_ID` / `AWS_ACCESS_KEY` | —                              | Credential fallback  |
 | `AWS_SECRET_ACCESS_KEY`                | —                              | Credential fallback  |
 
-Cloudflare R2 profile (see [`docs/BACKEND.md`](../../../docs/BACKEND.md)):
+Cloudflare R2 profile (see [README.md](../../../README.md)):
 `S3_ENDPOINT=https://<account>.r2.cloudflarestorage.com`, `S3_REGION=auto`,
 `S3_FORCE_PATH_STYLE=false`.
 
@@ -345,4 +345,4 @@ Neither suite opens a real network connection.
 - [Problem service](../../../apps/apis/problem/README.md) — the main storage consumer for writes.
 - [Execution worker](../../../apps/apis/execution/README.md) — the main storage consumer for reads.
 - [Gateway](../../../apps/apis/gateway/README.md) — the only Redis consumer.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md).
+- [README.md](../../../README.md).

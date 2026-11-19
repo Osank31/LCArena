@@ -3,7 +3,7 @@ name: Backend CI
 # Runs the checks that need NO infrastructure: typecheck, build, unit tests and
 # coverage. Integration tests, load tests and the Docker Compose stack are
 # deliberately separate — they need MongoDB/Redis/RabbitMQ and a Docker daemon,
-# so they belong in an environment that can provide them (see docs/BACKEND.md).
+# so they belong in an environment that can provide them (see README.md).
 on:
     push:
         branches: [main, master]

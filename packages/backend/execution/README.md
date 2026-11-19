@@ -414,4 +414,4 @@ Open hardening gaps (documented, not fixed):
 - [`@LCArena/models`](../models/README.md) — stores `ExecutionResult` in `Submission.status`.
 - [`@LCArena/utils`](../utils/README.md) — `logger`.
 - [`@LCArena/config`](../config/README.md) — test-case storage the worker stages into `testCasesDir`.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md) — the complete end-to-end trace, including these gaps.
+- [README.md](../../../README.md) — the complete end-to-end trace, including these gaps.

@@ -179,7 +179,7 @@ Verified behaviour in the current frontend source:
 - Requests are only sent when the user toggles **AI** on (`aiEnabled`); with AI
   off, `fetchSuggestions` returns immediately.
 - Trigger: `editor.onDidChangeCursorPosition` **debounced by 500 ms** (the
-  repository's `AGENTS.md` says 400 ms — the code says 500).
+  code says 500).
 - Cancellation: the previous request's `AbortController` is aborted on each new
   trigger, and on unmount. Axios cancellations are swallowed silently.
 - The request body is `{ prefix, suffix, language_id, cursor_position: { row: 1,

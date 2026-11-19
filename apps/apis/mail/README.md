@@ -250,4 +250,4 @@ completes, `503` when saturated).
 ## Related services
 
 - [Gateway](../gateway/README.md) — the only caller (`mail.client.ts` → `axios.post`) and the owner of the matching shared secret.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md) — where OTP delivery sits in the wider system.
+- [README.md](../../README.md) — where OTP delivery sits in the wider system.

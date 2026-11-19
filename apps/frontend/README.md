@@ -269,9 +269,7 @@ Development proxy (`vite.config.ts`):
 Because the SPA and gateway share an origin in development, CORS is not
 exercised locally. For a separate deployment origin, set `CORS_ORIGIN` on the
 gateway to the frontend origin — a cookie-bearing cross-origin setup requires an
-explicit allowlist, not `*` reflection with credentials in production. See
-[`docs/FRONTEND_DEPLOY_AWS.md`](../../docs/FRONTEND_DEPLOY_AWS.md) for the AWS
-deployment guide.
+explicit allowlist, not `*` reflection with credentials in production.
 
 ## Dependencies and prerequisites
 
@@ -351,7 +349,7 @@ Documented rather than fixed:
 2. **No push notification path.** The worker publishes `submission.completed`
    into a queue that nothing consumes; the SPA polls instead. Any real-time
    feature requires a new consumer plus a client channel — see
-   [`docs/SUBMISSION_EVALUATION_FLOW.md`](../../docs/SUBMISSION_EVALUATION_FLOW.md).
+   [README.md](../../README.md).
 3. **The in-browser judge is dead code** from the user's perspective: `runCode`
    and friends are implemented and tested but not invoked by the Run button.
 4. **History is device-local.** There is no `GET /api/submissions?userId=…`
@@ -365,4 +363,4 @@ Documented rather than fixed:
 - [Problem service](../apis/problem/README.md) — the real source of problems.
 - [Submission service](../apis/submission/README.md) — submission intake.
 - [AI suggestion service](../apis/ai-suggestion-service/README.md) — `/suggestions`.
-- [Submission evaluation flow](../../docs/SUBMISSION_EVALUATION_FLOW.md) — how a verdict reaches the UI.
+- [README.md](../../README.md) — how a verdict reaches the UI.

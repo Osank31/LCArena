@@ -236,4 +236,4 @@ back with the MongoDB driver to prove it landed. The load test is read-only.
 - [Execution worker](../execution/README.md) — consumes the test cases this service stores.
 - [`@LCArena/config`](../../../packages/backend/config/README.md) — storage helpers and the key layout.
 - [`@LCArena/models`](../../../packages/backend/models/README.md) — the `Problem` schema.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md).
+- [README.md](../../README.md).

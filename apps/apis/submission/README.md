@@ -43,7 +43,7 @@ flowchart LR
 The service is fire-and-forget from the client's perspective: the response says
 "accepted", not "judged". The verdict arrives in MongoDB later and the client
 polls for it — see
-[`docs/SUBMISSION_EVALUATION_FLOW.md`](../../../docs/SUBMISSION_EVALUATION_FLOW.md).
+[README.md](../../README.md).
 
 ## Technology stack
 
@@ -269,4 +269,4 @@ TEST_USER_ID=<id> CONCURRENT_REQUESTS=200 npm run test:load
 - [Execution worker](../execution/README.md) — consumes `submission.created` and writes the verdict.
 - [`@LCArena/models`](../../../packages/backend/models/README.md) — the `Submission` schema.
 - [`@LCArena/execution`](../../../packages/backend/execution/README.md) — the `ExecutionResult` contract.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md).
+- [README.md](../../README.md).

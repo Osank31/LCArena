@@ -51,9 +51,6 @@ flowchart LR
     Auth -->|"users"| Mongo
 ```
 
-The gateway is the trust boundary: it is the only component that reads the JWT,
-and the only one allowed to write `x-user-id` onto an upstream request.
-
 ## Technology stack
 
 | Concern           | Choice                                                                                          |
@@ -318,5 +315,5 @@ contract and needs MongoDB, Redis and the services running.
 - [Submission service](../submission/README.md) — proxied at `/api/submissions`.
 - [Mail service](../mail/README.md) — OTP delivery.
 - [Execution worker](../execution/README.md) — where submissions go after intake.
-- [Submission evaluation flow](../../../docs/SUBMISSION_EVALUATION_FLOW.md) — end-to-end lifecycle.
+- [README.md](../../README.md) — end-to-end lifecycle.
 - [`@LCArena/middlewares`](../../../packages/backend/middlewares/README.md), [`@LCArena/models`](../../../packages/backend/models/README.md), [`@LCArena/utils`](../../../packages/backend/utils/README.md), [`@LCArena/config`](../../../packages/backend/config/README.md).
